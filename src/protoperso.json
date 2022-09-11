@@ -1,0 +1,42 @@
+
+{
+    "Identité": "Jean la Mèche",
+    "Supérieur": "Baal",
+    "Faction": "Démon",
+    "Pool de PA": 16,
+    "Grade": 0,
+    "Talents principaux":[
+      {
+        "Nom": "Baratin",
+        "Niveau": 0.5
+      },
+      {
+        "Nom": "Combat (général)",
+        "Niveau": 6.5,
+      },    {
+        "Nom": "Combat (crayon très affuté)",
+        "Niveau": 10
+      }
+    ],
+    "Talents secondaire":[
+      {
+        "Nom": "Acrobatie",
+        "Niveau": 5.5
+      },
+      {
+        "Nom": "Athlétisme",
+        "Niveau": 6.5
+      },
+  
+    ],
+    "Talents exotiques":[
+      {
+        "Nom": "S'occuper des chiens",
+        "Niveau": 3
+      }
+    ],
+    "Pouvoirs":{
+      "Nom": "Art de combat",
+      "Niveau": 2
+    }
+  }

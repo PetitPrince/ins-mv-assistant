@@ -1,7 +1,7 @@
 import './App.css';
 import { MantineProvider, NumberInputProps } from '@mantine/core';
 import { Button, TextInput, NumberInput, Autocomplete, Stack, Group, Select, Title, Table } from '@mantine/core';
-import { Radio, Grid, ActionIcon } from '@mantine/core';
+import { Radio, Grid, ActionIcon, Dialog } from '@mantine/core';
 import { talents_par_defaut } from './talents';
 import { IconPlus, IconMinus, IconRotate, IconCheck, IconX } from '@tabler/icons'
 import React, { Component } from 'react';
@@ -882,6 +882,44 @@ function Pouvoirs(props: { pouvoirsDuPerso: any; }) {
   );
 }
 
+
+function PersistentPanel() {
+
+  return <Dialog opened={true} position={{ top: 20, right: 20 }}>
+    <Table>
+      <thead>
+        <tr>
+          <th>PA</th>
+          <th>Item</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1337</td>
+          <td> initial</td>
+        </tr>
+        <tr>
+          <td>-4</td>
+          <td> caracteristiques</td>
+          <td>
+            <IconCheck size={12} />
+            <IconX size={12} />
+          </td>
+        </tr>
+        <tr>
+          <td>24</td>
+          <td> total</td>
+          <td>
+            <IconCheck size={12} />
+            <IconX size={12} />
+          </td>
+        </tr>
+      </tbody>
+    </Table>
+
+  </Dialog>;
+}
 // ====================================================
 
 interface AssistantState {
@@ -1041,6 +1079,7 @@ class Assistant extends React.Component<AssistantProps, AssistantState> {
 
     return (
       <Stack>
+        <PersistentPanel />
         <Generalites
           identite={this.state.identite} handleIdentiteChange={this.handleIdentiteChange}
           faction={this.state.faction} handleFactionChange={this.handleFactionChange}

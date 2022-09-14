@@ -3,8 +3,16 @@
     "Identité": "Jean la Mèche",
     "Supérieur": "Baal",
     "Faction": "Démon",
-    "Pool de PA": 16,
-    "Grade": 0,
+    "PA": 16,
+    "Grade": 3,
+    "Caracteristique":{
+      "force": 4,
+      "agilite": 6,
+      "perception": 5,
+      "volonte": 7,
+      "presence": 1.5,
+      "foi": 5
+    },
     "Talents principaux":[
       {
         "Nom": "Baratin",
@@ -26,7 +34,7 @@
       {
         "Nom": "Athlétisme",
         "Niveau": 6.5
-      },
+      }
   
     ],
     "Talents exotiques":[

@@ -21,14 +21,13 @@ const INSMVNumberInput = (props: any) => {
 
 const INSMVCaraNumberInput = (props: any) => {
 
-  const { computeCaracCost, initialValue, ...restOfTheProps } = props; // extracting computeCaracCost and initialValue from props (I want to pass props forward to NumberInput)
-  const coutPourUneUpgradeDeForce = computeCaracCost(props.value, initialValue);
-  const isTooUpgradeExpenseive = coutPourUneUpgradeDeForce > props.pa;
+  const { initialValue, ...restOfTheProps } = props; // extracting  initialValue from props (I want to pass props forward to NumberInput)
   const variant = props.value === initialValue ? "default" : "filled";
-  const errMsg = isTooUpgradeExpenseive ? "Pas assez de PA" : "";
+  const radius = props.value === initialValue ? "sm" : "xl";
+
 
   return (
-    <INSMVNumberInput {...restOfTheProps} variant={variant} error={errMsg} min={1.5} max={9.5} />
+    <INSMVNumberInput {...restOfTheProps} variant={variant} min={1.5} max={9.5} radius={radius} />
   )
 };
 
@@ -150,24 +149,25 @@ function Caracteristiques(props: TCaraFuncProps) {
         [cara]: val
       },
       caraBillingItem: {
-        ["cara_"+cara]: {
+        ["cara_" + cara]: {
           msg: [cara] + ": " + props.initialcaracteristiques[cara] + "->" + val,
           cost: computeCaracCost(val, props.initialcaracteristiques[cara])
         }
       }
     }
     props.onChangeCara(updateMap);
+
   }
 
   return (
     <Stack>
       <Title order={2}>Caractéristiques</Title>
       <Group>
-        <INSMVCaraNumberInput label="Force" value={state.force} initialValue={props.initialcaracteristiques.force} onChange={(val: number) => { onChangeCara(val, "force") }} computeCaracCost={computeCaracCost} pa={props.pa} />
-        <INSMVCaraNumberInput label="Agilité" value={state.agilite} initialValue={props.initialcaracteristiques.agilite} onChange={(val: number) => { onChangeCara(val, "agilite") }} computeCaracCost={computeCaracCost} pa={props.pa} />
-        <INSMVCaraNumberInput label="Perception" value={state.perception} initialValue={props.initialcaracteristiques.perception} onChange={(val: number) => { onChangeCara(val, "perception") }} computeCaracCost={computeCaracCost} pa={props.pa} />
-        <INSMVCaraNumberInput label="Présence" value={state.presence} initialValue={props.initialcaracteristiques.presence} onChange={(val: number) => { onChangeCara(val, "presence") }} computeCaracCost={computeCaracCost} pa={props.pa} />
-        <INSMVCaraNumberInput label="Foi" value={state.foi} initialValue={props.initialcaracteristiques.foi} onChange={(val: number) => { onChangeCara(val, "foi") }} computeCaracCost={computeCaracCost} pa={props.pa} />
+        <INSMVCaraNumberInput label="Force" value={state.force} initialValue={props.initialcaracteristiques.force} onChange={(val: number) => { onChangeCara(val, "force") }} />
+        <INSMVCaraNumberInput label="Agilité" value={state.agilite} initialValue={props.initialcaracteristiques.agilite} onChange={(val: number) => { onChangeCara(val, "agilite") }} />
+        <INSMVCaraNumberInput label="Perception" value={state.perception} initialValue={props.initialcaracteristiques.perception} onChange={(val: number) => { onChangeCara(val, "perception") }} />
+        <INSMVCaraNumberInput label="Présence" value={state.presence} initialValue={props.initialcaracteristiques.presence} onChange={(val: number) => { onChangeCara(val, "presence") }} />
+        <INSMVCaraNumberInput label="Foi" value={state.foi} initialValue={props.initialcaracteristiques.foi} onChange={(val: number) => { onChangeCara(val, "foi") }} />
       </Group>
 
       {/* <Text>debug force: {props.force}; debug agilite {props.agilite}</Text> */}
@@ -178,18 +178,16 @@ function Caracteristiques(props: TCaraFuncProps) {
 }
 
 
-function BillingPanel(props: 
-  { billingState: { [s: string]: IBillingItem; }}) {
+function BillingPanel(props:
+  {
+    billingState: { [s: string]: IBillingItem; },
+    initialPa: number,
+    paAfterBillingHandler: (x: number) => void
+  }) {
 
-  console.log(props);
-  let sum = 0;
-
-  for (const billingItem of Object.values(props.billingState)) {
-    sum+= billingItem.cost;
-    
-  }
-
-  
+  const billingItems = Object.values(props.billingState);
+  const sum = calcBillingItemSum(billingItems);
+  const remainingPa = props.initialPa - sum;
 
   // maybe use Dialog instead
   return <Dialog opened={true} position={{ top: 20, right: 20 }}>
@@ -201,33 +199,36 @@ function BillingPanel(props:
           <th>Action</th>
         </tr>
       </thead>
-      <tbody> 
+      <tbody>
+        <tr>
+          <td>{props.initialPa}</td>
+          <td> Initial</td>
+        </tr>
+
         {
-          Object.values(props.billingState)
-            .map((billingItem: any) => {
-              if (Object.keys(billingItem).length){
+          Object.entries(props.billingState as {[k:string] : IBillingItem})
+            .map(([billingKey, billingItem]) => {
+              if (Object.keys(billingItem).length) {
                 return (
-                  <tr>
-                    <td>{billingItem.cost}</td>
+                  <tr key={billingKey}>
+                    <td>-{billingItem.cost}</td>
                     <td>{billingItem.msg}</td>
+                    <td>
+                      <IconCheck size={16} />
+                      <IconX size={16} />
+                    </td>
                   </tr>
-  
+
                 );
-              }else{
+              } else {
                 return;
               }
             })
 
         }
-
-
         <tr>
-          <td>{sum}</td>
+          <td>{remainingPa}</td>
           <td> total</td>
-          <td>
-            <IconCheck size={12} />
-            <IconX size={12} />
-          </td>
         </tr>
       </tbody>
     </Table>
@@ -238,12 +239,6 @@ function BillingPanel(props:
 
 type TcaracteristiquesSet = {
   [K in "force" | "agilite" | "perception" | "volonte" | "presence" | "foi" as string]: number;
-  // force: number;
-  // agilite: number;
-  // perception: number;
-  // volonte: number;
-  // presence: number;
-  // foi: number;  
 }
 
 interface IPerso {
@@ -258,15 +253,11 @@ interface IPerso {
   ppMax: number;
 
 }
-interface IAssistantProps {
-  perso: IPerso;
-}
 interface IAssistantState extends IPerso {
   billingState?: {
-    caracteristiquess?: IBillingItem[],
-    talents?: IBillingItem[],
-    pouvoirs?: IBillingItem[]
+    [x: string]: IBillingItem
   };
+  paAfterBilling: number
 
 }
 interface IBillingItem {
@@ -274,23 +265,41 @@ interface IBillingItem {
   cost: number
 }
 
-function FeuilleDePerso(props: any) {
+function calcBillingItemSum(billingItems: IBillingItem[]) {
+  let sum = 0;
+  for (const billingItem of billingItems) {
+    sum += billingItem.cost;
+  }
+  return sum;
+}
+
+function FeuilleDePerso(props: { perso: IPerso }) {
   const [state, setState] = useSetState({
     ...props.perso,
     billingState: {
-    }
+    },
+    paAfterBilling: props.perso.pa
   });
 
   const statusChangeHandler = (updatedState: Pick<IAssistantState, keyof IAssistantState>) => {
     setState(updatedState);
   }
-  const caraChangeHandler = (updateMap: {caracteristiques: Partial<TcaracteristiquesSet>; caraBillingItem: IBillingItem; }) => {
+  const caraChangeHandler = (updateMap: { caracteristiques: Pick<TcaracteristiquesSet, keyof TcaracteristiquesSet>; caraBillingItem: IBillingItem; }) => {
     console.log(updateMap);
-    let updatedBillingState = {
+    const updatedBillingState = {
       ...state.billingState,
       ...updateMap.caraBillingItem
     }
-    setState({ billingState: updatedBillingState })
+
+    const billingItems: IBillingItem[] = Object.values(updatedBillingState) as unknown as IBillingItem[];
+    const sum = calcBillingItemSum(billingItems);
+    const updatedPaAfterBilling = state.pa - sum;
+
+    setState({
+      billingState: updatedBillingState,
+      paAfterBilling: updatedPaAfterBilling
+    })
+
 
     setState({
       caracteristiques: {
@@ -299,16 +308,21 @@ function FeuilleDePerso(props: any) {
       }
     })
   };
+  const paAfterBillingHandler = (val: number) => {
+    setState({ paAfterBilling: val });
+  }
 
   return (
     <Stack>
 
-      <BillingPanel billingState={state.billingState} />
+      <BillingPanel billingState={state.billingState}
+        initialPa={props.perso.pa}
+        paAfterBillingHandler={paAfterBillingHandler} />
 
       <Caracteristiques caracteristiques={state.caracteristiques}
         initialcaracteristiques={props.perso.caracteristiques}
         onChangeCara={caraChangeHandler}
-        pa={state.pa}
+        pa={state.paAfterBilling}
       />
       <Status2 pa={state.pa} paTotal={state.paTotal} statusChangeHandler={statusChangeHandler}
         force={state.caracteristiques.force} faction={state.faction} />

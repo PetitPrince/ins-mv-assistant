@@ -22,12 +22,14 @@ const INSMVNumberInput = (props: any) => {
 const INSMVCaraNumberInput = (props: any) => {
 
   const { initialValue, ...restOfTheProps } = props; // extracting  initialValue from props (I want to pass props forward to NumberInput)
-  const variant = props.value === initialValue ? "default" : "filled";
-  const radius = props.value === initialValue ? "sm" : "xl";
+  const isModified = props.value !== initialValue;
+  const variant = isModified ?  "filled" : "default";
+  const radius = isModified ? "xl" : "sm";
+  const errorString = isModified && props.paAfterBilling < 0 ? "Pas assez de PA":""
 
 
   return (
-    <INSMVNumberInput {...restOfTheProps} variant={variant} min={1.5} max={9.5} radius={radius} />
+    <INSMVNumberInput {...restOfTheProps} variant={variant} min={1.5} max={9.5} radius={radius} error={errorString} />
   )
 };
 
@@ -150,7 +152,7 @@ function Caracteristiques(props: TCaraFuncProps) {
       },
       caraBillingItem: {
         ["cara_" + cara]: {
-          msg: [cara] + ": " + props.initialcaracteristiques[cara] + "->" + val,
+          msg: [cara] + ": " + props.initialcaracteristiques[cara] + " → " + val,
           cost: computeCaracCost(val, props.initialcaracteristiques[cara])
         }
       }
@@ -163,11 +165,11 @@ function Caracteristiques(props: TCaraFuncProps) {
     <Stack>
       <Title order={2}>Caractéristiques</Title>
       <Group>
-        <INSMVCaraNumberInput label="Force" value={state.force} initialValue={props.initialcaracteristiques.force} onChange={(val: number) => { onChangeCara(val, "force") }} />
-        <INSMVCaraNumberInput label="Agilité" value={state.agilite} initialValue={props.initialcaracteristiques.agilite} onChange={(val: number) => { onChangeCara(val, "agilite") }} />
-        <INSMVCaraNumberInput label="Perception" value={state.perception} initialValue={props.initialcaracteristiques.perception} onChange={(val: number) => { onChangeCara(val, "perception") }} />
-        <INSMVCaraNumberInput label="Présence" value={state.presence} initialValue={props.initialcaracteristiques.presence} onChange={(val: number) => { onChangeCara(val, "presence") }} />
-        <INSMVCaraNumberInput label="Foi" value={state.foi} initialValue={props.initialcaracteristiques.foi} onChange={(val: number) => { onChangeCara(val, "foi") }} />
+        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Force" value={state.force} initialValue={props.initialcaracteristiques.force} onChange={(val: number) => { onChangeCara(val, "force")} } />
+        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Agilité" value={state.agilite} initialValue={props.initialcaracteristiques.agilite} onChange={(val: number) => { onChangeCara(val, "agilite")} } />
+        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Perception" value={state.perception} initialValue={props.initialcaracteristiques.perception} onChange={(val: number) => { onChangeCara(val, "perception")} } />
+        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Présence" value={state.presence} initialValue={props.initialcaracteristiques.presence} onChange={(val: number) => { onChangeCara(val, "presence")} } />
+        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Foi" value={state.foi} initialValue={props.initialcaracteristiques.foi} onChange={(val: number) => { onChangeCara(val, "foi")} } />
       </Group>
 
       {/* <Text>debug force: {props.force}; debug agilite {props.agilite}</Text> */}
@@ -181,13 +183,12 @@ function Caracteristiques(props: TCaraFuncProps) {
 function BillingPanel(props:
   {
     billingState: { [s: string]: IBillingItem; },
-    initialPa: number,
-    paAfterBillingHandler: (x: number) => void
+    availablePa: number,
   }) {
 
   const billingItems = Object.values(props.billingState);
   const sum = calcBillingItemSum(billingItems);
-  const remainingPa = props.initialPa - sum;
+  const remainingPa = props.availablePa - sum;
 
   // maybe use Dialog instead
   return <Dialog opened={true} position={{ top: 20, right: 20 }}>
@@ -201,7 +202,7 @@ function BillingPanel(props:
       </thead>
       <tbody>
         <tr>
-          <td>{props.initialPa}</td>
+          <td>{props.availablePa}</td>
           <td> Initial</td>
         </tr>
 
@@ -281,8 +282,17 @@ function FeuilleDePerso(props: { perso: IPerso }) {
     paAfterBilling: props.perso.pa
   });
 
+  const updatePaAfterBilling = (billingState : IBillingItem[] | IBillingItem | {}, availablePa: number) => {
+    const billingItems = Object.values(billingState);
+    const sum = calcBillingItemSum(billingItems);
+    const updatedPaAfterBilling = availablePa - sum;
+    return updatedPaAfterBilling;
+  }
+
   const statusChangeHandler = (updatedState: Pick<IAssistantState, keyof IAssistantState>) => {
-    setState(updatedState);
+    const updatedPaAfterBilling = updatePaAfterBilling(state.billingState, updatedState.pa);
+
+    setState({...updatedState, paAfterBilling: updatedPaAfterBilling});
   }
   const caraChangeHandler = (updateMap: { caracteristiques: Pick<TcaracteristiquesSet, keyof TcaracteristiquesSet>; caraBillingItem: IBillingItem; }) => {
     console.log(updateMap);
@@ -291,9 +301,7 @@ function FeuilleDePerso(props: { perso: IPerso }) {
       ...updateMap.caraBillingItem
     }
 
-    const billingItems: IBillingItem[] = Object.values(updatedBillingState) as unknown as IBillingItem[];
-    const sum = calcBillingItemSum(billingItems);
-    const updatedPaAfterBilling = state.pa - sum;
+    const updatedPaAfterBilling = updatePaAfterBilling(updatedBillingState, state.pa);
 
     setState({
       billingState: updatedBillingState,
@@ -308,16 +316,13 @@ function FeuilleDePerso(props: { perso: IPerso }) {
       }
     })
   };
-  const paAfterBillingHandler = (val: number) => {
-    setState({ paAfterBilling: val });
-  }
+
 
   return (
     <Stack>
 
       <BillingPanel billingState={state.billingState}
-        initialPa={props.perso.pa}
-        paAfterBillingHandler={paAfterBillingHandler} />
+        availablePa={state.pa} />
 
       <Caracteristiques caracteristiques={state.caracteristiques}
         initialcaracteristiques={props.perso.caracteristiques}

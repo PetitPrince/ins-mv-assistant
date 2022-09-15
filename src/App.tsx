@@ -12,6 +12,7 @@ import { useSetState } from '@mantine/hooks';
 import { render } from '@testing-library/react';
 
 import { FACTIONS } from './myConst';
+import { ppid } from 'process';
 
 const INSMVNumberInput = (props: any) => {
   return (
@@ -97,11 +98,11 @@ function Blessures(props: { force: number; faction: string; }) {
   );
 }
 
-function Status2(props: any) {
-  const [state, setState] = useSetState({ pa: props.pa, paTotal: props.paTotal });
+function Status(props: any) {
+  const [state, setState] = useSetState({ pa: props.pa, paTotal: props.paTotal, pp: props.pp, ppMax: props.ppMax });
 
   const statusChangeHandler = (val: number, field: string) => {
-    const updatedState: Partial<IAssistantState> = { [field]: val };
+    const updatedState: Partial<IFeuilleDePersoState> = { [field]: val };
     setState(updatedState);
     props.statusChangeHandler(updatedState);
   };
@@ -111,10 +112,9 @@ function Status2(props: any) {
       <Title order={2}>Status</Title>
       <Group>
         <NumberInput label="Point d'Administration (PA)" value={state.pa} onChange={(val) => { statusChangeHandler(val || 0, "pa") }} />
-        {/* <NumberInput label="PA accumulés" value={state.paTotal} onChange={(val)=>{statusChangeHandler(val||0, "paTotal")}} /> */}
-        {/* <NumberInput label="Point de Pouvoir (PP)" value={this.props.pp} onChange={this.props.handlePpChange} />
-        <NumberInput label="PP Maximum" value={this.props.ppMax} onChange={this.props.handlePpMaxChange} />
-        <Text>debug force: {this.props.force}</Text> */}
+        <NumberInput label="PA accumulés" value={state.paTotal} onChange={(val)=>{statusChangeHandler(val||0, "paTotal")}} />
+        <NumberInput label="Point de Pouvoir (PP)" value={state.pp} onChange={(val)=>{statusChangeHandler(val||0, "pp")}} />
+        <NumberInput label="PP Maximum" value={state.ppMax} onChange={(val)=>{statusChangeHandler(val||0, "ppMax")}} />
         <Blessures force={props.force} faction={props.faction} />
       </Group>
     </Stack>
@@ -254,7 +254,7 @@ interface IPerso {
   ppMax: number;
 
 }
-interface IAssistantState extends IPerso {
+interface IFeuilleDePersoState extends IPerso {
   billingState?: {
     [x: string]: IBillingItem
   };
@@ -289,7 +289,7 @@ function FeuilleDePerso(props: { perso: IPerso }) {
     return updatedPaAfterBilling;
   }
 
-  const statusChangeHandler = (updatedState: Pick<IAssistantState, keyof IAssistantState>) => {
+  const statusChangeHandler = (updatedState: Pick<IFeuilleDePersoState, keyof IFeuilleDePersoState>) => {
     const updatedPaAfterBilling = updatePaAfterBilling(state.billingState, updatedState.pa);
 
     setState({...updatedState, paAfterBilling: updatedPaAfterBilling});
@@ -329,7 +329,8 @@ function FeuilleDePerso(props: { perso: IPerso }) {
         onChangeCara={caraChangeHandler}
         pa={state.paAfterBilling}
       />
-      <Status2 pa={state.pa} paTotal={state.paTotal} statusChangeHandler={statusChangeHandler}
+      <Status pa={state.pa} paTotal={state.paTotal} statusChangeHandler={statusChangeHandler}
+        pp={state.pp} ppMax={state.ppMax} 
         force={state.caracteristiques.force} faction={state.faction} />
 
     </Stack>

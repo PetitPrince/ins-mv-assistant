@@ -10,39 +10,40 @@ import { useInputState } from '@mantine/hooks';
 import { useState } from 'react';
 import { useSetState } from '@mantine/hooks';
 import { render } from '@testing-library/react';
-
-import { FACTIONS } from './myConst';
+import { FACTIONS, Factions } from './myConst';
 import { ppid } from 'process';
 
-const INSMVNumberInput = (props: any) => {
+const INSMVNumberInput = (props: NumberInputProps) => {
   return (
     <NumberInput {...props} step={0.5} precision={1} />
   );
 };
 
-const INSMVCaraNumberInput = (props: any) => {
-
-  const { initialValue, ...restOfTheProps } = props; // extracting  initialValue from props (I want to pass props forward to NumberInput)
+interface INSMVCaraNumberInputProps extends NumberInputProps {
+  initialValue: number,
+  paAfterBilling: number
+}
+const INSMVCaraNumberInput = (props: INSMVCaraNumberInputProps) => {
+  const { initialValue, paAfterBilling, ...restOfTheProps } = props; // extracting  initialValue from props (I want to pass props forward to NumberInput)
   const isModified = props.value !== initialValue;
-  const variant = isModified ?  "filled" : "default";
+  const variant = isModified ? "filled" : "default";
   const radius = isModified ? "xl" : "sm";
-  const errorString = isModified && props.paAfterBilling < 0 ? "Pas assez de PA":""
-
+  const errorString = isModified && paAfterBilling < 0 ? "Pas assez de PA" : ""
 
   return (
     <INSMVNumberInput {...restOfTheProps} variant={variant} min={1.5} max={9.5} radius={radius} error={errorString} />
   )
 };
 
-function Blessures(props: { force: number; faction: string; }) {
+function Blessures(props: { force: number; faction: Factions; }) {
   const force = props.force;
 
   let modificateur_faction;
   switch (props.faction) {
-    case FACTIONS.ANGES:
+    case Factions.ANGES:
       modificateur_faction = 3
       break;
-    case FACTIONS.DEMONS:
+    case Factions.DEMONS:
       modificateur_faction = 2
       break;
     default:
@@ -98,7 +99,18 @@ function Blessures(props: { force: number; faction: string; }) {
   );
 }
 
-function Status(props: any) {
+interface StatusProps {
+  pa: number,
+  paTotal: number,
+  pp: number,
+  ppMax: number,
+  force: number,
+  faction: Factions,
+
+  statusChangeHandler: (updatedState: Partial<IFeuilleDePersoState>) => void
+
+}
+function Status(props: StatusProps) {
   const [state, setState] = useSetState({ pa: props.pa, paTotal: props.paTotal, pp: props.pp, ppMax: props.ppMax });
 
   const statusChangeHandler = (val: number, field: string) => {
@@ -112,9 +124,9 @@ function Status(props: any) {
       <Title order={2}>Status</Title>
       <Group>
         <NumberInput label="Point d'Administration (PA)" value={state.pa} onChange={(val) => { statusChangeHandler(val || 0, "pa") }} />
-        <NumberInput label="PA accumulés" value={state.paTotal} onChange={(val)=>{statusChangeHandler(val||0, "paTotal")}} />
-        <NumberInput label="Point de Pouvoir (PP)" value={state.pp} onChange={(val)=>{statusChangeHandler(val||0, "pp")}} />
-        <NumberInput label="PP Maximum" value={state.ppMax} onChange={(val)=>{statusChangeHandler(val||0, "ppMax")}} />
+        <NumberInput label="PA accumulés" value={state.paTotal} onChange={(val) => { statusChangeHandler(val || 0, "paTotal") }} />
+        <NumberInput label="Point de Pouvoir (PP)" value={state.pp} onChange={(val) => { statusChangeHandler(val || 0, "pp") }} />
+        <NumberInput label="PP Maximum" value={state.ppMax} onChange={(val) => { statusChangeHandler(val || 0, "ppMax") }} />
         <Blessures force={props.force} faction={props.faction} />
       </Group>
     </Stack>
@@ -133,7 +145,10 @@ type TCaraFuncProps = {
   caracteristiques: TcaracteristiquesSet;
   initialcaracteristiques: TcaracteristiquesSet;
   pa: number;
-  onChangeCara: (x: any) => void;
+  onChangeCara: (x: {
+    caracteristiques: {[x: string]: number;},
+    caraBillingItem: IBillingItem
+  }) => void;
 }
 function Caracteristiques(props: TCaraFuncProps) {
   const [state, setState] = useSetState({
@@ -145,17 +160,16 @@ function Caracteristiques(props: TCaraFuncProps) {
   });
   const onChangeCara = (val: number, cara: string) => {
     setState({ [cara]: val });
-
+    const caraB : IBillingItem = {
+      key: "cara_" + cara,
+      msg: [cara] + ": " + props.initialcaracteristiques[cara] + " → " + val,
+      cost: computeCaracCost(val, props.initialcaracteristiques[cara])
+    };
     const updateMap = {
       caracteristiques: {
         [cara]: val
       },
-      caraBillingItem: {
-        ["cara_" + cara]: {
-          msg: [cara] + ": " + props.initialcaracteristiques[cara] + " → " + val,
-          cost: computeCaracCost(val, props.initialcaracteristiques[cara])
-        }
-      }
+      caraBillingItem: caraB
     }
     props.onChangeCara(updateMap);
 
@@ -165,11 +179,11 @@ function Caracteristiques(props: TCaraFuncProps) {
     <Stack>
       <Title order={2}>Caractéristiques</Title>
       <Group>
-        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Force" value={state.force} initialValue={props.initialcaracteristiques.force} onChange={(val: number) => { onChangeCara(val, "force")} } />
-        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Agilité" value={state.agilite} initialValue={props.initialcaracteristiques.agilite} onChange={(val: number) => { onChangeCara(val, "agilite")} } />
-        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Perception" value={state.perception} initialValue={props.initialcaracteristiques.perception} onChange={(val: number) => { onChangeCara(val, "perception")} } />
-        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Présence" value={state.presence} initialValue={props.initialcaracteristiques.presence} onChange={(val: number) => { onChangeCara(val, "presence")} } />
-        <INSMVCaraNumberInput  paAfterBilling={props.pa} label="Foi" value={state.foi} initialValue={props.initialcaracteristiques.foi} onChange={(val: number) => { onChangeCara(val, "foi")} } />
+        <INSMVCaraNumberInput paAfterBilling={props.pa} label="Force" value={state.force} initialValue={props.initialcaracteristiques.force} onChange={(val: number) => { onChangeCara(val, "force") }} />
+        <INSMVCaraNumberInput paAfterBilling={props.pa} label="Agilité" value={state.agilite} initialValue={props.initialcaracteristiques.agilite} onChange={(val: number) => { onChangeCara(val, "agilite") }} />
+        <INSMVCaraNumberInput paAfterBilling={props.pa} label="Perception" value={state.perception} initialValue={props.initialcaracteristiques.perception} onChange={(val: number) => { onChangeCara(val, "perception") }} />
+        <INSMVCaraNumberInput paAfterBilling={props.pa} label="Présence" value={state.presence} initialValue={props.initialcaracteristiques.presence} onChange={(val: number) => { onChangeCara(val, "presence") }} />
+        <INSMVCaraNumberInput paAfterBilling={props.pa} label="Foi" value={state.foi} initialValue={props.initialcaracteristiques.foi} onChange={(val: number) => { onChangeCara(val, "foi") }} />
       </Group>
 
       {/* <Text>debug force: {props.force}; debug agilite {props.agilite}</Text> */}
@@ -182,13 +196,15 @@ function Caracteristiques(props: TCaraFuncProps) {
 
 function BillingPanel(props:
   {
-    billingState: { [s: string]: IBillingItem; },
+    billingState: IBillingItem[],
     availablePa: number,
   }) {
 
-  const billingItems = Object.values(props.billingState);
+  const billingItems = props.billingState;
   const sum = calcBillingItemSum(billingItems);
   const remainingPa = props.availablePa - sum;
+
+  // TODO: sorting billingItems by key or name were would be a good idea
 
   // maybe use Dialog instead
   return <Dialog opened={true} position={{ top: 20, right: 20 }}>
@@ -207,11 +223,11 @@ function BillingPanel(props:
         </tr>
 
         {
-          Object.entries(props.billingState as {[k:string] : IBillingItem})
-            .map(([billingKey, billingItem]) => {
+          billingItems
+            .map((billingItem) => {
               if (Object.keys(billingItem).length) {
                 return (
-                  <tr key={billingKey}>
+                  <tr key={billingItem.key}>
                     <td>-{billingItem.cost}</td>
                     <td>{billingItem.msg}</td>
                     <td>
@@ -244,7 +260,7 @@ type TcaracteristiquesSet = {
 
 interface IPerso {
   identite: string;
-  faction: string;
+  faction: Factions;
   superieur: string;
   grade: number;
   caracteristiques: TcaracteristiquesSet;
@@ -255,50 +271,65 @@ interface IPerso {
 
 }
 interface IFeuilleDePersoState extends IPerso {
-  billingState?: {
-    [x: string]: IBillingItem
-  };
+  billingState: IBillingItem[];
   paAfterBilling: number
 
 }
 interface IBillingItem {
+  key: string,
   msg: string,
   cost: number
 }
 
 function calcBillingItemSum(billingItems: IBillingItem[]) {
   let sum = 0;
-  for (const billingItem of billingItems) {
-    sum += billingItem.cost;
+  if(billingItems){
+    for (const billingItem of billingItems) {
+      sum += billingItem.cost;
+    }  
   }
   return sum;
 }
 
 function FeuilleDePerso(props: { perso: IPerso }) {
-  const [state, setState] = useSetState({
+  const [state, setState] = useSetState<IFeuilleDePersoState>({
     ...props.perso,
-    billingState: {
-    },
+    billingState: [],
     paAfterBilling: props.perso.pa
   });
 
-  const updatePaAfterBilling = (billingState : IBillingItem[] | IBillingItem | {}, availablePa: number) => {
-    const billingItems = Object.values(billingState);
-    const sum = calcBillingItemSum(billingItems);
+  const updatePaAfterBilling = (billingState: IBillingItem[] , availablePa: number) => {
+    const sum = calcBillingItemSum(billingState);
     const updatedPaAfterBilling = availablePa - sum;
     return updatedPaAfterBilling;
   }
 
-  const statusChangeHandler = (updatedState: Pick<IFeuilleDePersoState, keyof IFeuilleDePersoState>) => {
-    const updatedPaAfterBilling = updatePaAfterBilling(state.billingState, updatedState.pa);
+  const statusChangeHandler = (updatedState: Partial<IFeuilleDePersoState>) => { 
+    let updatedPaAfterBilling = state.paAfterBilling;
+    if("pa" in updatedState){
+      const availablePa = updatedState.pa || state.paAfterBilling; // defaults to the current state (state.paAfterBilling) in case updatedState.pa is undefined
+      updatedPaAfterBilling = updatePaAfterBilling(state.billingState, availablePa);
+    }
+    
 
-    setState({...updatedState, paAfterBilling: updatedPaAfterBilling});
+    setState({ ...updatedState, paAfterBilling: updatedPaAfterBilling });
   }
+
   const caraChangeHandler = (updateMap: { caracteristiques: Pick<TcaracteristiquesSet, keyof TcaracteristiquesSet>; caraBillingItem: IBillingItem; }) => {
     console.log(updateMap);
-    const updatedBillingState = {
-      ...state.billingState,
-      ...updateMap.caraBillingItem
+    // iterate over the current billing state, update if same key is found, otherwise append
+    const caraBillingItem = updateMap.caraBillingItem;
+    let haveUpdated = false;
+    const updatedBillingState = state.billingState.map((billingItem: IBillingItem) => {
+      if (billingItem.key === caraBillingItem.key) {
+        haveUpdated=true;
+        return caraBillingItem;
+      } else {
+        return billingItem;
+      }
+    });
+    if(!haveUpdated){
+      updatedBillingState.push(caraBillingItem);
     }
 
     const updatedPaAfterBilling = updatePaAfterBilling(updatedBillingState, state.pa);
@@ -329,9 +360,10 @@ function FeuilleDePerso(props: { perso: IPerso }) {
         onChangeCara={caraChangeHandler}
         pa={state.paAfterBilling}
       />
-      <Status pa={state.pa} paTotal={state.paTotal} statusChangeHandler={statusChangeHandler}
-        pp={state.pp} ppMax={state.ppMax} 
-        force={state.caracteristiques.force} faction={state.faction} />
+      <Status pa={state.pa} paTotal={state.paTotal}
+        pp={state.pp} ppMax={state.ppMax}
+        force={state.caracteristiques.force} faction={state.faction}
+        statusChangeHandler={statusChangeHandler} />
 
     </Stack>
   );
@@ -342,7 +374,7 @@ function App() {
 
   let initialPerso = {
     identite: "Jean la Mèche",
-    faction: FACTIONS.DEMONS,
+    faction: Factions.DEMONS,
     superieur: "Baal",
     grade: 3,
 

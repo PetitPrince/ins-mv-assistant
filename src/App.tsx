@@ -13,7 +13,7 @@ import { render } from '@testing-library/react';
 import { FACTIONS, Factions } from './myConst';
 import { Blessures, Status } from './Status';
 import { Caracteristiques } from './Caracteristique';
-
+import create from 'zustand'
 export const INSMVNumberInput = (props: NumberInputProps) => {
   return (
     <NumberInput {...props} step={0.5} precision={1} />
@@ -26,6 +26,7 @@ function BillingPanel(props:
     billingState: IBillingItem[],
     availablePa: number,
     cancelThisBillableItem: (key: string) => void;
+    commitThisBillableItem:  (key: string) => void;
   }) {
 
   const billingItems = props.billingState;
@@ -34,7 +35,9 @@ function BillingPanel(props:
   const deleteTheStuffHandler = (key: string) => {
     props.cancelThisBillableItem(key);
   };
-
+  const commit = (key: string) => {
+    props.commitThisBillableItem(key);
+  };
   // TODO: sorting billingItems by key or name were would be a good idea
 
   // maybe use Dialog instead
@@ -65,7 +68,7 @@ function BillingPanel(props:
                       <ActionIcon onClick={(x: any) => deleteTheStuffHandler(billingItem.key)}>
                         <IconX size={16} />
                       </ActionIcon>
-                      <ActionIcon>
+                      <ActionIcon onClick={(x: any) => commit(billingItem.key)}>
                         <IconCheck size={16} />
                       </ActionIcon>
                     </td>
@@ -82,7 +85,7 @@ function BillingPanel(props:
           <td>{remainingPa}</td>
           <td> total</td>
           <td>
-            <ActionIcon>
+            <ActionIcon disabled={true}>
               <IconCheck size={16} />
             </ActionIcon>
           </td>
@@ -112,7 +115,7 @@ interface IPerso {
 }
 export interface IFeuilleDePersoState extends IPerso {
   billingState: IBillingItem[];
-  paAfterBilling: number
+  paAfterBilling: number,
 
 }
 export interface IBillingItem {
@@ -131,7 +134,20 @@ function calcBillingItemSum(billingItems: IBillingItem[]) {
   return sum;
 }
 
-function FeuilleDePerso(props: { perso: IPerso }) {
+interface IPersf {
+  perso: IPerso,
+  setPersoHandler : (x:any) => void  
+}
+
+interface ImyStore{
+  votes : number,
+  addVotes: (by: number )=>void
+}
+export const myStore = create<ImyStore>(set => ({
+  votes: 0,
+  addVotes: (by) => set(state => ({ votes: state.votes + by })),
+}));
+function FeuilleDePerso(props: IPersf) {
   const [state, setState] = useSetState<IFeuilleDePersoState>({
     ...props.perso,
     billingState: [],
@@ -185,7 +201,6 @@ function FeuilleDePerso(props: { perso: IPerso }) {
   };
 
   const cancelThisBillableItem = (key: string) => {
-    console.log(key);
     const updatedBillingState = state.billingState.filter(x => x.key !== key);
     const updatedPaAfterBilling = updatePaAfterBilling(updatedBillingState, state.pa);
     let updatedState: Partial<IFeuilleDePersoState> = {
@@ -213,7 +228,44 @@ function FeuilleDePerso(props: { perso: IPerso }) {
     presence: props.perso.caracteristiques.presence,
     foi: props.perso.caracteristiques.foi,
   });
+  const addVotes = myStore(state => state.addVotes);
 
+  const commitThisBillableItem = (key: string) => {
+    console.log(key);
+    // Remove the billable line
+    const billingLine = state.billingState.find(x => x.key === key);
+    if(billingLine != undefined){
+      const updatedBillingState = state.billingState.filter(x => x.key !== key);
+
+      const updatedPa = state.pa - billingLine.cost;
+      // Change the state.pa
+
+      let updatedPaAfterBilling  = updatePaAfterBilling(updatedBillingState, updatedPa);
+      let updatedState : Partial<IFeuilleDePersoState> = {
+        pa: updatedPa,
+        billingState: updatedBillingState,
+        paAfterBilling: updatedPaAfterBilling,
+      };
+
+      if (key.startsWith("cara_")) {
+        const caraKey = key.split("cara_")[1];
+        const updatedCaracteristique = { ...state.caracteristiques, [caraKey]: state.caracteristiques[caraKey] }
+        updatedState = { ...updatedState, caracteristiques: updatedCaracteristique };
+
+        let updatedPerso = {...props.perso, caracteristiques: updatedCaracteristique}
+        props.setPersoHandler({caracteristiques: updatedCaracteristique});
+        // update the state or update the parent props ?
+        caraSetState(updatedCaracteristique);
+        addVotes(5);
+      }
+
+
+      setState(updatedState);
+  
+    }
+
+
+  }
 
   return (
     <Stack>
@@ -222,6 +274,7 @@ function FeuilleDePerso(props: { perso: IPerso }) {
         billingState={state.billingState}
         availablePa={state.pa}
         cancelThisBillableItem={cancelThisBillableItem}
+        commitThisBillableItem={commitThisBillableItem}
       />
 
       <Caracteristiques caracteristiques={state.caracteristiques}
@@ -242,30 +295,33 @@ function FeuilleDePerso(props: { perso: IPerso }) {
 
 
 }
+
 function App() {
-
-  let initialPerso = {
-    identite: "Jean la Mèche",
-    faction: Factions.DEMONS,
-    superieur: "Baal",
-    grade: 3,
-
-    caracteristiques: {
-      force: 4,
-      agilite: 6,
-      perception: 5,
-      volonte: 7,
-      presence: 1.5,
-      foi: 5,
-    },
-    pa: 12,
-    paTotal: 9001,
-    pp: 60,
-    ppMax: 50,
-  }
+  
+  const [perso, setPerso] = useSetState({
+    
+      identite: "Jean la Mèche",
+      faction: Factions.DEMONS,
+      superieur: "Baal",
+      grade: 3,
+  
+      caracteristiques: {
+        force: 4,
+        agilite: 6,
+        perception: 5,
+        volonte: 7,
+        presence: 1.5,
+        foi: 5,
+      },
+      pa: 12,
+      paTotal: 9001,
+      pp: 60,
+      ppMax: 50,
+    
+  });
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <FeuilleDePerso perso={initialPerso} />
+      <FeuilleDePerso perso={perso} setPersoHandler={setPerso} />
     </MantineProvider>
   );
 }

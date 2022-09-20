@@ -28,7 +28,7 @@ export function Caracteristiques(props: { caracteristiques: ICaracteristiquesSet
   const { force, agilite, perception, volonte, presence, foi } = props.caracteristiques;
   const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = props.caracteristiques;
   const availablePa = props.availablePa;
-  const storeCaracteristiques = useStore(state => state.setDraftCaracteristiques);
+  const storeCaracteristiques = useStore(state => state.setCurrentCaracteristiques);
   const setCaracteristiques = (val: number, cara: CARACTERISTIQUES) => {
     storeCaracteristiques(val, cara);
   };

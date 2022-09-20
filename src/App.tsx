@@ -1,10 +1,10 @@
 import './App.css';
-import { MantineProvider, NumberInputProps } from '@mantine/core';
+import { InputProps, MantineProvider, NumberInputProps } from '@mantine/core';
 import { NumberInput, Stack, Group, Table } from '@mantine/core';
-import { Radio, Text, SegmentedControl } from '@mantine/core';
+import { Radio, Text, SegmentedControl, AutocompleteProps } from '@mantine/core';
 import { FACTIONS } from './myConst';
 import create from 'zustand'
-import produce, {  } from "immer"
+import produce, { } from "immer"
 import { enablePatches } from "immer"
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import { createPatch } from 'rfc6902'
@@ -13,6 +13,7 @@ import { NotificationsProvider } from '@mantine/notifications';
 import { IBillingItem, calcBillingItemSum, BillingPanel, generateBillingItems } from './BillingItem';
 import { Status } from './Status';
 import { Caracteristiques } from './Caracteristiques';
+import { Generalites } from './Generalites';
 
 enablePatches()
 export enum CARACTERISTIQUES {
@@ -102,12 +103,15 @@ interface Store {
 
   setPerso: (val: Personnage) => void,
   setOriginalPerso: (val: Personnage) => void,
-  setDraftCaracteristiques: (val: number, caracteristique: CARACTERISTIQUES) => void,
-  setDraftPa: (val: number) => void,
-  setDraftPaTotal: (val: number) => void,
-  setDraftPp: (val: number) => void,
-  setDraftPpMax: (val: number) => void,
-  setDraftFaction: (val: FACTIONS) => void,
+  setCurrentIdentite: (val: string) => void,
+  setCurrentFaction: (val: FACTIONS) => void,
+  setCurrentGrade: (val: number) => void,
+  setCurrentSuperieur: (val: string) => void,
+  setCurrentCaracteristiques: (val: number, caracteristique: CARACTERISTIQUES) => void,
+  setCurrentPa: (val: number) => void,
+  setCurrentPaTotal: (val: number) => void,
+  setCurrentPp: (val: number) => void,
+  setCurrentPpMax: (val: number) => void,
   updateBilling: (originalPerso: Personnage, draftPerso: Personnage) => void
 }
 
@@ -133,45 +137,42 @@ export const useStore = create<Store>((set, get) => ({
     set(produce(draftState => { draftState.originalPerso = val }))
     get().updateBilling(get().originalPerso, get().currentPerso);
   },
-  setDraftCaracteristiques: (val, cara) => {
-    set(produce(draftState => {
-      draftState.currentPerso.caracteristiques[cara] = val;
-    }));
+  setCurrentIdentite: (val) => {
+    set(produce(draftState => { draftState.currentPerso.identite = val }))
+    get().updateBilling(get().originalPerso, get().currentPerso);
+  },
+  setCurrentFaction: (val) => {
+    set(produce(draftState => { draftState.currentPerso.faction = val }))
+    get().updateBilling(get().originalPerso, get().currentPerso);
+  },
+  setCurrentGrade: (val) => {
+    set(produce(draftState => { draftState.currentPerso.grade = val }))
+    get().updateBilling(get().originalPerso, get().currentPerso);
+  },
+  setCurrentSuperieur: (val) => {
+    set(produce(draftState => { draftState.currentPerso.superieur = val }))
+    get().updateBilling(get().originalPerso, get().currentPerso);
+  },
+  setCurrentCaracteristiques: (val, cara) => {
+    set(produce(draftState => { draftState.currentPerso.caracteristiques[cara] = val; }));
     get().updateBilling(get().originalPerso, get().currentPerso);
 
   },
 
-  setDraftPa: (val) => {
-    set(
-      produce(draftState => {
-        draftState.currentPerso.pa = val;
-      }));
+  setCurrentPa: (val) => {
+    set(produce(draftState => { draftState.currentPerso.pa = val; }));
     get().updateBilling(get().originalPerso, get().currentPerso);
   },
-  setDraftPaTotal: (val) => {
-    set(
-      produce(draftState => {
-        draftState.currentPerso.paTotal = val;
-      }));
+  setCurrentPaTotal: (val) => {
+    set(produce(draftState => { draftState.currentPerso.paTotal = val; }));
   },
-  setDraftPp: (val) => {
-    set(
-      produce(draftState => {
-        draftState.currentPerso.pp = val;
-      }));
+  setCurrentPp: (val) => {
+    set(produce(draftState => { draftState.currentPerso.pp = val; }));
   },
-  setDraftPpMax: (val) => {
-    set(
-      produce(draftState => {
-        draftState.currentPerso.ppMax = val;
-      }));
+  setCurrentPpMax: (val) => {
+    set(produce(draftState => { draftState.currentPerso.ppMax = val; }));
   },
-  setDraftFaction: (val) => {
-    set(
-      produce(draftState => {
-        draftState.currentPerso.faction = val;
-      }));
-  },
+
 
 }));
 
@@ -188,8 +189,8 @@ export const INSMVNumberInput = (props: NumberInputProps) => {
   );
 };
 
-function FeuilleDePerso(props: { draftPerso: Personnage, originalPerso: Personnage, billingItems: IBillingItem[], paAfterBilling: number }) {
-  const { draftPerso, originalPerso, billingItems, paAfterBilling } = props;
+function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Personnage, billingItems: IBillingItem[], paAfterBilling: number }) {
+  const { currentPerso, originalPerso, billingItems, paAfterBilling } = props;
   // const {draftIdentite, draftFaction, draftSuperieur, draftGrade, draftCaracteristiques, draftPa, draftPaTotal, draftPp, draftPpMax} = props.draftPerso;
   // const {identite, faction, superieur, grade, caracteristiques, pa, paTotal, pp, ppMax} = props.perso;
 
@@ -197,26 +198,31 @@ function FeuilleDePerso(props: { draftPerso: Personnage, originalPerso: Personna
     <Stack>
       <BillingPanel
         billingItems={billingItems}
-        initialPa={draftPerso.pa}
+        initialPa={currentPerso.pa}
+      />
+
+      <Generalites
+        identite={currentPerso.identite}
+        faction={currentPerso.faction}
+        superieur={currentPerso.superieur}
+        grade={currentPerso.grade}
       />
 
       <Caracteristiques
-        caracteristiques={draftPerso.caracteristiques}
+        caracteristiques={currentPerso.caracteristiques}
         initialCaracteristiques={originalPerso.caracteristiques}
         // caraState={caraState}
         // caraSetState={caraSetState}
         availablePa={paAfterBilling}
       // onChangeCara={caraChangeHandler}
       />
-      <Status pa={draftPerso.pa} paTotal={draftPerso.paTotal}
-        pp={draftPerso.pp} ppMax={draftPerso.ppMax}
-        force={draftPerso.caracteristiques.force}
-        faction={draftPerso.faction}
+      <Status pa={currentPerso.pa} paTotal={currentPerso.paTotal}
+        pp={currentPerso.pp} ppMax={currentPerso.ppMax}
+        force={currentPerso.caracteristiques.force}
+        faction={currentPerso.faction}
       />
-
       <Group>
-        <Text>{draftPerso.caracteristiques.force}</Text>
-
+        <Text>{currentPerso.caracteristiques.force}</Text>
       </Group>
     </Stack>
   );
@@ -240,7 +246,7 @@ function App() {
             { label: "Update", value: "update" },
 
           ]} />
-        <FeuilleDePerso draftPerso={perso} originalPerso={originalPerso} billingItems={billingItems} paAfterBilling={paAfterBilling} />
+        <FeuilleDePerso currentPerso={perso} originalPerso={originalPerso} billingItems={billingItems} paAfterBilling={paAfterBilling} />
       </NotificationsProvider>
     </MantineProvider>
   );

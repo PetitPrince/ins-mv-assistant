@@ -77,7 +77,7 @@ export const Blessures = (props: { force: number; faction: FACTIONS; }) => {
 
 export function Status(props: StatusProps) {
 
-  const storePa = useStore(state => state.setDraftPa);
+  const storePa = useStore(state => state.setCurrentPa);
   const setPa = (val: number) => {
 
     storePa(val);
@@ -85,7 +85,7 @@ export function Status(props: StatusProps) {
 
   // const storePaTotal = useStore(state => state.setDraftPaTotal)
   // const storePp = useStore(state => state.setDraftPp)
-  const storePpMax = useStore(state => state.setDraftPpMax);
+  const storePpMax = useStore(state => state.setCurrentPpMax);
   const setPpMax = (val: number) => storePpMax(val);;
 
 

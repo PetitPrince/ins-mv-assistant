@@ -6,6 +6,7 @@ import { applyPatch, createPatch } from 'rfc6902';
 import { showNotification } from '@mantine/notifications';
 import { useStore, Personnage } from './App';
 import { ReplaceOperation } from 'rfc6902/diff';
+import { FACTIONS } from './myConst';
 
 let findDeepValueOfObjFromPathAndLeadingSep = function (obj: any, path: string, sep: string) {
   //@ts-ignore
@@ -29,28 +30,65 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
 
   for (const diff of differences) {
     console.log(diff);
-    const diffPathElements = diff.path.split("/");
-    // diff.path looks like "/caracteristiques/force"
-    const diffCategory = diffPathElements[1];
-    switch (diffCategory) {
-      case "caracteristiques":
-        if (diff.op === "replace") {
+    if (diff.op === "replace") {
+      const diffPathElements = diff.path.split("/");
+      // diff.path looks like "/caracteristiques/force"
+      const diffCategory = diffPathElements[1];
+      const originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
+      const casted: ReplaceOperation = diff;
+      const val = casted.value;
+
+      switch (diffCategory) {
+        case "caracteristiques":
           const caraName = diffPathElements[diffPathElements.length - 1];
-          const casted: ReplaceOperation = diff;
-          const val = casted.value;
-          const originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
           const valDiff = val - originalValue;
           billingItems.push({
             key: diff.path,
-            msg: caraName + ": " + originalValue + "->" + val,
+            msg: caraName + ": " + originalValue + " → " + val,
             cost: valDiff * 4,
           });
-        }
-        break;
+          break;
+        case "faction":
+          let updatedCost = null; // TODO: check if creation or update (or rather, if update -> faction change shouldn't even be a possiblity)
+          if(val==FACTIONS.ANGES){
+            updatedCost = -100;
+          }else if(val===FACTIONS.DEMONS){
+            updatedCost = -80;
 
-      default:
-        break;
+          }
+          billingItems.push({
+            key: diff.path,
+            msg: "Faction: " + originalValue + " → " + val,
+            cost: updatedCost,
+          });
+          break;
+        case "identite":
+          billingItems.push({
+            key: diff.path,
+            msg: "Identité: " + originalValue + " → " + val,
+            cost: null,
+          });
+          break;
+        case "superieur":
+          billingItems.push({
+            key: diff.path,
+            msg: "Supérieur: " + originalValue + " → " + val,
+            cost: null,
+          });
+          break;
+        case "grade":
+          billingItems.push({
+            key: diff.path,
+            msg: "Grade: " + originalValue + " → " + val,
+            cost: null,
+          });
+          break;
+
+        default:
+          break;
+      }
     }
+
   }
   return billingItems;
 };
@@ -58,13 +96,15 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
 export interface IBillingItem {
   key: string;
   msg: string;
-  cost: number;
+  cost: number | null;
 }
 export function calcBillingItemSum(billingItems: IBillingItem[]) {
   let sum = 0;
   if (billingItems) {
     for (const billingItem of billingItems) {
-      sum += billingItem.cost;
+      if (billingItem.cost != null) {
+        sum += billingItem.cost;
+      }
     }
   }
   return sum;
@@ -79,7 +119,7 @@ export function BillingPanel(props: {
   const currentPerso = useStore((state) => state.currentPerso);
   const setPerso = useStore((state) => state.setPerso);
   const setOriginalPerso = useStore((state) => state.setOriginalPerso);
-  const setDraftPa = useStore((state) => state.setDraftPa);
+  const setDraftPa = useStore((state) => state.setCurrentPa);
 
   const billingItems = props.billingItems;
   const sum = calcBillingItemSum(billingItems);
@@ -99,32 +139,46 @@ export function BillingPanel(props: {
   };
   const commitOneItem = (key: string) => {
     const cost = billingItems.filter(x => x.key === key)[0].cost;
-    const paAfterTransaction = currentPerso.pa - cost;
-    // key still looks like "/caracteristiques/volonte"
-    if (paAfterTransaction >= 0) { // only apply if we have enough pa
+    if (cost != null) {
+      const paAfterTransaction = currentPerso.pa - cost;
+      // key still looks like "/caracteristiques/volonte"
+      if (paAfterTransaction >= 0) { // only apply if we have enough pa
+        const difference = createPatch(originalPerso, currentPerso);
+        const differenceWithOnlyTheOneSelected = difference.filter(x => x.path === key);
+        let persoCopy: Personnage = JSON.parse(JSON.stringify(originalPerso)); // deep copy
+        applyPatch(persoCopy, differenceWithOnlyTheOneSelected);
+
+        // I need to update the pa
+        persoCopy.pa = paAfterTransaction;
+        // setPerso(persoCopy);
+        setOriginalPerso(persoCopy);
+        setDraftPa(paAfterTransaction);
+        showNotification({
+          message: "Commit ok!",
+          color: "green"
+        });
+      } else {
+        showNotification({
+          id: "delete-billing-item-nok",
+          message: "Pas assez de PA!",
+          color: "red"
+        });
+      }
+    } else {
+      // Update without updating PA
       const difference = createPatch(originalPerso, currentPerso);
       const differenceWithOnlyTheOneSelected = difference.filter(x => x.path === key);
       let persoCopy: Personnage = JSON.parse(JSON.stringify(originalPerso)); // deep copy
       applyPatch(persoCopy, differenceWithOnlyTheOneSelected);
-
-      // I need to update the pa
-      persoCopy.pa = paAfterTransaction;
-      // setPerso(persoCopy);
       setOriginalPerso(persoCopy);
-      setDraftPa(paAfterTransaction);
       showNotification({
         message: "Commit ok!",
         color: "green"
       });
-    } else {
-      showNotification({
-        id: "delete-billing-item-nok",
-        message: "Pas assez de PA!",
-        color: "red"
-      });
     }
     console.log(key);
   };
+
 
   const commitAll = () => {
     if (availablePa >= 0) {
@@ -159,9 +213,18 @@ export function BillingPanel(props: {
         {billingItems
           .map((billingItem) => {
             if (Object.keys(billingItem).length) {
+              const cost = billingItem.cost;
+              let costDisplay = String(cost);
+              if (cost == null) {
+                costDisplay = "/";
+              } else if (cost < 0) {
+                costDisplay = "+" + String(cost).split('-')[1];
+              } else {
+                costDisplay = "-" + cost;
+              }
               return (
                 <tr key={billingItem.key}>
-                  <td>-{billingItem.cost}</td>
+                  <td>{costDisplay}</td>
                   <td>{billingItem.msg}</td>
                   <td>
                     <ActionIcon onClick={(x: any) => deleteTheStuffHandler(billingItem.key)}>

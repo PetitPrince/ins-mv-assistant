@@ -1,329 +1,248 @@
 import './App.css';
 import { MantineProvider, NumberInputProps } from '@mantine/core';
-import { Button, TextInput, NumberInput, Autocomplete, Stack, Group, Select, Title, Table } from '@mantine/core';
-import { Radio, Grid, ActionIcon, Dialog, Text } from '@mantine/core';
-import { talents_par_defaut } from './talents';
-import { IconPlus, IconMinus, IconRotate, IconCheck, IconX } from '@tabler/icons'
-import React, { Component, useEffect } from 'react';
-import { useForm } from '@mantine/form';
-import { useInputState } from '@mantine/hooks';
-import { useState } from 'react';
-import { useSetState } from '@mantine/hooks';
-import { render } from '@testing-library/react';
-import { FACTIONS, Factions } from './myConst';
-import { Blessures, Status } from './Status';
-import { Caracteristiques } from './Caracteristique';
+import { NumberInput, Stack, Group, Table } from '@mantine/core';
+import { Radio, Text, SegmentedControl } from '@mantine/core';
+import { FACTIONS } from './myConst';
 import create from 'zustand'
+import produce, {  } from "immer"
+import { enablePatches } from "immer"
+import { mountStoreDevtool } from 'simple-zustand-devtools';
+import { createPatch } from 'rfc6902'
+import { ReplaceOperation } from "rfc6902/diff"
+import { NotificationsProvider } from '@mantine/notifications';
+import { IBillingItem, calcBillingItemSum, BillingPanel, generateBillingItems } from './BillingItem';
+import { Status } from './Status';
+import { Caracteristiques } from './Caracteristiques';
+
+enablePatches()
+export enum CARACTERISTIQUES {
+  FORCE = "force",
+  AGILITE = "agilite",
+  PERCEPTION = "perception",
+  VOLONTE = "volonte",
+  PRESENCE = "presence",
+  FOI = "foi"
+}
+
+
+export interface ICaracteristiquesSet {
+  force: number,
+  agilite: number,
+  perception: number,
+  volonte: number,
+  presence: number,
+  foi: number,
+}
+// export type TcaracteristiquesSet = {
+//   [K in CARACTERISTIQUES as string]: number;
+// }
+
+const emptyPerso: Personnage = {
+  identite: "",
+  faction: FACTIONS.AUTRE,
+  superieur: "",
+  grade: 0,
+  caracteristiques: {
+    force: 2,
+    agilite: 2,
+    perception: 2,
+    volonte: 2,
+    presence: 2,
+    foi: 2,
+  },
+  pa: 0,
+  paTotal: 0,
+  pp: 0,
+  ppMax: 0
+};
+
+const unPerso = {
+
+  identite: "Jean la Mèche",
+  faction: FACTIONS.DEMONS,
+  superieur: "Baal",
+  grade: 3,
+
+  caracteristiques: {
+    force: 4,
+    agilite: 6,
+    perception: 5,
+    volonte: 7,
+    presence: 1.5,
+    foi: 5,
+  },
+  pa: 12,
+  paTotal: 9001,
+  pp: 60,
+  ppMax: 50, // max PP is governed by faith + bought PP; not sure if it's the best to store it raw like this
+
+}
+
+
+
+
+export interface Personnage {
+  identite: String,
+  faction: FACTIONS,
+  superieur: String, // todo: enum
+  grade: 0 | 1 | 2 | 3 | 4, // todo: enum `availableGrades` ?
+  caracteristiques: ICaracteristiquesSet,
+  pa: number,
+  paTotal: number,
+  pp: number,
+  ppMax: number,
+  // TODO: talents, pouvoirs
+}
+
+interface Store {
+  currentPerso: Personnage,
+  originalPerso: Personnage,
+  billingItems: IBillingItem[],
+  paAfterBilling: number,
+
+  setPerso: (val: Personnage) => void,
+  setOriginalPerso: (val: Personnage) => void,
+  setDraftCaracteristiques: (val: number, caracteristique: CARACTERISTIQUES) => void,
+  setDraftPa: (val: number) => void,
+  setDraftPaTotal: (val: number) => void,
+  setDraftPp: (val: number) => void,
+  setDraftPpMax: (val: number) => void,
+  setDraftFaction: (val: FACTIONS) => void,
+  updateBilling: (originalPerso: Personnage, draftPerso: Personnage) => void
+}
+
+export const useStore = create<Store>((set, get) => ({
+  currentPerso: emptyPerso,
+  originalPerso: emptyPerso,
+  billingItems: [],
+  paAfterBilling: 0,
+
+  updateBilling: (originalPerso, draftPerso) => {
+    const updatedBillingItems = generateBillingItems(originalPerso, draftPerso);
+    set(produce(draftState => {
+      draftState.billingItems = updatedBillingItems;
+      draftState.paAfterBilling = get().currentPerso.pa - calcBillingItemSum(updatedBillingItems);
+    }
+    ))
+  },
+  setPerso: (val) => {
+    set(produce(draftState => { draftState.currentPerso = val }))
+    get().updateBilling(get().originalPerso, get().currentPerso);
+  },
+  setOriginalPerso: (val) => {
+    set(produce(draftState => { draftState.originalPerso = val }))
+    get().updateBilling(get().originalPerso, get().currentPerso);
+  },
+  setDraftCaracteristiques: (val, cara) => {
+    set(produce(draftState => {
+      draftState.currentPerso.caracteristiques[cara] = val;
+    }));
+    get().updateBilling(get().originalPerso, get().currentPerso);
+
+  },
+
+  setDraftPa: (val) => {
+    set(
+      produce(draftState => {
+        draftState.currentPerso.pa = val;
+      }));
+    get().updateBilling(get().originalPerso, get().currentPerso);
+  },
+  setDraftPaTotal: (val) => {
+    set(
+      produce(draftState => {
+        draftState.currentPerso.paTotal = val;
+      }));
+  },
+  setDraftPp: (val) => {
+    set(
+      produce(draftState => {
+        draftState.currentPerso.pp = val;
+      }));
+  },
+  setDraftPpMax: (val) => {
+    set(
+      produce(draftState => {
+        draftState.currentPerso.ppMax = val;
+      }));
+  },
+  setDraftFaction: (val) => {
+    set(
+      produce(draftState => {
+        draftState.currentPerso.faction = val;
+      }));
+  },
+
+}));
+
+if (process.env.NODE_ENV === 'development') {
+  mountStoreDevtool('Store', useStore);
+}
+
+
+
+
 export const INSMVNumberInput = (props: NumberInputProps) => {
   return (
     <NumberInput {...props} step={0.5} precision={1} />
   );
 };
 
-
-function BillingPanel(props:
-  {
-    billingState: IBillingItem[],
-    availablePa: number,
-    cancelThisBillableItem: (key: string) => void;
-    commitThisBillableItem:  (key: string) => void;
-  }) {
-
-  const billingItems = props.billingState;
-  const sum = calcBillingItemSum(billingItems);
-  const remainingPa = props.availablePa - sum;
-  const deleteTheStuffHandler = (key: string) => {
-    props.cancelThisBillableItem(key);
-  };
-  const commit = (key: string) => {
-    props.commitThisBillableItem(key);
-  };
-  // TODO: sorting billingItems by key or name were would be a good idea
-
-  // maybe use Dialog instead
-  return <Dialog opened={true} position={{ top: 20, right: 20 }}>
-    <Table>
-      <thead>
-        <tr>
-          <th>PA</th>
-          <th>Item</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{props.availablePa}</td>
-          <td> Initial</td>
-        </tr>
-
-        {
-          billingItems
-            .map((billingItem) => {
-              if (Object.keys(billingItem).length) {
-                return (
-                  <tr key={billingItem.key}>
-                    <td>-{billingItem.cost}</td>
-                    <td>{billingItem.msg}</td>
-                    <td>
-                      <ActionIcon onClick={(x: any) => deleteTheStuffHandler(billingItem.key)}>
-                        <IconX size={16} />
-                      </ActionIcon>
-                      <ActionIcon onClick={(x: any) => commit(billingItem.key)}>
-                        <IconCheck size={16} />
-                      </ActionIcon>
-                    </td>
-                  </tr>
-
-                );
-              } else {
-                return;
-              }
-            })
-
-        }
-        <tr>
-          <td>{remainingPa}</td>
-          <td> total</td>
-          <td>
-            <ActionIcon disabled={true}>
-              <IconCheck size={16} />
-            </ActionIcon>
-          </td>
-        </tr>
-      </tbody>
-    </Table>
-
-  </Dialog>;
-}
-
-
-export type TcaracteristiquesSet = {
-  [K in "force" | "agilite" | "perception" | "volonte" | "presence" | "foi" as string]: number;
-}
-
-interface IPerso {
-  identite: string;
-  faction: Factions;
-  superieur: string;
-  grade: number;
-  caracteristiques: TcaracteristiquesSet;
-  pa: number;
-  paTotal: number;
-  pp: number;
-  ppMax: number;
-
-}
-export interface IFeuilleDePersoState extends IPerso {
-  billingState: IBillingItem[];
-  paAfterBilling: number,
-
-}
-export interface IBillingItem {
-  key: string,
-  msg: string,
-  cost: number
-}
-
-function calcBillingItemSum(billingItems: IBillingItem[]) {
-  let sum = 0;
-  if (billingItems) {
-    for (const billingItem of billingItems) {
-      sum += billingItem.cost;
-    }
-  }
-  return sum;
-}
-
-interface IPersf {
-  perso: IPerso,
-  setPersoHandler : (x:any) => void  
-}
-
-interface ImyStore{
-  votes : number,
-  addVotes: (by: number )=>void
-}
-export const myStore = create<ImyStore>(set => ({
-  votes: 0,
-  addVotes: (by) => set(state => ({ votes: state.votes + by })),
-}));
-function FeuilleDePerso(props: IPersf) {
-  const [state, setState] = useSetState<IFeuilleDePersoState>({
-    ...props.perso,
-    billingState: [],
-    paAfterBilling: props.perso.pa
-  });
-
-  const updatePaAfterBilling = (billingState: IBillingItem[], availablePa: number) => {
-    const sum = calcBillingItemSum(billingState);
-    const updatedPaAfterBilling = availablePa - sum;
-    return updatedPaAfterBilling;
-
-  }
-
-  const statusChangeHandler = (updatedState: Partial<IFeuilleDePersoState>) => {
-    let updatedPaAfterBilling = state.paAfterBilling;
-    if ("pa" in updatedState) {
-      const availablePa = updatedState.pa || state.paAfterBilling; // defaults to the current state (state.paAfterBilling) in case updatedState.pa is undefined
-      updatedPaAfterBilling = updatePaAfterBilling(state.billingState, availablePa);
-    }
-
-
-    setState({ ...updatedState, paAfterBilling: updatedPaAfterBilling });
-  }
-
-  const caraChangeHandler = (updateMap: { caracteristiques: Pick<TcaracteristiquesSet, keyof TcaracteristiquesSet>; caraBillingItem: IBillingItem; }) => {
-    // iterate over the current billing state, update if same key is found, otherwise append
-    const caraBillingItem = updateMap.caraBillingItem;
-    let haveUpdated = false;
-    const updatedBillingState = state.billingState.map((billingItem: IBillingItem) => {
-      if (billingItem.key === caraBillingItem.key) {
-        haveUpdated = true;
-        return caraBillingItem;
-      } else {
-        return billingItem;
-      }
-    });
-    if (!haveUpdated) {
-      updatedBillingState.push(caraBillingItem);
-    }
-
-    const updatedPaAfterBilling = updatePaAfterBilling(updatedBillingState, state.pa);
-
-    setState({
-      billingState: updatedBillingState,
-      paAfterBilling: updatedPaAfterBilling,
-      caracteristiques: {
-        ...state.caracteristiques,
-        ...updateMap.caracteristiques
-      }
-    })
-  };
-
-  const cancelThisBillableItem = (key: string) => {
-    const updatedBillingState = state.billingState.filter(x => x.key !== key);
-    const updatedPaAfterBilling = updatePaAfterBilling(updatedBillingState, state.pa);
-    let updatedState: Partial<IFeuilleDePersoState> = {
-      billingState: updatedBillingState,
-      paAfterBilling: updatedPaAfterBilling,
-    };
-
-
-    if (key.startsWith("cara_")) {
-      const caraKey = key.split("cara_")[1];
-      const updatedCaracteristique = { ...state.caracteristiques, [caraKey]: props.perso.caracteristiques[caraKey] }
-      updatedState = { ...updatedState, caracteristiques: updatedCaracteristique };
-      caraSetState(updatedCaracteristique);
-    }
-
-    setState(updatedState);
-
-  }
-
-
-  const [caraState, caraSetState] = useSetState({
-    force: props.perso.caracteristiques.force,
-    agilite: props.perso.caracteristiques.agilite,
-    perception: props.perso.caracteristiques.perception,
-    presence: props.perso.caracteristiques.presence,
-    foi: props.perso.caracteristiques.foi,
-  });
-  const addVotes = myStore(state => state.addVotes);
-
-  const commitThisBillableItem = (key: string) => {
-    console.log(key);
-    // Remove the billable line
-    const billingLine = state.billingState.find(x => x.key === key);
-    if(billingLine != undefined){
-      const updatedBillingState = state.billingState.filter(x => x.key !== key);
-
-      const updatedPa = state.pa - billingLine.cost;
-      // Change the state.pa
-
-      let updatedPaAfterBilling  = updatePaAfterBilling(updatedBillingState, updatedPa);
-      let updatedState : Partial<IFeuilleDePersoState> = {
-        pa: updatedPa,
-        billingState: updatedBillingState,
-        paAfterBilling: updatedPaAfterBilling,
-      };
-
-      if (key.startsWith("cara_")) {
-        const caraKey = key.split("cara_")[1];
-        const updatedCaracteristique = { ...state.caracteristiques, [caraKey]: state.caracteristiques[caraKey] }
-        updatedState = { ...updatedState, caracteristiques: updatedCaracteristique };
-
-        let updatedPerso = {...props.perso, caracteristiques: updatedCaracteristique}
-        props.setPersoHandler({caracteristiques: updatedCaracteristique});
-        // update the state or update the parent props ?
-        caraSetState(updatedCaracteristique);
-        addVotes(5);
-      }
-
-
-      setState(updatedState);
-  
-    }
-
-
-  }
+function FeuilleDePerso(props: { draftPerso: Personnage, originalPerso: Personnage, billingItems: IBillingItem[], paAfterBilling: number }) {
+  const { draftPerso, originalPerso, billingItems, paAfterBilling } = props;
+  // const {draftIdentite, draftFaction, draftSuperieur, draftGrade, draftCaracteristiques, draftPa, draftPaTotal, draftPp, draftPpMax} = props.draftPerso;
+  // const {identite, faction, superieur, grade, caracteristiques, pa, paTotal, pp, ppMax} = props.perso;
 
   return (
     <Stack>
-
       <BillingPanel
-        billingState={state.billingState}
-        availablePa={state.pa}
-        cancelThisBillableItem={cancelThisBillableItem}
-        commitThisBillableItem={commitThisBillableItem}
+        billingItems={billingItems}
+        initialPa={draftPerso.pa}
       />
 
-      <Caracteristiques caracteristiques={state.caracteristiques}
-        initialcaracteristiques={props.perso.caracteristiques}
-        caraState={caraState}
-        caraSetState={caraSetState}
-        pa={state.paAfterBilling}
-        onChangeCara={caraChangeHandler}
+      <Caracteristiques
+        caracteristiques={draftPerso.caracteristiques}
+        initialCaracteristiques={originalPerso.caracteristiques}
+        // caraState={caraState}
+        // caraSetState={caraSetState}
+        availablePa={paAfterBilling}
+      // onChangeCara={caraChangeHandler}
       />
-      <Status pa={state.pa} paTotal={state.paTotal}
-        pp={state.pp} ppMax={state.ppMax}
-        force={state.caracteristiques.force} faction={state.faction}
-        statusChangeHandler={statusChangeHandler}
+      <Status pa={draftPerso.pa} paTotal={draftPerso.paTotal}
+        pp={draftPerso.pp} ppMax={draftPerso.ppMax}
+        force={draftPerso.caracteristiques.force}
+        faction={draftPerso.faction}
       />
 
+      <Group>
+        <Text>{draftPerso.caracteristiques.force}</Text>
+
+      </Group>
     </Stack>
   );
 
 
 }
 
+
 function App() {
-  
-  const [perso, setPerso] = useSetState({
-    
-      identite: "Jean la Mèche",
-      faction: Factions.DEMONS,
-      superieur: "Baal",
-      grade: 3,
-  
-      caracteristiques: {
-        force: 4,
-        agilite: 6,
-        perception: 5,
-        volonte: 7,
-        presence: 1.5,
-        foi: 5,
-      },
-      pa: 12,
-      paTotal: 9001,
-      pp: 60,
-      ppMax: 50,
-    
-  });
+  const perso = useStore((state) => state.currentPerso);
+  const originalPerso = useStore((state) => state.originalPerso);
+  const billingItems = useStore((state) => state.billingItems);
+  const paAfterBilling = useStore((state) => state.paAfterBilling);
+
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <FeuilleDePerso perso={perso} setPersoHandler={setPerso} />
+      <NotificationsProvider>
+        <SegmentedControl
+          data={[
+            { label: "Creation", value: "create" },
+            { label: "Update", value: "update" },
+
+          ]} />
+        <FeuilleDePerso draftPerso={perso} originalPerso={originalPerso} billingItems={billingItems} paAfterBilling={paAfterBilling} />
+      </NotificationsProvider>
     </MantineProvider>
   );
 }
-
 export default App;

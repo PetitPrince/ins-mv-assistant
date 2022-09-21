@@ -1,8 +1,9 @@
-export const talents_par_defaut = [
+ [
     {
       "specialisation": "Générique",
       "nom": "Acrobatie",
-      "caracteristique_associe": "Agilité",
+      "id": "acrobatie",
+      "caracteristique_associe": "agilite",
       "inne": true,
       "superieur_exotique": "",
       "type": "Secondaire"
@@ -10,7 +11,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Aisance sociale",
-      "caracteristique_associe": "Présence",
+      "id": "aisance-sociale",
+      "caracteristique_associe": "presence",
       "inne": true,
       "superieur_exotique": "",
       "type": "Secondaire"
@@ -18,7 +20,17 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Art",
-      "caracteristique_associe": "Présence",
+      "id": "art",
+      "caracteristique_associe": "presence",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Art   ",
+      "id": "art-specifique",
+      "caracteristique_associe": "presence",
       "inne": false,
       "superieur_exotique": "",
       "type": "Secondaire"
@@ -26,7 +38,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Athlétisme",
-      "caracteristique_associe": "Force",
+      "id": "athletisme",
+      "caracteristique_associe": "force",
       "inne": true,
       "superieur_exotique": "",
       "type": "Secondaire"
@@ -34,7 +47,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Baratin",
-      "caracteristique_associe": "Présence",
+      "id": "baratin",
+      "caracteristique_associe": "presence",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -42,7 +56,17 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Combat",
-      "caracteristique_associe": "Agilité",
+      "id": "combat",
+      "caracteristique_associe": "agilite",
+      "inne": true,
+      "superieur_exotique": "",
+      "type": "Principal"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Combat   ",
+      "id": "combat-specifique",
+      "caracteristique_associe": "agilite",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -50,7 +74,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Conduite",
-      "caracteristique_associe": "Agilité",
+      "id": "conduite",
+      "caracteristique_associe": "agilite",
       "inne": false,
       "superieur_exotique": "",
       "type": "Secondaire"
@@ -58,7 +83,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Contorsionisme",
-      "caracteristique_associe": "Agilité",
+      "id": "contorsionisme",
+      "caracteristique_associe": "agilite",
       "inne": false,
       "superieur_exotique": "Christophe, Janus, Kobal, Valefor",
       "type": "Exotique"
@@ -66,7 +92,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Corps à corps",
-      "caracteristique_associe": "Agilité",
+      "id": "corps-a-corps",
+      "caracteristique_associe": "agilite",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -74,6 +101,16 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Culture générale",
+      "id": "culture-generale",
+      "caracteristique_associe": "Aucune",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Culture générale   ",
+      "id": "culture-generale-specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -82,7 +119,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Défense",
-      "caracteristique_associe": "Agilité",
+      "id": "defense",
+      "caracteristique_associe": "agilite",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -90,7 +128,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Discrétion",
-      "caracteristique_associe": "Agilité",
+      "id": "discretion",
+      "caracteristique_associe": "agilite",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -98,7 +137,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Discussion",
-      "caracteristique_associe": "Volonté",
+      "id": "discussion",
+      "caracteristique_associe": "volonte",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -106,7 +146,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Enquête",
-      "caracteristique_associe": "Chance / Foi",
+      "id": "enquete",
+      "caracteristique_associe": "foi",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -114,7 +155,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Fouille",
-      "caracteristique_associe": "Perception",
+      "id": "fouille",
+      "caracteristique_associe": "perception",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -122,6 +164,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Multiple",
       "nom": "Hobby",
+      "id": "hobby",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -130,6 +173,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Humour",
+      "id": "humour",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "Christophe, Haagenti, Kobal",
@@ -138,7 +182,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Hypnotisme",
-      "caracteristique_associe": "Volonté",
+      "id": "hypnotisme",
+      "caracteristique_associe": "volonte",
       "inne": false,
       "superieur_exotique": "Joseph, Walther, Abalam, Nog, Scox",
       "type": "Exotique"
@@ -146,6 +191,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Informatique",
+      "id": "informatique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -154,7 +200,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Intimidation",
-      "caracteristique_associe": "Force",
+      "id": "intimidation",
+      "caracteristique_associe": "force",
       "inne": true,
       "superieur_exotique": "",
       "type": "Secondaire"
@@ -162,6 +209,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Intrusion",
+      "id": "intrusion",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -170,6 +218,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Jeu",
+      "id": "jeu",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "Asmodée",
@@ -178,6 +227,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Kama sutra",
+      "id": "kama-sutra",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "Andrealphus",
@@ -186,7 +236,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Language animal",
-      "caracteristique_associe": "Perception",
+      "id": "language-animal",
+      "caracteristique_associe": "perception",
       "inne": false,
       "superieur_exotique": "Jordi, Novalis, Caym",
       "type": "Exotique"
@@ -194,6 +245,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Multiple",
       "nom": "Langues",
+      "id": "langues",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -202,6 +254,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Médecine",
+      "id": "medecine",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -210,6 +263,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Multiple",
       "nom": "Métier",
+      "id": "metier",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -218,7 +272,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Narcolepsie",
-      "caracteristique_associe": "Volonté",
+      "id": "narcolepsie",
+      "caracteristique_associe": "volonte",
       "inne": false,
       "superieur_exotique": "Blandine, Beleth, Nog",
       "type": "Exotique"
@@ -226,6 +281,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Navigation",
+      "id": "navigation",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -234,7 +290,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Pickpocket",
-      "caracteristique_associe": "Agilité",
+      "id": "pickpocket",
+      "caracteristique_associe": "agilite",
       "inne": false,
       "superieur_exotique": "Janus, Valefor",
       "type": "Exotique"
@@ -242,6 +299,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Pilotage",
+      "id": "pilotage",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -250,7 +308,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Prestedigitation",
-      "caracteristique_associe": "Agilité",
+      "id": "prestedigitation",
+      "caracteristique_associe": "agilite",
       "inne": false,
       "superieur_exotique": "Christophe, Janus, Valefor",
       "type": "Exotique"
@@ -258,6 +317,16 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Savoir criminel",
+      "id": "savoir-criminel",
+      "caracteristique_associe": "Aucune",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Savoir criminel   ",
+      "id": "savoir-criminel-specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -266,6 +335,16 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Savoir d’espion",
+      "id": "savoir-d-espion",
+      "caracteristique_associe": "Aucune",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Savoir d’espion   ",
+      "id": "savoir-d-espion-specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -274,6 +353,16 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Savoir militaire",
+      "id": "savoir-militaire",
+      "caracteristique_associe": "Aucune",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Savoir militaire   ",
+      "id": "savoir-militaire-specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -282,6 +371,16 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Savoir occulte",
+      "id": "savoir-occulte",
+      "caracteristique_associe": "Aucune",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Savoir occulte   ",
+      "id": "savoir-occulte-specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -290,6 +389,16 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Science",
+      "id": "science",
+      "caracteristique_associe": "Aucune",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Science   ",
+      "id": "science-specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -298,7 +407,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Séduction",
-      "caracteristique_associe": "Présence",
+      "id": "seduction",
+      "caracteristique_associe": "presence",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -306,7 +416,8 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Sixième sens",
-      "caracteristique_associe": "Chance / Foi",
+      "id": "sixieme-sens",
+      "caracteristique_associe": "foi",
       "inne": false,
       "superieur_exotique": "Dominique, Andromalius",
       "type": "Exotique"
@@ -314,7 +425,17 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Survie",
-      "caracteristique_associe": "Perception",
+      "id": "survie",
+      "caracteristique_associe": "perception",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Survie   ",
+      "id": "survie-specifique",
+      "caracteristique_associe": "perception",
       "inne": false,
       "superieur_exotique": "",
       "type": "Secondaire"
@@ -322,6 +443,16 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Technique",
+      "id": "technique",
+      "caracteristique_associe": "Aucune",
+      "inne": false,
+      "superieur_exotique": "",
+      "type": "Secondaire"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Technique   ",
+      "id": "technique-specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -330,7 +461,17 @@ export const talents_par_defaut = [
     {
       "specialisation": "Spécifique",
       "nom": "Tir",
-      "caracteristique_associe": "Perception",
+      "id": "tir",
+      "caracteristique_associe": "perception",
+      "inne": true,
+      "superieur_exotique": "",
+      "type": "Principal"
+    },
+    {
+      "specialisation": "Spécifique",
+      "nom": "Tir   ",
+      "id": "tir-specifique",
+      "caracteristique_associe": "perception",
       "inne": true,
       "superieur_exotique": "",
       "type": "Principal"
@@ -338,6 +479,7 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Torture",
+      "id": "torture",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "Joseph",
@@ -346,9 +488,10 @@ export const talents_par_defaut = [
     {
       "specialisation": "Générique",
       "nom": "Ventriloquie",
+      "id": "ventriloquie",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "Christophe",
       "type": "Exotique"
     }
-  ];
+  ]

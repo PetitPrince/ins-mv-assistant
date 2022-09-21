@@ -1,3 +1,4 @@
+// @ts-nocheck
 import './App.css';
 import { MantineProvider, NumberInputProps } from '@mantine/core';
 import { Button, TextInput, NumberInput, Autocomplete, Stack, Group, Select, Title, Table } from '@mantine/core';

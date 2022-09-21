@@ -4,7 +4,7 @@ import { IconCheck, IconX } from '@tabler/icons';
 import React from 'react';
 import { applyPatch, createPatch } from 'rfc6902';
 import { showNotification } from '@mantine/notifications';
-import { useStore, Personnage } from './App';
+import { useStore, Personnage, Talent, allTalents } from './App';
 import { ReplaceOperation } from 'rfc6902/diff';
 import { FACTIONS } from './myConst';
 
@@ -30,14 +30,12 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
 
   for (const diff of differences) {
     console.log(diff);
-    if (diff.op === "replace") {
+    if (diff.op === "replace" || diff.op === "add") {
       const diffPathElements = diff.path.split("/");
       // diff.path looks like "/caracteristiques/force"
       const diffCategory = diffPathElements[1];
-      const originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
-      const casted: ReplaceOperation = diff;
-      const val = casted.value;
-
+      let originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
+      const val = diff.op === "add" ? diff.value.niveau : diff.value;
       switch (diffCategory) {
         case "caracteristiques":
           const caraName = diffPathElements[diffPathElements.length - 1];
@@ -81,6 +79,47 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
             key: diff.path,
             msg: "Grade: " + originalValue + " → " + val,
             cost: null,
+          });
+          break;
+        case "talents":
+          const talentId = diffPathElements[3];
+          const talentCategory = diffPathElements[2];
+          const standardTalent = allTalents.find(x => x.id === talentId)
+          if(standardTalent == undefined){
+            console.log("Cannot find talent with id "+ talentId);
+            break;
+          }
+
+          // Calc cost here
+
+          const associatedCara = standardTalent.associatedChara
+          if(diff.op === "add"){
+            originalValue=Math.floor(currentPerso.caracteristiques[associatedCara]/2)
+          } 
+          let cost;
+          if(talentCategory==="principaux"){
+            cost = (val-originalValue)*2;
+          }
+          // else if(talentCategory==="secondaire"){
+          //   cost = value.niveau;
+          // }
+          else{ // assume exotique
+            cost = val;
+          }
+
+          // Get name here
+          let talentName = standardTalent.name;
+          if(diff.path.includes("specifique")){
+            //  talentName = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path.split('/').slice(0, -1).join('/'), '/').customNameFragment;
+            const fragment = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path, '/').customNameFragment;
+            talentName = fragment ? fragment : "spécifique"
+          }
+          // TODO: something wrong here
+          
+          billingItems.push({
+            key: diff.path,
+            msg: "Talent "+standardTalent.name+"("+talentName+"): " + originalValue + " → " + val,
+            cost: cost,
           });
           break;
 

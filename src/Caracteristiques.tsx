@@ -1,6 +1,6 @@
 import { NumberInputProps } from '@mantine/core';
 import { Stack, Group, Title } from '@mantine/core';
-import { INSMVNumberInput, ICaracteristiquesSet, useStore, CARACTERISTIQUES } from './App';
+import { INSMVNumberInput, TCaracteristiquesSet, useStore, CARACTERISTIQUES } from './App';
 
 interface INSMVCaraNumberInputProps extends NumberInputProps {
   initialValue: number;
@@ -23,7 +23,7 @@ const INSMVCaraNumberInput = (props: INSMVCaraNumberInputProps) => {
 };
 
 
-export function Caracteristiques(props: { caracteristiques: ICaracteristiquesSet; initialCaracteristiques: ICaracteristiquesSet; availablePa: number; }) {
+export function Caracteristiques(props: { caracteristiques: TCaracteristiquesSet; initialCaracteristiques: TCaracteristiquesSet; availablePa: number; }) {
   // const {force, agilite,perception, volonte, presence, foi } = useStore(state => state.currentPerso.caracteristiques)
   const { force, agilite, perception, volonte, presence, foi } = props.caracteristiques;
   const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = props.caracteristiques;

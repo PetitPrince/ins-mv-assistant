@@ -1,10 +1,10 @@
-import { Table } from '@mantine/core';
+import { ScrollArea, Table } from '@mantine/core';
 import { ActionIcon, Dialog } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons';
 import React from 'react';
 import { applyPatch, createPatch } from 'rfc6902';
 import { showNotification } from '@mantine/notifications';
-import { useStore, Personnage, Talent, allTalents } from './App';
+import { useStore, Personnage, allTalents } from './App';
 import { ReplaceOperation } from 'rfc6902/diff';
 import { FACTIONS } from './myConst';
 
@@ -48,7 +48,7 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           break;
         case "faction":
           let updatedCost = null; // TODO: check if creation or update (or rather, if update -> faction change shouldn't even be a possiblity)
-          if(val==FACTIONS.ANGES){
+          if(val===FACTIONS.ANGES){
             updatedCost = -100;
           }else if(val===FACTIONS.DEMONS){
             updatedCost = -80;
@@ -84,41 +84,57 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
         case "talents":
           const talentId = diffPathElements[3];
           const talentCategory = diffPathElements[2];
-          const standardTalent = allTalents.find(x => x.id === talentId)
-          if(standardTalent == undefined){
+          let standardTalent = allTalents.find(x => x.id === talentId)
+          if(standardTalent === undefined){            
+            console.log("Cannot find talent with id "+ talentId);
+          }
+          const standardTalentAgain = allTalents.find(x => x.id === talentId.split('-')[0]);
+          if(standardTalentAgain === undefined){            
             console.log("Cannot find talent with id "+ talentId);
             break;
           }
+          standardTalent = standardTalentAgain;
+
 
           // Calc cost here
 
           const associatedCara = standardTalent.associatedChara
           if(diff.op === "add"){
-            originalValue=Math.floor(currentPerso.caracteristiques[associatedCara]/2)
+            if(associatedCara==="Aucune"){
+              originalValue=1;
+
+            }else{
+              originalValue=Math.floor(currentPerso.caracteristiques[associatedCara]/2)
+
+            }
           } 
           let cost;
           if(talentCategory==="principaux"){
             cost = (val-originalValue)*2;
           }
-          // else if(talentCategory==="secondaire"){
-          //   cost = value.niveau;
-          // }
+          else if(talentCategory==="secondaires"){
+            cost = (val-originalValue)*2;
+            // TODO: but there's also the freepoints
+          }
           else{ // assume exotique
             cost = val;
           }
 
           // Get name here
           let talentName = standardTalent.name;
+          let msgString = "Talent " + standardTalent.name +" "+ originalValue + " → " + val;
+
           if(diff.path.includes("specifique")){
             //  talentName = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path.split('/').slice(0, -1).join('/'), '/').customNameFragment;
             const fragment = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path, '/').customNameFragment;
-            talentName = fragment ? fragment : "spécifique"
+            talentName = fragment ? fragment : "spécifique";
+            msgString = "Talent " + standardTalent.name + "(" + talentName + "): " + originalValue + " → " + val;
           }
           // TODO: something wrong here
           
           billingItems.push({
             key: diff.path,
-            msg: "Talent "+standardTalent.name+"("+talentName+"): " + originalValue + " → " + val,
+            msg: msgString,
             cost: cost,
           });
           break;
@@ -127,8 +143,8 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           break;
       }
     }
-
   }
+
   return billingItems;
 };
 
@@ -167,7 +183,7 @@ export function BillingPanel(props: {
     // key looks lioke "/caracteristiques/volonte"
     // I have to reset the value to the original number
     const differences = createPatch(originalPerso, currentPerso);
-    const differencesMinusTheOneIWantToDelete = differences.filter(x => x.path != key);
+    const differencesMinusTheOneIWantToDelete = differences.filter(x => x.path !== key);
     let persoCopy = JSON.parse(JSON.stringify(originalPerso)); // deep copy
     applyPatch(persoCopy, differencesMinusTheOneIWantToDelete);
     setPerso(persoCopy);
@@ -235,6 +251,8 @@ export function BillingPanel(props: {
   // TODO: sorting billingItems by key or name were would be a good idea
   // maybe use Dialog instead
   return <Dialog opened={true} position={{ top: 20, right: 20 }}>
+    <ScrollArea.Autosize maxHeight={300}>
+      
     <Table>
       <thead>
         <tr>
@@ -277,7 +295,7 @@ export function BillingPanel(props: {
 
               );
             } else {
-              return;
+              return null;
             }
           })}
         <tr>
@@ -291,6 +309,7 @@ export function BillingPanel(props: {
         </tr>
       </tbody>
     </Table>
+    </ScrollArea.Autosize>
 
   </Dialog>;
 }

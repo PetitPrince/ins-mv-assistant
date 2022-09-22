@@ -1,5 +1,5 @@
 import './App.css';
-import { ActionIcon, Button, Grid, InputProps, MantineProvider, NumberInputProps, Popover, TextInput, Title } from '@mantine/core';
+import { ActionIcon, Box, Button, Center, Grid, InputProps, MantineProvider, NumberInputProps, Popover, TextInput, Title } from '@mantine/core';
 import { NumberInput, Stack, Group, Table } from '@mantine/core';
 import { Radio, Text, SegmentedControl, AutocompleteProps } from '@mantine/core';
 import { FACTIONS } from './myConst';
@@ -14,7 +14,7 @@ import { IBillingItem, calcBillingItemSum, BillingPanel, generateBillingItems } 
 import { Status } from './Status';
 import { Caracteristiques } from './Caracteristiques';
 import { Generalites } from './Generalites';
-import { IconCheck, IconEdit, IconX } from '@tabler/icons';
+import { IconCheck, IconEdit, IconSortAscendingLetters, IconTool, IconX } from '@tabler/icons';
 import talentsJson from './talents.json';
 
 enablePatches()
@@ -69,8 +69,12 @@ const emptyPerso: Personnage = {
       //   niveau: 3
       // }
     },
-    secondaire: [],
-    exotique: []
+    secondaire: {
+      "aisance-sociale": {
+        niveau: 3
+      }
+    },
+    exotique: {}
   }
 
 };
@@ -150,10 +154,9 @@ const talentsJson2: LoadedTalentJson[] = talentsJson;
 export const allTalents = talentsJson2.map(TalentStandard.fromJson);
 const TALENTS_PRINCIPAUX_STANDARD = allTalents.filter((talent) => { return talent.talentType === "Principal"; })
 
-interface TalentsPrincipaux {
+interface TalentsCollection {
   [key: string]: Talent;
 }
-
 export interface Personnage {
   identite: String,
   faction: FACTIONS,
@@ -166,9 +169,9 @@ export interface Personnage {
   ppMax: number,
   freeTalentPoints: number,
   talents: {
-    principaux: TalentsPrincipaux
-    secondaire: Talent[],
-    exotique: Talent[],
+    principaux: TalentsCollection
+    secondaire: TalentsCollection,
+    exotique: TalentsCollection,
   }
   // TODO: talents, pouvoirs
 }
@@ -294,7 +297,7 @@ interface TalentDisplayRow {
   isNameEditable: boolean
 }
 
-function computeRowsTalentsPrincipaux(characterTalents: TalentsPrincipaux, characterCara: TCaracteristiquesSet) {
+function computeRowsTalentsPrincipaux(characterTalents: TalentsCollection, characterCara: TCaracteristiquesSet) {
   let rows: TalentDisplayRow[] = [];
 
   // Go through the list of standard talents, display those who are presents
@@ -316,7 +319,7 @@ function computeRowsTalentsPrincipaux(characterTalents: TalentsPrincipaux, chara
           })
         } else {
           const defaultLevel = isInnate ? Math.floor(characterCara[associatedChara] / 2) : undefined
-          const displayName = isNameEditable ? name+"(...)" : name
+          const displayName = isNameEditable ? name + "(...)" : name
           rows.push({
             id: id,
             name: displayName,
@@ -356,23 +359,25 @@ function computeRowsTalentsPrincipaux(characterTalents: TalentsPrincipaux, chara
 
 }
 
-function TalentsPrincipaux(props: any) {
+
+
+function TalentsPrincipaux(props: {characterTalents: TalentsCollection}) {
   const perso = useStore((state) => state.currentPerso);
   const originalPerso = useStore((state) => state.originalPerso);
   const storeCurrentTalentPrincipal = useStore(state => state.setCurrentTalentPrincipal);
-  const setCurrentTalentPrincipal = (id: string, val: number|undefined, newCustomNameFragment?: string) => {
-    if(val != undefined){
+  const setCurrentTalentPrincipal = (id: string, val: number | undefined, newCustomNameFragment?: string) => {
+    if (val != undefined) {
       let updatedCustomNameFragment;
-      if(Object.hasOwn(perso.talents.principaux,id) && perso.talents.principaux[id].customNameFragment){
-        updatedCustomNameFragment=perso.talents.principaux[id].customNameFragment;
+      if (Object.hasOwn(perso.talents.principaux, id) && perso.talents.principaux[id].customNameFragment) {
+        updatedCustomNameFragment = perso.talents.principaux[id].customNameFragment;
       }
-      if(newCustomNameFragment){
+      if (newCustomNameFragment) {
         updatedCustomNameFragment = newCustomNameFragment;
       }
       const newTal: Talent = updatedCustomNameFragment ? {
         niveau: val,
         customNameFragment: updatedCustomNameFragment
-      }:{
+      } : {
         niveau: val,
       }
       storeCurrentTalentPrincipal(id, newTal)
@@ -382,6 +387,25 @@ function TalentsPrincipaux(props: any) {
   return (
     <Stack>
       <Title order={3}>Talents principaux</Title>
+      {/* To this after */}
+      {/* <SegmentedControl data={[
+        {
+          label: (<Center>
+            <IconSortAscendingLetters size={16} />
+            <Box ml={10}>Alphabétique</Box>
+          </Center>
+          ), 
+          value: 'alpha'
+        },
+        {
+          label: (<Center>
+            <IconTool size={16} />
+            <Box ml={10}>Utilisation</Box>
+          </Center>
+          ), 
+          value: 'usage'
+        },
+      ]} /> */}
       <Table>
         <thead>
           <tr>
@@ -393,44 +417,43 @@ function TalentsPrincipaux(props: any) {
         <tbody>{
           rows.map((row: TalentDisplayRow) => {
             let isModified = false;
-            if(Object.hasOwn(originalPerso.talents.principaux,row.id)){
+            if (Object.hasOwn(originalPerso.talents.principaux, row.id)) {
               isModified = row.level !== originalPerso.talents.principaux[row.id].niveau;
-            }else{
-              console.log(row.level ||0);
+            } else {
+              console.log(row.level || 0);
 
-              isModified = (row.level ||0) > 1;
+              isModified = (row.level || 0) > 1;
             }
             const availablePa = perso.pa;
             const variant = isModified ? "filled" : "default";
             const radius = isModified ? "xl" : "sm";
             let errorString = isModified && availablePa < 0 ? "  " : "";
-          
+
             if (row.isNameEditable) {
-              const primaryTalentId =  row.id.split("-specifique")[0]
+              const primaryTalentId = row.id.split("-specifique")[0]
               const primaryTalent = perso.talents.principaux[primaryTalentId]
-              if(primaryTalent && row.level){
-                if(primaryTalent.niveau > row.level)
-                {
+              if (primaryTalent && row.level) {
+                if (primaryTalent.niveau > row.level) {
                   errorString = "Le niveau du talent général ne peut pas dépasser la spécialité"
                 }
               }
               console.log();
               return (
                 <tr key={row.name}>
-                  <td>{row.name} 
-                  <Popover width={300} trapFocus position="bottom" shadow="md">
-                    <Popover.Target>
-                      <ActionIcon><IconEdit size={16} /></ActionIcon>
-                    </Popover.Target>
-                    <Popover.Dropdown >
-                      <form 
-                      onSubmit={ (event:any)=> {let talentNameFragment = event.target.talentNameFragment.value; setCurrentTalentPrincipal(row.id, row.level, talentNameFragment)}}
-                      >
-                      <TextInput label="Nom de la spécialisation" name="talentNameFragment" size="xs" />
-                      <Button type="submit">Changer</Button>
-                      </form>
-                    </Popover.Dropdown>
-                  </Popover>
+                  <td>{row.name}
+                    <Popover width={300} trapFocus position="bottom" shadow="md">
+                      <Popover.Target>
+                        <ActionIcon><IconEdit size={16} /></ActionIcon>
+                      </Popover.Target>
+                      <Popover.Dropdown >
+                        <form
+                          onSubmit={(event: any) => { let talentNameFragment = event.target.talentNameFragment.value; setCurrentTalentPrincipal(row.id, row.level, talentNameFragment) }}
+                        >
+                          <TextInput label="Nom de la spécialisation" name="talentNameFragment" size="xs" />
+                          <Button type="submit">Changer</Button>
+                        </form>
+                      </Popover.Dropdown>
+                    </Popover>
                   </td>
                   <td><INSMVNumberInput error={errorString} variant={variant} radius={radius} value={row.level} min={0} onChange={(val: number) => { setCurrentTalentPrincipal(row.id, val) }} /></td>
                   <td>{row.associatedCarac}</td>
@@ -457,9 +480,9 @@ function TalentsPrincipaux(props: any) {
 function Talents(props: {
   talents: {
 
-    principaux: TalentsPrincipaux,
-    secondaire: Talent[],
-    exotique: Talent[],
+    principaux: TalentsCollection,
+    secondaire: TalentsCollection,
+    exotique: TalentsCollection,
 
   }
 }) { // TODO: props
@@ -469,7 +492,7 @@ function Talents(props: {
       <Title order={2}>Talents</Title>
       <Grid>
         <Grid.Col span={4}>
-          <TalentsPrincipaux characterTalents={props.talents.principaux} />
+          <TalentsPrincipaux characterTalents={props.talents.principaux}/>
         </Grid.Col>
         {/* <Grid.Col span={4}>
           <TalentsExotiques talentsExotiquesDuPerso={props.talentsExotiquesDuPerso} />

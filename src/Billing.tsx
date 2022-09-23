@@ -90,7 +90,7 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           }
           const standardTalentAgain = allTalents.find(x => x.id === talentId.split('-')[0]);
           if(standardTalentAgain === undefined){            
-            console.log("Cannot find talent with id "+ talentId);
+            console.log("Cannot find talent with id "+ talentId+", breaking");
             break;
           }
           standardTalent = standardTalentAgain;
@@ -125,12 +125,10 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           let msgString = "Talent " + standardTalent.name +" "+ originalValue + " → " + val;
 
           if(diff.path.includes("specifique")){
-            //  talentName = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path.split('/').slice(0, -1).join('/'), '/').customNameFragment;
             const fragment = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path, '/').customNameFragment;
             talentName = fragment ? fragment : "spécifique";
             msgString = "Talent " + standardTalent.name + "(" + talentName + "): " + originalValue + " → " + val;
           }
-          // TODO: something wrong here
           
           billingItems.push({
             key: diff.path,

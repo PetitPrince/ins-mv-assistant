@@ -1,7 +1,7 @@
 import { Autocomplete, Select, TextInput, Title } from '@mantine/core';
 import { NumberInput, Stack, Group } from '@mantine/core';
 import { FACTIONS, SUPERIEURS_ANGES, SUPERIEURS_DEMONS } from './myConst';
-import { useStore } from './App';
+import { useStore } from "./Store";
 
 interface SuperieurProps {
   value: string;

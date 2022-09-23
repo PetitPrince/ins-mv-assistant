@@ -1,5 +1,5 @@
 import { NumberInput, Stack, Group, Title, Table, Radio } from '@mantine/core';
-import { useStore } from './App';
+import { useStore } from "./Store";
 import { FACTIONS } from './myConst';
 
 export interface StatusProps {

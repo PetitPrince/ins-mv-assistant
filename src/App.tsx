@@ -30,19 +30,6 @@ export enum CARACTERISTIQUES {
 }
 
 
-// export interface ICaracteristiquesSet {
-//   force: number,
-//   agilite: number,
-//   perception: number,
-//   volonte: number,
-//   presence: number,
-//   foi: number,
-// }
-export type TCaracteristiquesSet = {
-  [K in CARACTERISTIQUES as string]: number;
-}
-
-
 const unPerso = {
 
   identite: "Jean la Mèche",
@@ -64,10 +51,7 @@ const unPerso = {
   ppMax: 50, // max PP is governed by faith + bought PP; not sure if it's the best to store it raw like this
 
 }
-export interface TalentExistant {
-  niveau: number,
-  customNameFragment?: string
-}
+
 
 export class TalentStandard {
   name: string;
@@ -107,9 +91,31 @@ const talentsJsonCasted: LoadedTalentJson[] = talentsJson;
 export const TOUS_LES_TALENTS = talentsJsonCasted.map(TalentStandard.fromJson);
 export const TALENTS_PRINCIPAUX_STANDARD = TOUS_LES_TALENTS.filter((talent) => { return talent.talentType === "Principal"; })
 export const TALENTS_SECONDAIRES_STANDARD = TOUS_LES_TALENTS.filter((talent) => { return talent.talentType === "Secondaire"; })
-
+export interface TalentExistant {
+  pa_depense?: number,
+  niveau: number,
+  customNameFragment?: string
+}
 export interface TalentsCollection {
   [key: string]: TalentExistant;
+}
+// export interface ICaracteristiquesSet {
+//   force: number,
+//   agilite: number,
+//   perception: number,
+//   volonte: number,
+//   presence: number,
+//   foi: number,
+// }
+export type TCaracteristiquesSet = {
+  [K in CARACTERISTIQUES as string]: number;
+}
+
+export type TCaracteristiquesSet2 ={
+  [K in CARACTERISTIQUES as string]: {
+    niveau: number,
+    pa_depense?: number
+  };
 }
 export interface Personnage {
   identite: String,
@@ -136,6 +142,19 @@ if (process.env.NODE_ENV === 'development') {
   mountStoreDevtool('Store', useStore);
 }
 
+interface Personnage2 {
+  identite: String,
+  faction: FACTIONS,
+  superieur: String, // todo: enum
+  grade: 0 | 1 | 2 | 3 | 4,
+  caracteristiques: {
+    force: {
+      pa_depense: number, // 2 PA dépensé en force -> 22 ; at creation, consider that every stat has a free bonus of +0.5
+      modificateur: number
+    },
+    /// etc
+  }
+}
 
 
 

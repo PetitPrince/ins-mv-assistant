@@ -1,6 +1,7 @@
 import { NumberInputProps } from '@mantine/core';
 import { Stack, Group, Title } from '@mantine/core';
-import { INSMVNumberInput, TCaracteristiquesSet, useStore, CARACTERISTIQUES } from './App';
+import { INSMVNumberInput, TCaracteristiquesSet, CARACTERISTIQUES } from './App';
+import { useStore } from "./Store";
 
 interface INSMVCaraNumberInputProps extends NumberInputProps {
   initialValue: number;

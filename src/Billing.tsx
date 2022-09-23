@@ -3,7 +3,8 @@ import { ActionIcon, Dialog } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons';
 import { applyPatch, createPatch } from 'rfc6902';
 import { showNotification } from '@mantine/notifications';
-import { useStore, Personnage, allTalents } from './App';
+import { Personnage, TOUS_LES_TALENTS } from './App';
+import { useStore } from "./Store";
 import { FACTIONS } from './myConst';
 
 export interface BillingItem {
@@ -87,13 +88,13 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
         case "talents":
           // Check if there's a standard talent existing
           const talentId = diffPathElements[3];
-          let standardTalent = allTalents.find(x => x.id === talentId)
+          let standardTalent = TOUS_LES_TALENTS.find(x => x.id === talentId)
           if (standardTalent === undefined) {
             console.log("Cannot find talent with id " + talentId);
           }
 
           // If not, maybe it's a specialized / multiple one; find the primary talent
-          const standardTalentAgain = allTalents.find(x => x.id === talentId.split('-')[0]);
+          const standardTalentAgain = TOUS_LES_TALENTS.find(x => x.id === talentId.split('-')[0]);
           if (standardTalentAgain === undefined) {
             console.log("Cannot find primary talent for id " + talentId + ", breaking");
             break;

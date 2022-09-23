@@ -138,7 +138,7 @@ export interface Personnage {
   faction: FACTIONS,
   superieur: String, // todo: enum
   grade: 0 | 1 | 2 | 3 | 4,
-  caracteristiques: ICaracteristiquesSet,
+  caracteristiques: ICaracteristiquesSet2,
   pa: number,
   paTotal: number,
   pp: number,
@@ -210,7 +210,7 @@ function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Person
       />
       <Status pa={currentPerso.pa} paTotal={currentPerso.paTotal}
         pp={currentPerso.pp} ppMax={currentPerso.ppMax}
-        force={currentPerso.caracteristiques.force}
+        force={currentPerso.caracteristiques.force.niveau}
         faction={currentPerso.faction}
       />
       <Talents talents={currentPerso.talents} />

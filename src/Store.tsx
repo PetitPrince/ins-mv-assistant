@@ -11,12 +11,30 @@ export const emptyPerso: Personnage = {
   superieur: "",
   grade: 0,
   caracteristiques: {
-    force: 2,
-    agilite: 2,
-    perception: 2,
-    volonte: 2,
-    presence: 2,
-    foi: 2,
+    force:{
+      niveau: 2,
+      pa_depense: 0
+    },
+    agilite:{
+      niveau: 2,
+      pa_depense: 0
+    },
+    perception:{
+      niveau: 2,
+      pa_depense: 0
+    },
+    volonte:{
+      niveau: 2,
+      pa_depense: 0
+    },
+    presence:{
+      niveau: 2,
+      pa_depense: 0
+    },
+    foi:{
+      niveau: 2,
+      pa_depense: 0
+    },
   },
   pa: 0,
   paTotal: 0,

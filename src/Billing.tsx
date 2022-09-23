@@ -44,10 +44,10 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
       switch (diffCategory) {
         case "caracteristiques":
           const caraName = diffPathElements[diffPathElements.length - 1]; // TODO: a neater way would be use a caraDisplay string instead of a the id
-          const valDiff = val - originalValue;
+          const valDiff = val - originalValue.niveau;
           billingItems.push({
             key: diff.path,
-            msg: caraName + ": " + originalValue + " → " + val,
+            msg: caraName + ": " + originalValue.niveau + " → " + val,
             cost: valDiff * 4,
           });
           break;
@@ -107,7 +107,7 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
             if (associatedCara === "Aucune") {
               originalValue = 1;
             } else {
-              originalValue = Math.floor(currentPerso.caracteristiques[associatedCara] / 2)
+              originalValue = Math.floor(currentPerso.caracteristiques[associatedCara].niveau / 2)
             }
           }
           const cost = (val - originalValue) * 2;

@@ -4,12 +4,12 @@ import { Text } from '@mantine/core';
 import { IconEdit } from '@tabler/icons';
 import slugify from 'slugify';
 import { useStore } from './Store';
-import { TalentStandard, TalentsCollection, TCaracteristiquesSet, TalentExistant, TALENTS_PRINCIPAUX_STANDARD, TALENTS_SECONDAIRES_STANDARD, INSMVNumberInput } from './App';
+import { TalentStandard, TalentsCollection, TCaracteristiquesSet, TalentExistant, TALENTS_PRINCIPAUX_STANDARD, TALENTS_SECONDAIRES_STANDARD, INSMVNumberInput, ICaracteristiquesSet, ICaracteristiquesSet2 } from './App';
 
 interface TalentDisplayRow extends TalentStandard {
   level: number | undefined;
 }
-function computeRowsTalents(characterTalents: TalentsCollection, characterCara: TCaracteristiquesSet, talentsStandards: TalentStandard[]) {
+function computeRowsTalents(characterTalents: TalentsCollection, characterCara: ICaracteristiquesSet2, talentsStandards: TalentStandard[]) {
   let rows: TalentDisplayRow[] = [];
 
   // Go through the list of standard talents, display those who are presents
@@ -50,7 +50,7 @@ function computeRowsTalents(characterTalents: TalentsCollection, characterCara: 
           });
 
         } else {
-          const defaultLevel = isInnate ? Math.floor(characterCara[associatedChara] / 2) : undefined;
+          const defaultLevel = isInnate ? Math.floor(characterCara[associatedChara].niveau / 2) : undefined;
           const displayName = isNameEditable ? name + "(...)" : name;
           rows.push({
             ...standardTalent,
@@ -67,7 +67,7 @@ function computeRowsTalents(characterTalents: TalentsCollection, characterCara: 
             level: existingTalent.niveau
           });
         } else {
-          const defaultLevel = isInnate ? Math.floor(characterCara[associatedChara] / 2) : undefined;
+          const defaultLevel = isInnate ? Math.floor(characterCara[associatedChara].niveau / 2) : undefined;
           rows.push({
             ...standardTalent,
             level: defaultLevel

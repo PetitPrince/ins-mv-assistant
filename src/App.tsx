@@ -111,7 +111,7 @@ export interface ICaracteristiquesSet {
 
 export interface Caracteristique{
   niveau: number,
-  pa_depense?:number
+  pa_depense:number
 }
 export interface ICaracteristiquesSet2 {
   [index: string] : Caracteristique,
@@ -134,9 +134,9 @@ export type TCaracteristiquesSet2 ={
   };
 }
 export interface Personnage {
-  identite: String,
+  identite: string,
   faction: FACTIONS,
-  superieur: String, // todo: enum
+  superieur: string, // todo: enum
   grade: 0 | 1 | 2 | 3 | 4,
   caracteristiques: ICaracteristiquesSet2,
   pa: number,
@@ -158,19 +158,7 @@ if (process.env.NODE_ENV === 'development') {
   mountStoreDevtool('Store', useStore);
 }
 
-interface Personnage2 {
-  identite: String,
-  faction: FACTIONS,
-  superieur: String, // todo: enum
-  grade: 0 | 1 | 2 | 3 | 4,
-  caracteristiques: {
-    force: {
-      pa_depense: number, // 2 PA dépensé en force -> 22 ; at creation, consider that every stat has a free bonus of +0.5
-      modificateur: number
-    },
-    /// etc
-  }
-}
+
 
 
 
@@ -181,31 +169,24 @@ export const INSMVNumberInput = (props: NumberInputProps) => {
 };
 
 
-function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Personnage, billingItems: BillingItem[], paAfterBilling: number }) {
-  const { currentPerso, originalPerso, billingItems, paAfterBilling } = props;
+function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Personnage, paAfterBilling: number }) {
+  const { currentPerso, originalPerso, paAfterBilling } = props;
   // const {draftIdentite, draftFaction, draftSuperieur, draftGrade, draftCaracteristiques, draftPa, draftPaTotal, draftPp, draftPpMax} = props.draftPerso;
   // const {identite, faction, superieur, grade, caracteristiques, pa, paTotal, pp, ppMax} = props.perso;
 
   return (
     <Stack>
-      <BillingPanel
-        billingItems={billingItems}
-        initialPa={currentPerso.pa}
-      />
+      <BillingPanel/>
 
       <Generalites
-        identite={currentPerso.identite}
-        faction={currentPerso.faction}
-        superieur={currentPerso.superieur}
-        grade={currentPerso.grade}
       />
 
       <Caracteristiques
-        caracteristiques={currentPerso.caracteristiques}
-        initialCaracteristiques={originalPerso.caracteristiques}
+        // caracteristiques={currentPerso.caracteristiques}
+        // initialCaracteristiques={originalPerso.caracteristiques}
         // caraState={caraState}
-        // caraSetState={caraSetState}
-        availablePa={paAfterBilling}
+        // // caraSetState={caraSetState}
+        // availablePa={paAfterBilling}
       // onChangeCara={caraChangeHandler}
       />
       <Status pa={currentPerso.pa} paTotal={currentPerso.paTotal}
@@ -213,10 +194,10 @@ function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Person
         force={currentPerso.caracteristiques.force.niveau}
         faction={currentPerso.faction}
       />
-      <Talents talents={currentPerso.talents} />
-      <Group>
+      {/* <Talents talents={currentPerso.talents} /> */}
+      {/* <Group>
         <Text> debug free secondary talent points {currentPerso.freeSecondayTalentPoints}</Text>
-      </Group>
+      </Group> */}
     </Stack>
   );
 
@@ -227,7 +208,6 @@ function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Person
 function App() {
   const perso = useStore((state) => state.currentPerso);
   const originalPerso = useStore((state) => state.originalPerso);
-  const billingItems = useStore((state) => state.billingItems);
   const paAfterBilling = useStore((state) => state.paAfterBilling);
 
   return (
@@ -239,7 +219,7 @@ function App() {
             { label: "Update", value: "update" },
 
           ]} />
-        <FeuilleDePerso currentPerso={perso} originalPerso={originalPerso} billingItems={billingItems} paAfterBilling={paAfterBilling} />
+        <FeuilleDePerso currentPerso={perso} originalPerso={originalPerso} paAfterBilling={paAfterBilling} />
       </NotificationsProvider>
     </MantineProvider>
   );

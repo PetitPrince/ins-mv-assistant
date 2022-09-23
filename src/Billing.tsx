@@ -6,6 +6,7 @@ import { showNotification } from '@mantine/notifications';
 import { Personnage, TOUS_LES_TALENTS } from './App';
 import { useStore } from "./Store";
 import { FACTIONS } from './myConst';
+import { paToCarac } from './Caracteristiques';
 
 export interface BillingItem {
   key: string;
@@ -21,7 +22,33 @@ let findDeepValueOfObjFromPathAndLeadingSep = function (obj: any, path: string, 
   };
   return obj;
 };
+export const generateBillingItems2 = (originalPerso: Personnage, currentPerso: Personnage) => {
+  const differences = createPatch(originalPerso, currentPerso);
+  let billingItems: BillingItem[] = [];
+  for (const diff of differences) {
+    if (diff.op === "replace" || diff.op === "add") {
+      const diffPathElements = diff.path.split("/"); // diff.path looks like "/caracteristiques/force"
+      const diffCategory = diffPathElements[1];
+      let originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
+      const val = diff.op === "add" ? diff.value.pa_depense : diff.value;
+      switch (diffCategory) {
+        case "caracteristiques":
+          // it's always replace for caracteristiques
 
+          const caraName = diffPathElements[2];
+          // diff.value is the number of PA spent on one cara.
+          const valDiff = val - originalValue;
+          billingItems.push({
+            key: diff.path,
+            msg: caraName + ": " + paToCarac(originalValue) + " → " + paToCarac(val),
+            cost: valDiff,
+          });
+          break;
+      }
+    }
+  }
+  return billingItems;
+}
 export const generateBillingItems = (originalPerso: Personnage, currentPerso: Personnage) => {
   const differences = createPatch(originalPerso, currentPerso);
   // Using naively `[, patches]= produceWithPatches(perso, notUsed => {return draftPerso})` will not produce a minimal set of changes to
@@ -151,22 +178,35 @@ export function calcBillingItemSum(billingItems: BillingItem[]) {
   return sum;
 }
 
+function prepareCostDisplay(cost: number | null | undefined){
+  let costDisplay : string;
+  if (cost == null && cost == undefined) {
+    costDisplay = "/";
+  } else if (cost < 0) {
+    costDisplay = "+" + String(cost).split('-')[1];
+  } else {
+    costDisplay = "-" + cost;
+  }
+  return costDisplay
+}
 
-export function BillingPanel(props: {
-  billingItems: BillingItem[];
-  initialPa: number;
-}) {
+
+export function BillingPanel(props:{}){
+  const billingItems = useStore((state) => state.billingItems);
+  const sum = calcBillingItemSum(billingItems);
+
   const originalPerso = useStore((state) => state.originalPerso);
   const currentPerso = useStore((state) => state.currentPerso);
+
+  const currentPa = useStore((state) => state.currentPerso.pa);
+  const availablePa = currentPa - sum;
+
   const setPerso = useStore((state) => state.setPerso);
   const setOriginalPerso = useStore((state) => state.setOriginalPerso);
-  const setDraftPa = useStore((state) => state.setCurrentPa);
+  const setCurrentPa = useStore((state) => state.setCurrentPa);
 
-  const billingItems = props.billingItems;
-  const sum = calcBillingItemSum(billingItems);
-  const availablePa = props.initialPa - sum;
   const deleteOneBillingLine = (key: string, billingMsg: string) => {
-    // key looks lioke "/caracteristiques/volonte"
+    // key looks lioke "/caracteristiques/volonte/pa_depense"
     // I have to reset the value to the original number
     const differences = createPatch(originalPerso, currentPerso);
     const differencesMinusTheOneIWantToDelete = differences.filter(x => x.path !== key);
@@ -175,17 +215,18 @@ export function BillingPanel(props: {
     setPerso(persoCopy);
     showNotification({
       title: "Ligne supprimée",
-      message: "C'était celle là: " + billingMsg,
+      message: billingMsg,
       color: "green"
     });
   };
+
   const commitOneItem = (key: string, billingMsg: string) => {
     const cost = billingItems.filter(x => x.key === key)[0].cost;
+
     if (cost != null) {
-      // key still looks like "/caracteristiques/volonte"
+      // key still looks like "/caracteristiques/volonte/pa_depense"
       // Create a patch with only one line selected, then apply it
       const paAfterTransaction = currentPerso.pa - cost;
-
       if (paAfterTransaction >= 0) { // We have enough PA
         const difference = createPatch(originalPerso, currentPerso);
         const differenceWithOnlyTheOneSelected = difference.filter(x => x.path === key);
@@ -194,7 +235,7 @@ export function BillingPanel(props: {
 
         persoCopy.pa = paAfterTransaction; // Don't forget to update the PA
         setOriginalPerso(persoCopy);
-        setDraftPa(paAfterTransaction);
+        setCurrentPa(paAfterTransaction);
         showNotification({
           title: "Ligne appliquée",
           message: "C'est celle là: " + billingMsg,
@@ -222,10 +263,10 @@ export function BillingPanel(props: {
     }
   };
 
-  const commitAll = () => {
+  const commitAllBillingLine = () => {
     if (availablePa >= 0) {
       setOriginalPerso(currentPerso);
-      setDraftPa(availablePa);
+      setCurrentPa(availablePa);
       showNotification({
         message: "Toutes les modifications ont été appliquée",
         color: "green"
@@ -239,11 +280,13 @@ export function BillingPanel(props: {
     }
   };
 
-  const superButton = billingItems.length ? (<ActionIcon onClick={commitAll}>
-  <IconCheck size={16} />
-</ActionIcon>) : null;
 
-  return <Dialog opened={true} position={{ top: 20, right: 20 }}>
+  const commitAllButton = billingItems.length ? (<ActionIcon
+   onClick={commitAllBillingLine}
+   >
+    <IconCheck size={16} />
+  </ActionIcon>) : null;
+  return (<Dialog opened={true} position={{ top: 20, right: 20 }}>
     <ScrollArea.Autosize maxHeight={300}>
       <Table>
         <thead>
@@ -255,29 +298,27 @@ export function BillingPanel(props: {
         </thead>
         <tbody>
           <tr>
-            <td>{props.initialPa}</td>
+            <td>{currentPa}</td>
             <td> Initial</td>
           </tr>
           {billingItems.map((billingItem) => {
             if (Object.keys(billingItem).length) {
               const cost = billingItem.cost;
-              let costDisplay = String(cost);
-              if (cost == null) {
-                costDisplay = "/";
-              } else if (cost < 0) {
-                costDisplay = "+" + String(cost).split('-')[1];
-              } else {
-                costDisplay = "-" + cost;
-              }
+              const costDisplay = prepareCostDisplay(cost) ;
+
               return (
                 <tr key={billingItem.key}>
                   <td>{costDisplay}</td>
                   <td>{billingItem.msg}</td>
                   <td>
-                    <ActionIcon onClick={(x: any) => deleteOneBillingLine(billingItem.key, billingItem.msg)}>
+                    <ActionIcon 
+                    onClick={(x: any) => deleteOneBillingLine(billingItem.key, billingItem.msg)}
+                    >
                       <IconX size={16} />
                     </ActionIcon>
-                    <ActionIcon onClick={(x: any) => commitOneItem(billingItem.key, billingItem.msg)}>
+                    <ActionIcon
+                     onClick={(x: any) => commitOneItem(billingItem.key, billingItem.msg)}
+                     >
                       <IconCheck size={16} />
                     </ActionIcon>
                   </td>
@@ -298,10 +339,11 @@ export function BillingPanel(props: {
         <tr>
           <td>{availablePa}</td>
           <td> total</td>
-          <td> {superButton}
+          <td> {commitAllButton}
           </td>
         </tr>
       </tbody>
     </Table>
-  </Dialog>;
+  </Dialog>);
+
 }

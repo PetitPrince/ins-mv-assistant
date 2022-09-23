@@ -33,7 +33,12 @@ function Superieur(props: SuperieurProps) {
       onChange={onBlur} />
   );
 }
-export function Generalites(props: any) {
+export function Generalites(props: {}) {
+  const identite = useStore((state) => state.currentPerso.identite) ;
+  const faction = useStore((state) => state.currentPerso.faction) ;
+  const superieur = useStore((state) => state.currentPerso.superieur) ;
+  const grade = useStore((state) => state.currentPerso.grade);
+
   const setCurrentIdentite = useStore((state) => state.setCurrentIdentite);
   const setCurrentFaction = useStore((state) => state.setCurrentFaction);
   const setCurrentSuperieur = useStore((state) => state.setCurrentSuperieur);
@@ -46,11 +51,11 @@ export function Generalites(props: any) {
       <Group>
         <TextInput
           label="Identité"
-          defaultValue={props.identite}
+          defaultValue={identite}
           onBlur={(event) => {setCurrentIdentite(event.currentTarget.value)}} />
         <Select
           label="Faction"
-          value={props.faction}
+          value={faction}
 
           data={[
             { value: FACTIONS.ANGES, label: "Anges" },
@@ -60,11 +65,11 @@ export function Generalites(props: any) {
           ]}
           onChange={(val: FACTIONS) => setCurrentFaction(val)} />
         <Superieur
-          value={props.superieur}
+          value={superieur}
           onBlur={(val: string) => setCurrentSuperieur(val)}
-          faction={props.faction} />
+          faction={faction} />
 
-        <NumberInput label="Grade" min={0} max={4}
+        <NumberInput label="Grade" min={0} max={4} defaultValue={grade}
           onChange={(val: number) => setCurrentGrade(val)} />
       </Group>
     </Stack>

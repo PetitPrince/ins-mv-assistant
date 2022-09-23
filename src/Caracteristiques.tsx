@@ -1,5 +1,6 @@
-import { NumberInputProps } from '@mantine/core';
+import { NumberInput, NumberInputProps } from '@mantine/core';
 import { Stack, Group, Title } from '@mantine/core';
+import { useState } from 'react';
 import { INSMVNumberInput, TCaracteristiquesSet, CARACTERISTIQUES, ICaracteristiquesSet, ICaracteristiquesSet2 } from './App';
 import { useStore } from "./Store";
 
@@ -7,47 +8,71 @@ interface INSMVCaraNumberInputProps extends NumberInputProps {
   initialValue: number;
   availablePa: number;
 }
-const INSMVCaraNumberInput = (props: INSMVCaraNumberInputProps) => {
+const INSMVCaraPaDepenseNumberInput = (props: INSMVCaraNumberInputProps) => {
+
   const { initialValue, availablePa, ...restOfTheProps } = props; // extracting  initialValue from props (I want to pass props forward to NumberInput)
-  console.log("props.value: "+props.value+"; initialValue: "+initialValue);
   const isModified = props.value !== initialValue;
   const variant = isModified ? "filled" : "default";
-  // const radius = isModified ? "xl" : "sm";
   const errorString = isModified && availablePa < 0 ? "  " : "";
 
   return (
-    <INSMVNumberInput
+    <NumberInput
       // {...props}
-      min={1.5} max={9.5}
       {...restOfTheProps}
       variant={variant}
       // radius={radius}
-       error={errorString} />
+      error={errorString} />
   );
 };
 
+export function paToCarac(pa: number) {
+  return 2 + Math.floor(10 * (pa / 4) / 5) * 5 / 10
+}
+export function Caracteristiques(props: {}) {
+  const { force, agilite, perception, volonte, presence, foi } = useStore(state => state.currentPerso.caracteristiques);
+  const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = useStore(state => state.originalPerso.caracteristiques);
+  const availablePa = useStore(state => state.paAfterBilling);
+  
 
-export function Caracteristiques(props: { caracteristiques: ICaracteristiquesSet2; initialCaracteristiques: ICaracteristiquesSet2; availablePa: number; }) {
-  // const {force, agilite,perception, volonte, presence, foi } = useStore(state => state.currentPerso.caracteristiques)
-  const { force, agilite, perception, volonte, presence, foi } = props.caracteristiques;
-  const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = props.initialCaracteristiques;
-  const availablePa = props.availablePa;
-  const storeCaracteristiques = useStore(state => state.setCurrentCaracteristiques);
-  const setCaracteristiques = (val: number, cara: CARACTERISTIQUES) => {
-    storeCaracteristiques(val, cara);
+  const storeCurrentCaracteristiquesPaDepense = useStore(state => state.setCurrentCaracteristiquesPaDepense)
+  const setPaDepense = (val: number, cara: CARACTERISTIQUES) => {
+    storeCurrentCaracteristiquesPaDepense(val, cara);
   };
-
+  const force_niveau = paToCarac(force.pa_depense);
+  const agilite_niveau = paToCarac(agilite.pa_depense);
+  const perception_niveau = paToCarac(perception.pa_depense);
+  const volonte_niveau = paToCarac(volonte.pa_depense);
+  const presence_niveau = paToCarac(presence.pa_depense);
+  const foi_niveau = paToCarac(foi.pa_depense);
 
   return (
     <Stack>
       <Title order={2}>Caractéristiques</Title>
       <Group>
-        <INSMVCaraNumberInput label="Force" value={force.niveau} initialValue={og_force.niveau} availablePa={availablePa} onChange={(val: number) => setCaracteristiques(val, CARACTERISTIQUES.FORCE)} />
-        <INSMVCaraNumberInput label="Agilité" value={agilite.niveau} initialValue={og_agilite.niveau} availablePa={availablePa} onChange={(val: number) => setCaracteristiques(val, CARACTERISTIQUES.AGILITE)} />
-        <INSMVCaraNumberInput label="Perception" value={perception.niveau} initialValue={og_perception.niveau} availablePa={availablePa} onChange={(val: number) => setCaracteristiques(val, CARACTERISTIQUES.PERCEPTION)} />
-        <INSMVCaraNumberInput label="Volonté" value={volonte.niveau} initialValue={og_volonte.niveau} availablePa={availablePa} onChange={(val: number) => setCaracteristiques(val, CARACTERISTIQUES.VOLONTE)} />
-        <INSMVCaraNumberInput label="Présence" value={presence.niveau} initialValue={og_presence.niveau} availablePa={availablePa} onChange={(val: number) => setCaracteristiques(val, CARACTERISTIQUES.PRESENCE)} />
-        <INSMVCaraNumberInput label="Foi" value={foi.niveau} initialValue={og_foi.niveau} availablePa={availablePa} onChange={(val: number) => setCaracteristiques(val, CARACTERISTIQUES.FOI)} />
+        <Group spacing="xs">
+          <INSMVNumberInput label="Force" hideControls value={force_niveau} readOnly variant="unstyled" />
+          <INSMVCaraPaDepenseNumberInput initialValue={og_force.pa_depense} availablePa={availablePa} label="Force - PA dépensé" value={force.pa_depense} onChange={(val: number) => setPaDepense(val, CARACTERISTIQUES.FORCE)} />
+        </Group>
+        <Group spacing="xs">
+          <INSMVNumberInput label="Agilite" hideControls value={agilite_niveau} readOnly variant="unstyled" />
+          <INSMVCaraPaDepenseNumberInput initialValue={og_agilite.pa_depense} availablePa={availablePa} label="Agilite - PA dépensé" value={agilite.pa_depense} onChange={(val: number) => setPaDepense(val, CARACTERISTIQUES.AGILITE)} />
+        </Group>
+        <Group spacing="xs">
+          <INSMVNumberInput label="Perception" hideControls value={perception_niveau} readOnly variant="unstyled" />
+          <INSMVCaraPaDepenseNumberInput initialValue={og_perception.pa_depense} availablePa={availablePa} label="Perception - PA dépensé" value={perception.pa_depense} onChange={(val: number) => setPaDepense(val, CARACTERISTIQUES.PERCEPTION)} />
+        </Group>
+        <Group spacing="xs">
+          <INSMVNumberInput label="Volonté" hideControls value={volonte_niveau} readOnly variant="unstyled" />
+          <INSMVCaraPaDepenseNumberInput initialValue={og_volonte.pa_depense} availablePa={availablePa} label="Volonté - PA dépensé" value={volonte.pa_depense} onChange={(val: number) => setPaDepense(val, CARACTERISTIQUES.VOLONTE)} />
+        </Group>
+        <Group spacing="xs">
+          <INSMVNumberInput label="Présence" hideControls value={presence_niveau} readOnly variant="unstyled" />
+          <INSMVCaraPaDepenseNumberInput initialValue={og_presence.pa_depense} availablePa={availablePa} label="Présence - PA dépensé" value={presence.pa_depense} onChange={(val: number) => setPaDepense(val, CARACTERISTIQUES.PRESENCE)} />
+        </Group>
+        <Group spacing="xs">
+          <INSMVNumberInput label="Foi" hideControls value={foi_niveau} readOnly variant="unstyled" />
+          <INSMVCaraPaDepenseNumberInput initialValue={og_foi.pa_depense} availablePa={availablePa} label="Foi - PA dépensé" value={foi.pa_depense} onChange={(val: number) => setPaDepense(val, CARACTERISTIQUES.FOI)} />
+        </Group>
       </Group>
     </Stack>
 

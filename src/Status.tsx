@@ -1,16 +1,7 @@
 import { NumberInput, Stack, Group, Title, Table, Radio } from '@mantine/core';
 import { useStore } from "./Store";
 import { FACTIONS } from './myConst';
-
-export interface StatusProps {
-  pa: number,
-  paTotal: number,
-  pp: number,
-  ppMax: number,
-  force: number,
-  faction: FACTIONS,
-}
-
+import { paToCarac } from './Caracteristiques';
 
 export const Blessures = (props: { force: number; faction: FACTIONS; }) => {
   const force = props.force;
@@ -74,14 +65,21 @@ export const Blessures = (props: { force: number; faction: FACTIONS; }) => {
     </Table>
   );
 }
+export function Status(props: {
+  pa: number,
+  paTotal: number,
+  pp: number,
+  ppMax: number,
+  force: number,
+  faction: FACTIONS,
+}) {
 
-export function Status(props: StatusProps) {
+  const pa = useStore(state => state.currentPerso.pa);
+  const force_pa = useStore(state => state.currentPerso.caracteristiques.force.pa_depense);
+  const force = paToCarac(force_pa);
+  const faction = useStore(state => state.currentPerso.faction);
+  const setCurrentPa = useStore(state => state.setCurrentPa);
 
-  const storePa = useStore(state => state.setCurrentPa);
-  const setPa = (val: number) => {
-
-    storePa(val);
-  };
 
   // const storePaTotal = useStore(state => state.setDraftPaTotal)
   // const storePp = useStore(state => state.setDraftPp)
@@ -96,14 +94,14 @@ export function Status(props: StatusProps) {
       <Title order={2}>Status</Title>
       <Group>
 
-        <NumberInput label="Point d'Administration (PA) restant" value={props.pa}
-          onChange={(val: number) => { setPa(val); }} />
-        {/* <NumberInput label="PA accumulés" value={props.paTotal}/> */}
+        <NumberInput label="Point d'Administration (PA) restant" value={pa}
+          onChange={(val: number) => { setCurrentPa(val); }} />
+        {/* <NumberInput label="PA accumulés" value={paTotal}/> */}
         {/* <NumberInput label="Point de Pouvoir (PP)" value={props.pp}
                     onChange={(val: number) => { setPp(val) }}/> */}
         <NumberInput label="PP Maximum" value={props.ppMax}
           onChange={(val: number) => { setPpMax(val); }} />
-        <Blessures force={props.force} faction={props.faction} />
+        <Blessures force={force} faction={faction} />
       </Group>
     </Stack>
   );

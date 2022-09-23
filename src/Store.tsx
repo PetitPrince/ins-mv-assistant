@@ -1,7 +1,7 @@
 import { FACTIONS } from './myConst';
 import create from 'zustand';
 import produce from "immer";
-import { BillingItem, calcBillingItemSum, generateBillingItems } from './Billing';
+import { BillingItem, calcBillingItemSum, generateBillingItems, generateBillingItems2 } from './Billing';
 import { Personnage, CARACTERISTIQUES, TalentExistant } from './App';
 
 // any operation in the app is done on the Personnage, and the billing sort out the rest
@@ -78,6 +78,7 @@ export const useStore = create<{
   setCurrentGrade: (val: number) => void;
   setCurrentSuperieur: (val: string) => void;
   setCurrentCaracteristiques: (val: number, caracteristique: CARACTERISTIQUES) => void;
+  setCurrentCaracteristiquesPaDepense: (val: number, caracteristique: CARACTERISTIQUES) => void;
   setCurrentPa: (val: number) => void;
   setCurrentPaTotal: (val: number) => void;
   setCurrentPp: (val: number) => void;
@@ -86,12 +87,25 @@ export const useStore = create<{
   setCurrentTalentPrincipal: (talentId: string, val: TalentExistant) => void;
   setCurrentTalentSecondaire: (talentId: string, val: TalentExistant) => void;
   updateBilling: (originalPerso: Personnage, draftPerso: Personnage) => void;
+  updateBilling2: (originalPerso: Personnage, draftPerso: Personnage) => void;
+
 }>((set, get) => ({
   currentPerso: emptyPerso,
   originalPerso: emptyPerso,
   billingItems: [],
   paAfterBilling: 0,
   freeTalentPoints: 0,
+
+  updateBilling2: (originalPerso, draftPerso) =>{
+    const updatedBillingItems = generateBillingItems2(originalPerso, draftPerso);
+    console.log(updatedBillingItems);
+
+    set(produce(draftState => {
+      draftState.billingItems = updatedBillingItems;
+      draftState.paAfterBilling = get().currentPerso.pa - calcBillingItemSum(updatedBillingItems);
+    }));
+
+  },
 
   updateBilling: (originalPerso, draftPerso) => {
     const updatedBillingItems = generateBillingItems(originalPerso, draftPerso);
@@ -171,11 +185,17 @@ export const useStore = create<{
   setCurrentCaracteristiques: (val, cara) => {
     set(produce(draftState => { draftState.currentPerso.caracteristiques[cara] = val; }));
     get().updateBilling(get().originalPerso, get().currentPerso);
-
   },
+  setCurrentCaracteristiquesPaDepense: (val, cara) => {
+    set(produce(draftState => { draftState.currentPerso.caracteristiques[cara].pa_depense = val; }));
+    get().updateBilling2(get().originalPerso, get().currentPerso);
+  },
+
+
+
   setCurrentPa: (val) => {
     set(produce(draftState => { draftState.currentPerso.pa = val; }));
-    get().updateBilling(get().originalPerso, get().currentPerso);
+    get().updateBilling2(get().originalPerso, get().currentPerso);
   },
   setCurrentPaTotal: (val) => {
     set(produce(draftState => { draftState.currentPerso.paTotal = val; }));

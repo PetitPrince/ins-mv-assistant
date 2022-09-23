@@ -99,14 +99,30 @@ export interface TalentExistant {
 export interface TalentsCollection {
   [key: string]: TalentExistant;
 }
-// export interface ICaracteristiquesSet {
-//   force: number,
-//   agilite: number,
-//   perception: number,
-//   volonte: number,
-//   presence: number,
-//   foi: number,
-// }
+export interface ICaracteristiquesSet {
+  [index: string] : number,
+  force: number,
+  agilite: number,
+  perception: number,
+  volonte: number,
+  presence: number,
+  foi: number,
+}
+
+export interface Caracteristique{
+  niveau: number,
+  pa_depense?:number
+}
+export interface ICaracteristiquesSet2 {
+  [index: string] : Caracteristique,
+  force: Caracteristique,
+  agilite: Caracteristique,
+  perception: Caracteristique,
+  volonte: Caracteristique,
+  presence: Caracteristique,
+  foi: Caracteristique,
+}
+
 export type TCaracteristiquesSet = {
   [K in CARACTERISTIQUES as string]: number;
 }
@@ -122,7 +138,7 @@ export interface Personnage {
   faction: FACTIONS,
   superieur: String, // todo: enum
   grade: 0 | 1 | 2 | 3 | 4,
-  caracteristiques: TCaracteristiquesSet,
+  caracteristiques: ICaracteristiquesSet,
   pa: number,
   paTotal: number,
   pp: number,

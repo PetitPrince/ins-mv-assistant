@@ -10,7 +10,7 @@ import { mountStoreDevtool } from 'simple-zustand-devtools';
 import { createPatch } from 'rfc6902'
 import { ReplaceOperation } from "rfc6902/diff"
 import { NotificationsProvider } from '@mantine/notifications';
-import { IBillingItem, calcBillingItemSum, BillingPanel, generateBillingItems } from './Billing';
+import { BillingItem, calcBillingItemSum, BillingPanel, generateBillingItems } from './Billing';
 import { Status } from './Status';
 import { Caracteristiques } from './Caracteristiques';
 import { Generalites } from './Generalites';
@@ -73,13 +73,13 @@ const emptyPerso: Personnage = {
       // }
     },
     secondaires: {
-      "aisance-sociale": {
-        niveau: 3
-      },
-      "hobby-dressage-de-bouquetin": {
-        customNameFragment: "Dressage de bouquetin",
-        niveau: 4
-      }
+      // "aisance-sociale": {
+      //   niveau: 3
+      // },
+      // "hobby-dressage-de-bouquetin": {
+      //   customNameFragment: "Dressage de bouquetin",
+      //   niveau: 4
+      // }
     },
     exotiques: {}
   }
@@ -187,7 +187,7 @@ export interface Personnage {
 interface Store {
   currentPerso: Personnage,
   originalPerso: Personnage,
-  billingItems: IBillingItem[],
+  billingItems: BillingItem[],
   paAfterBilling: number,
 
   setPerso: (val: Personnage) => void,
@@ -696,7 +696,7 @@ function Talents(props: {
   );
 }
 
-function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Personnage, billingItems: IBillingItem[], paAfterBilling: number }) {
+function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Personnage, billingItems: BillingItem[], paAfterBilling: number }) {
   const { currentPerso, originalPerso, billingItems, paAfterBilling } = props;
   // const {draftIdentite, draftFaction, draftSuperieur, draftGrade, draftCaracteristiques, draftPa, draftPaTotal, draftPp, draftPpMax} = props.draftPerso;
   // const {identite, faction, superieur, grade, caracteristiques, pa, paTotal, pp, ppMax} = props.perso;

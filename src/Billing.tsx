@@ -1,15 +1,20 @@
 import { ScrollArea, Table } from '@mantine/core';
 import { ActionIcon, Dialog } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons';
-import React from 'react';
 import { applyPatch, createPatch } from 'rfc6902';
 import { showNotification } from '@mantine/notifications';
 import { useStore, Personnage, allTalents } from './App';
-import { ReplaceOperation } from 'rfc6902/diff';
 import { FACTIONS } from './myConst';
+
+export interface BillingItem {
+  key: string;
+  msg: string;
+  cost: number | null;
+}
 
 let findDeepValueOfObjFromPathAndLeadingSep = function (obj: any, path: string, sep: string) {
   //@ts-ignore
+  // eslint-disable-next-line
   for (var i = 1, path = path.split(sep), len = path.length; i < len; i++) {
     obj = obj[path[i]];
   };
@@ -26,19 +31,18 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
   // For most of the changes I assume the type of difference is "replace"
   // "add" should be only for talents (maybe?) and powers (for sure)
   // "remove" shouldn't ever be used
-  let billingItems: IBillingItem[] = [];
+  let billingItems: BillingItem[] = [];
 
   for (const diff of differences) {
     console.log(diff);
     if (diff.op === "replace" || diff.op === "add") {
-      const diffPathElements = diff.path.split("/");
-      // diff.path looks like "/caracteristiques/force"
+      const diffPathElements = diff.path.split("/"); // diff.path looks like "/caracteristiques/force"
       const diffCategory = diffPathElements[1];
       let originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
       const val = diff.op === "add" ? diff.value.niveau : diff.value;
       switch (diffCategory) {
         case "caracteristiques":
-          const caraName = diffPathElements[diffPathElements.length - 1];
+          const caraName = diffPathElements[diffPathElements.length - 1]; // TODO: a neater way would be use a caraDisplay string instead of a the id
           const valDiff = val - originalValue;
           billingItems.push({
             key: diff.path,
@@ -48,11 +52,10 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           break;
         case "faction":
           let updatedCost = null; // TODO: check if creation or update (or rather, if update -> faction change shouldn't even be a possiblity)
-          if(val===FACTIONS.ANGES){
+          if (val === FACTIONS.ANGES) {
             updatedCost = -100;
-          }else if(val===FACTIONS.DEMONS){
+          } else if (val === FACTIONS.DEMONS) {
             updatedCost = -80;
-
           }
           billingItems.push({
             key: diff.path,
@@ -82,54 +85,42 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           });
           break;
         case "talents":
+          // Check if there's a standard talent existing
           const talentId = diffPathElements[3];
-          const talentCategory = diffPathElements[2];
           let standardTalent = allTalents.find(x => x.id === talentId)
-          if(standardTalent === undefined){            
-            console.log("Cannot find talent with id "+ talentId);
+          if (standardTalent === undefined) {
+            console.log("Cannot find talent with id " + talentId);
           }
+
+          // If not, maybe it's a specialized / multiple one; find the primary talent
           const standardTalentAgain = allTalents.find(x => x.id === talentId.split('-')[0]);
-          if(standardTalentAgain === undefined){            
-            console.log("Cannot find talent with id "+ talentId+", breaking");
+          if (standardTalentAgain === undefined) {
+            console.log("Cannot find primary talent for id " + talentId + ", breaking");
             break;
           }
           standardTalent = standardTalentAgain;
 
-
           // Calc cost here
-
           const associatedCara = standardTalent.associatedChara
-          if(diff.op === "add"){
-            if(associatedCara==="Aucune"){
-              originalValue=1;
-
-            }else{
-              originalValue=Math.floor(currentPerso.caracteristiques[associatedCara]/2)
-
+          if (diff.op === "add") { // A new talent doesn't have an original value, so it's either the associated cara/2, or 1
+            if (associatedCara === "Aucune") {
+              originalValue = 1;
+            } else {
+              originalValue = Math.floor(currentPerso.caracteristiques[associatedCara] / 2)
             }
-          } 
-          let cost;
-          if(talentCategory==="principaux"){
-            cost = (val-originalValue)*2;
           }
-          else if(talentCategory==="secondaires"){
-            cost = (val-originalValue)*2;
-            // TODO: but there's also the freepoints
-          }
-          else{ // assume exotique
-            cost = val;
-          }
+          const cost = (val - originalValue) * 2;
 
-          // Get name here
-          let talentName = standardTalent.name;
-          let msgString = "Talent " + standardTalent.name +" "+ originalValue + " → " + val;
+          // Craft message here
+          let msgString = "Talent " + standardTalent.name + " " + originalValue + " → " + val;
 
-          if(diff.path.includes("specifique")){
+          if (diff.path.includes("specifique")) {
+            // Put the specialization name, otherwise default to "spécifique"
             const fragment = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path, '/').customNameFragment;
-            talentName = fragment ? fragment : "spécifique";
-            msgString = "Talent " + standardTalent.name + "(" + talentName + "): " + originalValue + " → " + val;
+            const specializationName = fragment ? fragment : "spécifique";
+            msgString = "Talent " + standardTalent.name + " (" + specializationName + "): " + originalValue + " → " + val;
           }
-          
+
           billingItems.push({
             key: diff.path,
             msg: msgString,
@@ -138,6 +129,7 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           break;
 
         default:
+          console.log("Unhandled billing category : " + diffCategory);
           break;
       }
     }
@@ -146,12 +138,7 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
   return billingItems;
 };
 
-export interface IBillingItem {
-  key: string;
-  msg: string;
-  cost: number | null;
-}
-export function calcBillingItemSum(billingItems: IBillingItem[]) {
+export function calcBillingItemSum(billingItems: BillingItem[]) {
   let sum = 0;
   if (billingItems) {
     for (const billingItem of billingItems) {
@@ -165,7 +152,7 @@ export function calcBillingItemSum(billingItems: IBillingItem[]) {
 
 
 export function BillingPanel(props: {
-  billingItems: IBillingItem[];
+  billingItems: BillingItem[];
   initialPa: number;
 }) {
   const originalPerso = useStore((state) => state.originalPerso);
@@ -177,7 +164,7 @@ export function BillingPanel(props: {
   const billingItems = props.billingItems;
   const sum = calcBillingItemSum(billingItems);
   const availablePa = props.initialPa - sum;
-  const deleteTheStuffHandler = (key: string) => {
+  const deleteOneBillingLine = (key: string, billingMsg: string) => {
     // key looks lioke "/caracteristiques/volonte"
     // I have to reset the value to the original number
     const differences = createPatch(originalPerso, currentPerso);
@@ -186,87 +173,91 @@ export function BillingPanel(props: {
     applyPatch(persoCopy, differencesMinusTheOneIWantToDelete);
     setPerso(persoCopy);
     showNotification({
-      message: "Delete ok!",
+      title: "Ligne supprimée",
+      message: "C'était celle là: " + billingMsg,
       color: "green"
     });
   };
-  const commitOneItem = (key: string) => {
+  const commitOneItem = (key: string, billingMsg: string) => {
     const cost = billingItems.filter(x => x.key === key)[0].cost;
     if (cost != null) {
-      const paAfterTransaction = currentPerso.pa - cost;
       // key still looks like "/caracteristiques/volonte"
-      if (paAfterTransaction >= 0) { // only apply if we have enough pa
+      // Create a patch with only one line selected, then apply it
+      const paAfterTransaction = currentPerso.pa - cost;
+
+      if (paAfterTransaction >= 0) { // We have enough PA
         const difference = createPatch(originalPerso, currentPerso);
         const differenceWithOnlyTheOneSelected = difference.filter(x => x.path === key);
         let persoCopy: Personnage = JSON.parse(JSON.stringify(originalPerso)); // deep copy
         applyPatch(persoCopy, differenceWithOnlyTheOneSelected);
 
-        // I need to update the pa
-        persoCopy.pa = paAfterTransaction;
-        // setPerso(persoCopy);
+        persoCopy.pa = paAfterTransaction; // Don't forget to update the PA
         setOriginalPerso(persoCopy);
         setDraftPa(paAfterTransaction);
         showNotification({
-          message: "Commit ok!",
+          title: "Ligne appliquée",
+          message: "C'est celle là: " + billingMsg,
           color: "green"
         });
-      } else {
+      } else { // We don't have enough PA
         showNotification({
-          id: "delete-billing-item-nok",
-          message: "Pas assez de PA!",
+          title: "Pas assez de PA",
+          message: "Il manque " + -paAfterTransaction + " PA.",
           color: "red"
         });
       }
-    } else {
+    } else { // A null cost is the same as an update without updating the PA
       // Update without updating PA
       const difference = createPatch(originalPerso, currentPerso);
       const differenceWithOnlyTheOneSelected = difference.filter(x => x.path === key);
-      let persoCopy: Personnage = JSON.parse(JSON.stringify(originalPerso)); // deep copy
+      let persoCopy: Personnage = JSON.parse(JSON.stringify(originalPerso));
       applyPatch(persoCopy, differenceWithOnlyTheOneSelected);
       setOriginalPerso(persoCopy);
       showNotification({
-        message: "Commit ok!",
+        title: "Ligne appliquée",
+        message: "C'est celle là: " + billingMsg,
         color: "green"
       });
     }
-    console.log(key);
   };
-
 
   const commitAll = () => {
     if (availablePa >= 0) {
       setOriginalPerso(currentPerso);
       setDraftPa(availablePa);
+      showNotification({
+        message: "Toutes les modifications ont été appliquée",
+        color: "green"
+      });
     } else {
       showNotification({
-        id: "delete-billing-item-nok",
-        message: "Pas assez de PA!",
+        title: "Pas assez de PA",
+        message: "Il manque " + -availablePa + " PA.",
         color: "red"
       });
     }
   };
 
-  // TODO: sorting billingItems by key or name were would be a good idea
-  // maybe use Dialog instead
+  const superButton = billingItems.length ? (<ActionIcon onClick={commitAll}>
+  <IconCheck size={16} />
+</ActionIcon>) : null;
+
   return <Dialog opened={true} position={{ top: 20, right: 20 }}>
     <ScrollArea.Autosize maxHeight={300}>
-      
-    <Table>
-      <thead>
-        <tr>
-          <th>PA</th>
-          <th>Item</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{props.initialPa}</td>
-          <td> Initial</td>
-        </tr>
-
-        {billingItems
-          .map((billingItem) => {
+      <Table>
+        <thead>
+          <tr>
+            <th>PA</th>
+            <th>Item</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{props.initialPa}</td>
+            <td> Initial</td>
+          </tr>
+          {billingItems.map((billingItem) => {
             if (Object.keys(billingItem).length) {
               const cost = billingItem.cost;
               let costDisplay = String(cost);
@@ -282,10 +273,10 @@ export function BillingPanel(props: {
                   <td>{costDisplay}</td>
                   <td>{billingItem.msg}</td>
                   <td>
-                    <ActionIcon onClick={(x: any) => deleteTheStuffHandler(billingItem.key)}>
+                    <ActionIcon onClick={(x: any) => deleteOneBillingLine(billingItem.key, billingItem.msg)}>
                       <IconX size={16} />
                     </ActionIcon>
-                    <ActionIcon onClick={(x: any) => commitOneItem(billingItem.key)}>
+                    <ActionIcon onClick={(x: any) => commitOneItem(billingItem.key, billingItem.msg)}>
                       <IconCheck size={16} />
                     </ActionIcon>
                   </td>
@@ -296,18 +287,20 @@ export function BillingPanel(props: {
               return null;
             }
           })}
+
+        </tbody>
+      </Table>
+
+    </ScrollArea.Autosize>
+    <Table>
+      <tbody>
         <tr>
           <td>{availablePa}</td>
           <td> total</td>
-          <td>
-            <ActionIcon onClick={commitAll}>
-              <IconCheck size={16} />
-            </ActionIcon>
+          <td> {superButton}
           </td>
         </tr>
       </tbody>
     </Table>
-    </ScrollArea.Autosize>
-
   </Dialog>;
 }

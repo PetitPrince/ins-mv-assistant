@@ -8,17 +8,20 @@ interface INSMVCaraNumberInputProps extends NumberInputProps {
 }
 const INSMVCaraNumberInput = (props: INSMVCaraNumberInputProps) => {
   const { initialValue, availablePa, ...restOfTheProps } = props; // extracting  initialValue from props (I want to pass props forward to NumberInput)
+  console.log("props.value: "+props.value+"; initialValue: "+initialValue);
   const isModified = props.value !== initialValue;
   const variant = isModified ? "filled" : "default";
-  const radius = isModified ? "xl" : "sm";
+  // const radius = isModified ? "xl" : "sm";
   const errorString = isModified && availablePa < 0 ? "  " : "";
 
   return (
     <INSMVNumberInput
       // {...props}
       min={1.5} max={9.5}
-      {...restOfTheProps} variant={variant}
-      radius={radius} error={errorString} />
+      {...restOfTheProps}
+      variant={variant}
+      // radius={radius}
+       error={errorString} />
   );
 };
 
@@ -26,7 +29,7 @@ const INSMVCaraNumberInput = (props: INSMVCaraNumberInputProps) => {
 export function Caracteristiques(props: { caracteristiques: TCaracteristiquesSet; initialCaracteristiques: TCaracteristiquesSet; availablePa: number; }) {
   // const {force, agilite,perception, volonte, presence, foi } = useStore(state => state.currentPerso.caracteristiques)
   const { force, agilite, perception, volonte, presence, foi } = props.caracteristiques;
-  const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = props.caracteristiques;
+  const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = props.initialCaracteristiques;
   const availablePa = props.availablePa;
   const storeCaracteristiques = useStore(state => state.setCurrentCaracteristiques);
   const setCaracteristiques = (val: number, cara: CARACTERISTIQUES) => {

@@ -6,10 +6,10 @@ import { useStore } from './App';
 interface SuperieurProps {
   value: string;
   faction: string;
-  onChange: (val: string) => void;
+  onBlur: (val: string) => void;
 }
 function Superieur(props: SuperieurProps) {
-  const { value, faction, onChange } = props;
+  const { value, faction, onBlur } = props;
 
   let superieurs;
   switch (faction) {
@@ -30,7 +30,7 @@ function Superieur(props: SuperieurProps) {
       label="Supérieur"
       limit={1000}
       value={value}
-      onChange={onChange} />
+      onChange={onBlur} />
   );
 }
 export function Generalites(props: any) {
@@ -46,8 +46,8 @@ export function Generalites(props: any) {
       <Group>
         <TextInput
           label="Identité"
-          value={props.identite}
-          onChange={(event) => setCurrentIdentite(event.currentTarget.value)} />
+          defaultValue={props.identite}
+          onBlur={(event) => {setCurrentIdentite(event.currentTarget.value)}} />
         <Select
           label="Faction"
           value={props.faction}
@@ -61,7 +61,7 @@ export function Generalites(props: any) {
           onChange={(val: FACTIONS) => setCurrentFaction(val)} />
         <Superieur
           value={props.superieur}
-          onChange={(val: string) => setCurrentSuperieur(val)}
+          onBlur={(val: string) => setCurrentSuperieur(val)}
           faction={props.faction} />
 
         <NumberInput label="Grade" min={0} max={4}

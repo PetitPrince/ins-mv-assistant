@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconEdit } from "@tabler/icons";
 import { TalentInvestiCollection } from "../../utils/const/Personnage";
+import { useDisclosure } from "@mantine/hooks";
 
 export const TalentRowSpecifique = (props: {
   row: TalentDisplayRow;
@@ -17,10 +18,11 @@ export const TalentRowSpecifique = (props: {
   setCurrentTalentPaDense: (talentId: string, val: number) => void;
   setCurrentTalentNameFragment: (talentId: string, val: string) => void;
 }) => {
+  const [opened, { close, open }] = useDisclosure(false);
+  const currentPerso = useStore((state) => state.currentPerso);
   const row = props.row;
   const talentId = row.id;
   const primaryTalentId = talentId.split("-specifique")[0];
-  const currentPerso = useStore((state) => state.currentPerso);
   const talentsInvesti = props.talentsInvesti;
 
   // Check if the primary talent has a higher level than the specialized one
@@ -54,18 +56,19 @@ export const TalentRowSpecifique = (props: {
     <tr key={row.id}>
       <td>
         {row.name}
-        <Popover width={300} trapFocus position="bottom" shadow="md">
+        <Popover width={300} trapFocus position="bottom" shadow="md" opened={opened}>
           <Popover.Target>
-            <ActionIcon>
+            <ActionIcon onClick={open}>
               <IconEdit size={16} />
             </ActionIcon>
           </Popover.Target>
-          <Popover.Dropdown>
+          <Popover.Dropdown >
             <form
               onSubmit={(event: any) => {
-                let talentNameFragment = event.target.talentNameFragment.value;
+                const talentNameFragment = event.target.talentNameFragment.value;
                 setCurrentTalentNameFragment(row.id, talentNameFragment);
                 event.preventDefault();
+                close();
               }}
             >
               <TextInput

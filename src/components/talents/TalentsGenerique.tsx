@@ -9,12 +9,14 @@ import { Title } from "@mantine/core";
 import { Stack, Table } from "@mantine/core";
 import { TalentInvesti, TalentInvestiCollection } from "../../utils/const/Personnage";
 
+
+
 export const TalentsGenerique = (props: {
-  standardTalentPool: TalentStandard[];
+  talentsStandardCollection: TalentStandard[];
   title: string;
   tpool: string;
 }) => {
-  const standardTalentPool = props.standardTalentPool;
+  const talentsStandardCollection = props.talentsStandardCollection;
   const title = props.title;
   const tpool = props.tpool;
   const characterTalentsPrincipaux = useStore(
@@ -62,7 +64,7 @@ export const TalentsGenerique = (props: {
   const rows = computeRowsTalents(
     characterTalents,
     currentPerso,
-    standardTalentPool
+    talentsStandardCollection
   );
 
   return (
@@ -87,7 +89,7 @@ export const TalentsGenerique = (props: {
                     <TalentRowSpecifique
                       row={row}
                       key={row.id}
-                      talentPool={characterTalents}
+                      talentsInvesti={characterTalents}
                       setCurrentTalentPaDense={setCurrentTalentPaDense}
                       setCurrentTalentNameFragment={
                         setCurrentTalentNameFragment
@@ -108,7 +110,7 @@ export const TalentsGenerique = (props: {
                   <TalentRowMultiple
                     row={row}
                     key={row.id}
-                    talentPool={characterTalents}
+                    talentsInvesti={characterTalents}
                     setCurrentTalent={setCurrentTalent}
                   />
                 );

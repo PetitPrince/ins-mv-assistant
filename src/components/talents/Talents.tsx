@@ -19,7 +19,7 @@ export const Talents = (props: {}) => {
         <Grid.Col span={4}>
           <TalentsGenerique
             title="Talents principaux"
-            standardTalentPool={TALENTS_PRINCIPAUX_STANDARD}
+            talentsStandardCollection={TALENTS_PRINCIPAUX_STANDARD}
             tpool="Principal"
           />
         </Grid.Col>
@@ -29,7 +29,7 @@ export const Talents = (props: {}) => {
         <Grid.Col span={4}>
           <TalentsGenerique
             title="Talents secondaires"
-            standardTalentPool={TALENTS_SECONDAIRES_STANDARD}
+            talentsStandardCollection={TALENTS_SECONDAIRES_STANDARD}
             tpool="Secondaire"
           />
         </Grid.Col>

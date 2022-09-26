@@ -6,12 +6,12 @@ import { TalentDisplayRow } from "./Talents";
 export const computeRowsTalents = (
   characterTalents: TalentInvestiCollection,
   currentPerso: Personnage,
-  standardTalentPool: TalentStandard[]
+  standardTalentCollection: TalentStandard[]
 ) => {
   let rows: TalentDisplayRow[] = [];
 
   // Go through the list of standard talents, display those who are present
-  for (const standardTalent of standardTalentPool) {
+  for (const standardTalent of standardTalentCollection) {
     const { name, id, associatedChara, isInnate, specialisationType } =
       standardTalent;
     switch (specialisationType) {

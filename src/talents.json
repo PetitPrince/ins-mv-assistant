@@ -29,7 +29,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Art   ",
-      "id": "art-specifique",
+      "id": "art_specifique",
       "caracteristique_associe": "presence",
       "inne": false,
       "superieur_exotique": "",
@@ -65,7 +65,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Combat   ",
-      "id": "combat-specifique",
+      "id": "combat_specifique",
       "caracteristique_associe": "agilite",
       "inne": true,
       "superieur_exotique": "",
@@ -110,7 +110,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Culture générale   ",
-      "id": "culture-generale-specifique",
+      "id": "culture-generale_specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -326,7 +326,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Savoir criminel   ",
-      "id": "savoir-criminel-specifique",
+      "id": "savoir-criminel_specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -344,7 +344,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Savoir d’espion   ",
-      "id": "savoir-d-espion-specifique",
+      "id": "savoir-d-espion_specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -362,7 +362,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Savoir militaire   ",
-      "id": "savoir-militaire-specifique",
+      "id": "savoir-militaire_specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -380,7 +380,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Savoir occulte   ",
-      "id": "savoir-occulte-specifique",
+      "id": "savoir-occulte_specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -398,7 +398,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Science   ",
-      "id": "science-specifique",
+      "id": "science_specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -434,7 +434,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Survie   ",
-      "id": "survie-specifique",
+      "id": "survie_specifique",
       "caracteristique_associe": "perception",
       "inne": false,
       "superieur_exotique": "",
@@ -452,7 +452,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Technique   ",
-      "id": "technique-specifique",
+      "id": "technique_specifique",
       "caracteristique_associe": "Aucune",
       "inne": false,
       "superieur_exotique": "",
@@ -470,7 +470,7 @@
     {
       "specialisation": "Spécifique",
       "nom": "Tir   ",
-      "id": "tir-specifique",
+      "id": "tir_specifique",
       "caracteristique_associe": "perception",
       "inne": true,
       "superieur_exotique": "",

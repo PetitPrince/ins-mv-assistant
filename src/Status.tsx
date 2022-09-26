@@ -66,18 +66,19 @@ export const Blessures = (props: { force: number; faction: FACTIONS; }) => {
   );
 }
 export function Status(props: {
-  pa: number,
-  paTotal: number,
-  pp: number,
-  ppMax: number,
-  force: number,
-  faction: FACTIONS,
+  // pa: number,
+  // paTotal: number,
+  // pp: number,
+  // ppMax: number,
+  // force: number,
+  // faction: FACTIONS,
 }) {
 
   const pa = useStore(state => state.currentPerso.pa);
   const force_pa = useStore(state => state.currentPerso.caracteristiques.force.pa_depense);
   const force = paToCarac(force_pa);
   const faction = useStore(state => state.currentPerso.faction);
+  const ppMax = useStore(state => state.currentPerso.ppMax);
   const setCurrentPa = useStore(state => state.setCurrentPa);
 
 
@@ -99,7 +100,7 @@ export function Status(props: {
         {/* <NumberInput label="PA accumulés" value={paTotal}/> */}
         {/* <NumberInput label="Point de Pouvoir (PP)" value={props.pp}
                     onChange={(val: number) => { setPp(val) }}/> */}
-        <NumberInput label="PP Maximum" value={props.ppMax}
+        <NumberInput label="PP Maximum" value={ppMax}
           onChange={(val: number) => { setPpMax(val); }} />
         <Blessures force={force} faction={faction} />
       </Group>

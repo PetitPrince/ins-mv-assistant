@@ -15,7 +15,7 @@ import { Caracteristiques } from './Caracteristiques';
 import { Generalites } from './Generalites';
 import { IconCheck, IconNewSection, IconSortAscendingLetters, IconTool, IconX } from '@tabler/icons';
 import talentsJson from './talents.json';
-import { useStore } from './Store';
+import { Personnage, useStore } from './Store';
 import { Talents } from './Talents';
 
 enablePatches()
@@ -89,10 +89,13 @@ interface LoadedTalentJson {
 //@ts-ignore
 const talentsJsonCasted: LoadedTalentJson[] = talentsJson;
 export const TOUS_LES_TALENTS = talentsJsonCasted.map(TalentStandard.fromJson);
+export function findStandardTalentById(id:string){
+  return TOUS_LES_TALENTS.find(x=>x.id===id);
+}
 export const TALENTS_PRINCIPAUX_STANDARD = TOUS_LES_TALENTS.filter((talent) => { return talent.talentType === "Principal"; })
 export const TALENTS_SECONDAIRES_STANDARD = TOUS_LES_TALENTS.filter((talent) => { return talent.talentType === "Secondaire"; })
 export interface TalentExistant {
-  pa_depense?: number,
+  pa_depense: number,
   niveau: number,
   customNameFragment?: string
 }
@@ -110,7 +113,7 @@ export interface ICaracteristiquesSet {
 }
 
 export interface Caracteristique{
-  niveau: number,
+  // niveau: number,
   pa_depense:number
 }
 export interface ICaracteristiquesSet2 {
@@ -133,24 +136,7 @@ export type TCaracteristiquesSet2 ={
     pa_depense?: number
   };
 }
-export interface Personnage {
-  identite: string,
-  faction: FACTIONS,
-  superieur: string, // todo: enum
-  grade: 0 | 1 | 2 | 3 | 4,
-  caracteristiques: ICaracteristiquesSet2,
-  pa: number,
-  paTotal: number,
-  pp: number,
-  ppMax: number,
-  freeSecondayTalentPoints: number,
-  talents: {
-    principaux: TalentsCollection
-    secondaires: TalentsCollection,
-    exotiques: TalentsCollection,
-  }
-  // TODO: talents, pouvoirs
-}
+
 
 
 
@@ -189,12 +175,13 @@ function FeuilleDePerso(props: { currentPerso: Personnage, originalPerso: Person
         // availablePa={paAfterBilling}
       // onChangeCara={caraChangeHandler}
       />
-      <Status pa={currentPerso.pa} paTotal={currentPerso.paTotal}
-        pp={currentPerso.pp} ppMax={currentPerso.ppMax}
-        force={currentPerso.caracteristiques.force.niveau}
-        faction={currentPerso.faction}
+      <Status
+      //  pa={currentPerso.pa} paTotal={currentPerso.paTotal}
+        // pp={currentPerso.pp} ppMax={currentPerso.ppMax}
+      //   force={currentPerso.caracteristiques.force.niveau}
+      //   faction={currentPerso.faction}
       />
-      {/* <Talents talents={currentPerso.talents} /> */}
+      <Talents />
       {/* <Group>
         <Text> debug free secondary talent points {currentPerso.freeSecondayTalentPoints}</Text>
       </Group> */}

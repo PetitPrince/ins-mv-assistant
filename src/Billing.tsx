@@ -3,8 +3,8 @@ import { ActionIcon, Dialog } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons';
 import { applyPatch, createPatch } from 'rfc6902';
 import { showNotification } from '@mantine/notifications';
-import { Personnage, TOUS_LES_TALENTS } from './App';
-import { useStore } from "./Store";
+import { TOUS_LES_TALENTS } from './App';
+import { getCaracteristiqueLevel, getTalentLevel, Personnage, useStore } from "./Store";
 import { FACTIONS } from './myConst';
 import { paToCarac } from './Caracteristiques';
 
@@ -29,21 +29,113 @@ export const generateBillingItems2 = (originalPerso: Personnage, currentPerso: P
     if (diff.op === "replace" || diff.op === "add") {
       const diffPathElements = diff.path.split("/"); // diff.path looks like "/caracteristiques/force"
       const diffCategory = diffPathElements[1];
-      let originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
+      let originalValue;
+      if(diff.op ==="replace"){
+        originalValue = findDeepValueOfObjFromPathAndLeadingSep(originalPerso, diff.path, "/");
+      }else{ // assume add
+        originalValue = 0;
+      }
       const val = diff.op === "add" ? diff.value.pa_depense : diff.value;
       switch (diffCategory) {
+        case "faction":
+          let updatedCost = null; // TODO: check if creation or update (or rather, if update -> faction change shouldn't even be a possiblity)
+          if (val === FACTIONS.ANGES) {
+            updatedCost = -100;
+          } else if (val === FACTIONS.DEMONS) {
+            updatedCost = -80;
+          }
+          billingItems.push({
+            key: diff.path,
+            msg: "Faction: " + originalValue + " → " + val,
+            cost: updatedCost,
+          });
+          break;
+        case "identite":
+          billingItems.push({
+            key: diff.path,
+            msg: "Identité: " + originalValue + " → " + val,
+            cost: null,
+          });
+          break;
+        case "superieur":
+          billingItems.push({
+            key: diff.path,
+            msg: "Supérieur: " + originalValue + " → " + val,
+            cost: null,
+          });
+          break;
+        case "grade":
+          billingItems.push({
+            key: diff.path,
+            msg: "Grade: " + originalValue + " → " + val,
+            cost: null,
+          });
+          break;
         case "caracteristiques":
+          {
           // it's always replace for caracteristiques
-
           const caraName = diffPathElements[2];
           // diff.value is the number of PA spent on one cara.
           const valDiff = val - originalValue;
           billingItems.push({
             key: diff.path,
-            msg: caraName + ": " + paToCarac(originalValue) + " → " + paToCarac(val),
+            msg: caraName + ": " + getCaracteristiqueLevel(originalPerso,caraName) + " → " + getCaracteristiqueLevel(currentPerso, caraName) ,
             cost: valDiff,
           });
+
+          }
           break;
+        case "talents":
+          {
+            const talentId = diffPathElements[3];
+            let standardTalent = TOUS_LES_TALENTS.find(x => x.id === talentId)
+            if (standardTalent === undefined) {
+              console.log("Cannot find talent with id " + talentId);
+            }
+  
+            // If not, maybe it's a specialized / multiple one; find the primary talent
+            const standardTalentAgain = TOUS_LES_TALENTS.find(x => x.id === talentId.split('_')[0]);
+            if (standardTalentAgain === undefined) {
+              console.log("Cannot find primary talent for id " + talentId + ", breaking");
+              break;
+            }
+            standardTalent = standardTalentAgain;
+
+            // Calc cost here
+            let originalTalentValue = getTalentLevel(originalPerso,talentId);
+            let finalTalentValue = getTalentLevel(currentPerso,talentId);
+            let valDiff = val - originalValue;
+
+            // Craft message here
+            let msgString = "Talent " + standardTalent.name + " " + originalTalentValue + " → " + finalTalentValue;
+            if (diff.path.includes("specifique")) {
+              // Put the specialization name, otherwise default to "spécifique"
+              const fragment = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path, '/').customNameFragment;
+              const specializationName = fragment ? fragment : "spécifique";
+              msgString = "Talent " + standardTalent.name + " (" + specializationName + "): " + originalValue + " → " + val;
+            }else if(diff.path.includes("_")){ // TODO: not idea but this means there's a "multiple" talent somewhere
+              let existingTalent;
+              if (Object.hasOwn(currentPerso.talents.principaux, talentId)){
+                existingTalent = currentPerso.talents.principaux[talentId];
+              }else if(Object.hasOwn(currentPerso.talents.secondaires, talentId)){
+                existingTalent = currentPerso.talents.secondaires[talentId];
+              }else if(Object.hasOwn(currentPerso.talents.exotiques, talentId)){
+                existingTalent = currentPerso.talents.secondaires[talentId];
+              }
+              msgString = "Talent " + standardTalent.name + " (" + existingTalent?.customNameFragment + "): " + originalValue + " → " + val;
+            }
+            billingItems.push({
+              key: diff.path,
+              msg: msgString,
+              cost: valDiff,
+            });
+          }
+
+        break;
+        default:
+          console.log("Unhandled billing category : " + diffCategory);
+          break;
+
       }
     }
   }
@@ -121,7 +213,7 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
           }
 
           // If not, maybe it's a specialized / multiple one; find the primary talent
-          const standardTalentAgain = TOUS_LES_TALENTS.find(x => x.id === talentId.split('-')[0]);
+          const standardTalentAgain = TOUS_LES_TALENTS.find(x => x.id === talentId.split('_')[0]);
           if (standardTalentAgain === undefined) {
             console.log("Cannot find primary talent for id " + talentId + ", breaking");
             break;
@@ -134,7 +226,7 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
             if (associatedCara === "Aucune") {
               originalValue = 1;
             } else {
-              originalValue = Math.floor(currentPerso.caracteristiques[associatedCara].niveau / 2)
+              originalValue = getCaracteristiqueLevel(currentPerso, associatedCara)
             }
           }
           const cost = (val - originalValue) * 2;
@@ -192,13 +284,14 @@ function prepareCostDisplay(cost: number | null | undefined){
 
 
 export function BillingPanel(props:{}){
-  const billingItems = useStore((state) => state.billingItems);
-  const sum = calcBillingItemSum(billingItems);
 
   const originalPerso = useStore((state) => state.originalPerso);
   const currentPerso = useStore((state) => state.currentPerso);
+  const currentPa = currentPerso.pa;
 
-  const currentPa = useStore((state) => state.currentPerso.pa);
+  const billingItems = generateBillingItems2(originalPerso, currentPerso);
+  const sum = calcBillingItemSum(billingItems);
+
   const availablePa = currentPa - sum;
 
   const setPerso = useStore((state) => state.setPerso);
@@ -268,7 +361,7 @@ export function BillingPanel(props:{}){
       setOriginalPerso(currentPerso);
       setCurrentPa(availablePa);
       showNotification({
-        message: "Toutes les modifications ont été appliquée",
+        message: "Toutes les modifications ont été appliquées",
         color: "green"
       });
     } else {
@@ -286,12 +379,15 @@ export function BillingPanel(props:{}){
    >
     <IconCheck size={16} />
   </ActionIcon>) : null;
+
+const forcePaDepense = useStore((state)=> state.currentPerso.caracteristiques.force.pa_depense)
+
   return (<Dialog opened={true} position={{ top: 20, right: 20 }}>
     <ScrollArea.Autosize maxHeight={300}>
       <Table>
         <thead>
           <tr>
-            <th>PA</th>
+            <th>PA {forcePaDepense}</th>
             <th>Item</th>
             <th>Action</th>
           </tr>

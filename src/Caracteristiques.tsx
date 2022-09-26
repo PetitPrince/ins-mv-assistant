@@ -2,7 +2,8 @@ import { NumberInput, NumberInputProps } from '@mantine/core';
 import { Stack, Group, Title } from '@mantine/core';
 import { useState } from 'react';
 import { INSMVNumberInput, TCaracteristiquesSet, CARACTERISTIQUES, ICaracteristiquesSet, ICaracteristiquesSet2 } from './App';
-import { useStore } from "./Store";
+import { getCaracteristiqueLevel, useStore } from "./Store";
+import shallow from 'zustand'
 
 interface INSMVCaraNumberInputProps extends NumberInputProps {
   initialValue: number;
@@ -29,6 +30,7 @@ export function paToCarac(pa: number) {
   return 2 + Math.floor(10 * (pa / 4) / 5) * 5 / 10
 }
 export function Caracteristiques(props: {}) {
+  const currentPerso = useStore(state => state.currentPerso);
   const { force, agilite, perception, volonte, presence, foi } = useStore(state => state.currentPerso.caracteristiques);
   const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = useStore(state => state.originalPerso.caracteristiques);
   const availablePa = useStore(state => state.paAfterBilling);
@@ -38,12 +40,12 @@ export function Caracteristiques(props: {}) {
   const setPaDepense = (val: number, cara: CARACTERISTIQUES) => {
     storeCurrentCaracteristiquesPaDepense(val, cara);
   };
-  const force_niveau = paToCarac(force.pa_depense);
-  const agilite_niveau = paToCarac(agilite.pa_depense);
-  const perception_niveau = paToCarac(perception.pa_depense);
-  const volonte_niveau = paToCarac(volonte.pa_depense);
-  const presence_niveau = paToCarac(presence.pa_depense);
-  const foi_niveau = paToCarac(foi.pa_depense);
+  const force_niveau =  getCaracteristiqueLevel(currentPerso,"force");
+  const agilite_niveau = getCaracteristiqueLevel(currentPerso,"agilite");
+  const perception_niveau = getCaracteristiqueLevel(currentPerso,"perception");
+  const volonte_niveau = getCaracteristiqueLevel(currentPerso,"volonte");
+  const presence_niveau = getCaracteristiqueLevel(currentPerso,"presence");
+  const foi_niveau = getCaracteristiqueLevel(currentPerso,"foi");
 
   return (
     <Stack>

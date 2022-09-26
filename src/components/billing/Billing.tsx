@@ -149,7 +149,7 @@ export const generateBillingItems = (
                 " → " +
                 finalTalentValue;
             } else if (diff.path.includes("_")) {
-              // TODO: not idea but this means there's a "multiple" talent somewhere
+              // TODO: not ideal but this means there's a "multiple" talent somewhere
               let existingTalent = findTalentInCaracterFromName(
                 currentPerso,
                 talentId

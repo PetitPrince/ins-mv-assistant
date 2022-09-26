@@ -40,17 +40,8 @@ export const TalentRowSpecifique = (props: {
 
   const setCurrentTalent = (
     id: string,
-    val: number | undefined,
-    newCustomNameFragment?: string
-  ) => {
+    val: number | undefined  ) => {
     if (val !== undefined) {
-      let updatedCustomNameFragment;
-      if (Object.hasOwn(talentPool, id) && talentPool[id].customNameFragment) {
-        updatedCustomNameFragment = talentPool[id].customNameFragment;
-      }
-      if (newCustomNameFragment) {
-        updatedCustomNameFragment = newCustomNameFragment;
-      }
       props.setCurrentTalentPaDense(id, val);
     }
   };

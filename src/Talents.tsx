@@ -4,28 +4,27 @@ import { Text } from '@mantine/core';
 import { IconEdit } from '@tabler/icons';
 import slugify from 'slugify';
 import { getCaracteristiqueLevel, getTalentLevel, Personnage, useStore } from './Store';
-import { TalentStandard, TalentsCollection, TCaracteristiquesSet, TalentExistant, TALENTS_PRINCIPAUX_STANDARD, TALENTS_SECONDAIRES_STANDARD, INSMVNumberInput, ICaracteristiquesSet, ICaracteristiquesSet2 } from './App';
-import { paToCarac } from './Caracteristiques';
-import { PropsOf } from '@emotion/react';
+import { TalentStandard, TalentsCollection, TalentExistant, TALENTS_PRINCIPAUX_STANDARD, TALENTS_SECONDAIRES_STANDARD, INSMVNumberInput } from './App';
+import { findTalentInCaracterFromName } from './Billing';
 
 interface TalentDisplayRow extends TalentStandard {
   level: number | undefined;
   pa_depense: number;
 }
-function computeRowsTalents(characterTalents: TalentsCollection, currentPerso: Personnage, talentsStandards: TalentStandard[]) {
+const  computeRowsTalents = (characterTalents: TalentsCollection, currentPerso: Personnage, standardTalentPool: TalentStandard[]) => {
   let rows: TalentDisplayRow[] = [];
 
-  // Go through the list of standard talents, display those who are presents
-  for (const standardTalent of talentsStandards) {
+  // Go through the list of standard talents, display those who are present
+  for (const standardTalent of standardTalentPool) {
     const { name, id, associatedChara, isInnate, specialisationType } = standardTalent;
-    // TODO: cleanup
     switch (specialisationType) {
       case "Multiple":
-        // I need look for hobby, but also hobby-dressage-de-bouquetin
-        // from a list of key(talent-id), determine if one begins with a string
-        const existingTalentsStartingWithId = Object.entries(characterTalents).filter(([k, v]) => k.startsWith(id));
+        // Look for a family of talents in the character sheet, all starting with the same string (for instance all hobby, include "hobby" and
+        // "hobby-dressage-de-bouquetin"). There could be an arbitrary number of them
+        const characterTalentsStartingWithId = Object.entries(characterTalents).filter(([k, v]) => k.startsWith(id));
 
-        for (const [existingTalentId, existingTalent] of existingTalentsStartingWithId) {
+        // For each on of them, add one row with their existing info
+        for (const [existingTalentId, existingTalent] of characterTalentsStartingWithId) {
           rows.push({
             ...standardTalent,
             id: existingTalentId,
@@ -34,17 +33,20 @@ function computeRowsTalents(characterTalents: TalentsCollection, currentPerso: P
             pa_depense: existingTalent.pa_depense
           });
         }
+        // Also add a row to add a new one talent. The trigger is getting an undefined level
         rows.push({
           ...standardTalent,
           name: standardTalent.name + "...",
           level: undefined,
           pa_depense: 0
         });
-        // iterate over all of them
         break;
-      case "Spécifique":
-        const isNameEditable = id.includes("specifique");
 
+      case "Spécifique":
+        // There's always a pair of Talent, The generic on doesn't have the "-specifique" suffix.
+        const isSpecific = id.includes("specifique");
+
+        // If the talent already exists in the character sheet, add a new row
         if (Object.hasOwn(characterTalents, id)) {
           const existingTalent = characterTalents[id];
           const displayName = existingTalent.customNameFragment ? name + " (" + existingTalent.customNameFragment + ")" : name;
@@ -54,20 +56,19 @@ function computeRowsTalents(characterTalents: TalentsCollection, currentPerso: P
             level: existingTalent.niveau,
             pa_depense: existingTalent.pa_depense
           });
-
-        } else {
+        } else { // otherwise add an empty row
           const defaultLevel = isInnate ? getCaracteristiqueLevel(currentPerso, associatedChara) : undefined;
-          const displayName = isNameEditable ? name + "(...)" : name;
+          const displayName = isSpecific ? name + "(...)" : name;
           rows.push({
             ...standardTalent,
             name: displayName,
             level: defaultLevel,
             pa_depense: 0
-
           });
         }
         break;
       case "Générique":
+        // If the talent already exists in the character sheet, add a new row
         if (Object.hasOwn(characterTalents, id)) {
           const existingTalent = characterTalents[id];
           rows.push({
@@ -76,13 +77,12 @@ function computeRowsTalents(characterTalents: TalentsCollection, currentPerso: P
             pa_depense: existingTalent.pa_depense
 
           });
-        } else {
+        } else { // otherwise add an empty row
           const defaultLevel = isInnate ? getCaracteristiqueLevel(currentPerso, associatedChara) : undefined;
           rows.push({
             ...standardTalent,
             level: defaultLevel,
             pa_depense: 0
-
           });
         }
         break;
@@ -92,17 +92,15 @@ function computeRowsTalents(characterTalents: TalentsCollection, currentPerso: P
 }
 
 
-function TalentRow(props: { row: TalentDisplayRow, tpool: string }) {
+const TalentRow = (props: { row: TalentDisplayRow, setCurrentTalentPaDense: (talentId: string, val: number) => void }) => {
   const row = props.row;
-  const tpool = props.tpool
   const perso = useStore((state) => state.currentPerso);
   const talentPool = perso.talents.principaux;
 
-  const setCurrentTalentPrincipalPaDepense = useStore((state) => state.setCurrentTalentPrincipalPaDepense);
   const niveau = getTalentLevel(perso, row.id);
 
   const setCurrentTalent = (id: string, val: number | undefined, newCustomNameFragment?: string) => {
-    if (val != undefined) {
+    if (val !== undefined) {
       let updatedCustomNameFragment;
       if (Object.hasOwn(talentPool, id) && talentPool[id].customNameFragment) {
         updatedCustomNameFragment = talentPool[id].customNameFragment;
@@ -110,8 +108,7 @@ function TalentRow(props: { row: TalentDisplayRow, tpool: string }) {
       if (newCustomNameFragment) {
         updatedCustomNameFragment = newCustomNameFragment;
       }
-      setCurrentTalentPrincipalPaDepense(id, val);
-
+      props.setCurrentTalentPaDense(id, val);
     }
   }
 
@@ -127,45 +124,29 @@ function TalentRow(props: { row: TalentDisplayRow, tpool: string }) {
   );
 }
 
-function TalentRowSpecifique(props: { row: TalentDisplayRow, tpool : string }) {
+const TalentRowSpecifique = (props: { row: TalentDisplayRow, talentPool:TalentsCollection, setCurrentTalentPaDense : (talentId: string, val: number) => void, setCurrentTalentNameFragment: (talentId: string, val: string) => void }) => {
   const row = props.row;
   const talentId = row.id;
   const primaryTalentId = talentId.split("-specifique")[0];
-
-  const setCurrentTalentPrincipalPaDepense = useStore((state) => state.setCurrentTalentPrincipalPaDepense);
-  const setCurrentTalentPrincipalNameFragment = useStore((state) => state.setCurrentTalentPrincipalNameFragment);
-
-  const setCurrentTalentSecondairePaDepense = useStore((state) => state.setCurrentTalentSecondairePaDepense);
-  const setCurrentTalentSecondaireNameFragment = useStore((state) => state.setCurrentTalentSecondaireNameFragment);
-
   const currentPerso = useStore((state) => state.currentPerso);
-  const tpool = props.tpool;
-  let talentPool : TalentsCollection;
-  if(tpool==="principaux"){
-    talentPool = currentPerso.talents.principaux;
-  }else{ // assume secondaire
-    talentPool = currentPerso.talents.secondaires;
+  const talentPool = props.talentPool;
 
-  }
-
-  // check if the primary talent has a higher level than the specialized one; output a warning if it's the case
-  let primaryTalentLevel;
-  if (Object.hasOwn(talentPool, primaryTalentId)) { // does the primary talent is defined ?
-    primaryTalentLevel = getTalentLevel(currentPerso, primaryTalentId);
-  } else { // otherwise set level to 0
-    primaryTalentLevel = 0;
-  }
+  // Check if the primary talent has a higher level than the specialized one
+  // Output a warning in the UI if it's the case
+  
+  const isPrimaryTalentDefined = Object.hasOwn(talentPool, primaryTalentId); // does the primary talent (talent id without the -specifique suffix) exists in the standard list of talent ?
+  let primaryTalentLevel = isPrimaryTalentDefined ? getTalentLevel(currentPerso, primaryTalentId) : 0;
 
   const specificTalentLevel = getTalentLevel(currentPerso, talentId);
-  let errorString;
+
+  let errorString; // keep the if loop in case I want to have anoter error string
   if (primaryTalentLevel > specificTalentLevel) {
     errorString = "Le niveau du talent général ne peut pas dépasser la spécialité";
   }
 
-  const niveau = getTalentLevel(currentPerso, talentId);
 
   const setCurrentTalent = (id: string, val: number | undefined, newCustomNameFragment?: string) => {
-    if (val != undefined) {
+    if (val !== undefined) {
       let updatedCustomNameFragment;
       if (Object.hasOwn(talentPool, id) && talentPool[id].customNameFragment) {
         updatedCustomNameFragment = talentPool[id].customNameFragment;
@@ -173,25 +154,17 @@ function TalentRowSpecifique(props: { row: TalentDisplayRow, tpool : string }) {
       if (newCustomNameFragment) {
         updatedCustomNameFragment = newCustomNameFragment;
       }
-      if(tpool==="Principal"){
-        setCurrentTalentPrincipalPaDepense(id, val);
-      }{
-        setCurrentTalentSecondairePaDepense(id,val);
-      }
+      props.setCurrentTalentPaDense(id,val)
     }
   };
 
   const setCurrentTalentNameFragment = (talentId:string, val:string)=>{
-    if(tpool==="Principal"){
-      setCurrentTalentPrincipalNameFragment(talentId, val);
-    }else{
-      setCurrentTalentSecondaireNameFragment(talentId,val);
-    }
+    props.setCurrentTalentNameFragment(talentId,val);
   }
 
   return (
     <tr key={row.id}>
-      <td>{row.name} {errorString}
+      <td>{row.name}
         <Popover width={300} trapFocus position="bottom" shadow="md">
           <Popover.Target>
             <ActionIcon><IconEdit size={16} /></ActionIcon>
@@ -207,7 +180,7 @@ function TalentRowSpecifique(props: { row: TalentDisplayRow, tpool : string }) {
         </Popover>
       </td>
       <td>
-        <INSMVNumberInput error={errorString} value={niveau} hideControls readOnly variant="unstyled" />
+        <INSMVNumberInput error={errorString} value={specificTalentLevel} hideControls readOnly variant="unstyled" />
         <NumberInput value={row.pa_depense} onChange={(val: number) => { setCurrentTalent(row.id, val); }} />
       </td>
       <td>{row.associatedChara}</td>
@@ -216,24 +189,14 @@ function TalentRowSpecifique(props: { row: TalentDisplayRow, tpool : string }) {
 }
 
 
-function TalentRowMultiple(props: { row: TalentDisplayRow, tpool: string }) {
+const TalentRowMultiple = (props: { row: TalentDisplayRow, talentPool: TalentsCollection, setCurrentTalent:(talentId: string, val: TalentExistant) => void; }) => {
   const row = props.row;
   const talentId = row.id;
-  const tpool =props.tpool;
-  let talentPool : TalentsCollection;
+  const talentPool : TalentsCollection = props.talentPool;
   const currentPerso = useStore((state) => state.currentPerso);
-  const storeCurrentTalentSecondaire = useStore(state => state.setCurrentTalentSecondaire);
-  const storeCurrentTalentPrincipal = useStore(state => state.setCurrentTalentPrincipal);
-
-  if(tpool==="Principal"){
-    talentPool = currentPerso.talents.principaux;
-  }else{ // assume secondaire
-    talentPool = currentPerso.talents.secondaires;
-
-  }
 
   const setCurrentTalent = (id: string, val: number | undefined, newCustomNameFragment?: string) => {
-    if (val != undefined) {
+    if (val !== undefined) {
       let updatedCustomNameFragment;
       if (Object.hasOwn(talentPool, id) && talentPool[id].customNameFragment) {
         updatedCustomNameFragment = talentPool[id].customNameFragment;
@@ -249,14 +212,11 @@ function TalentRowMultiple(props: { row: TalentDisplayRow, tpool: string }) {
         niveau: 0,// todo: this is useless
         pa_depense: val
       };
-      if(tpool==="Principal"){
-        storeCurrentTalentPrincipal(id, newTal);
-      }{
-        storeCurrentTalentSecondaire(id,newTal);
-      }
+      props.setCurrentTalent(id,newTal);
+
     }
   };
-  if (row.level == undefined) {
+  if (row.level === undefined) {
     return (
       <tr key={row.id}>
         <td>{row.name}
@@ -282,8 +242,11 @@ function TalentRowMultiple(props: { row: TalentDisplayRow, tpool: string }) {
       </tr>
     );
   }
-  const justTheParens = row.name.match(/\([^\)]*\)/);
-  const parensContent = justTheParens ? justTheParens[0].slice(1, justTheParens[0].length - 1) : undefined;
+  // Get the fragment name from the displayed name
+  const t = findTalentInCaracterFromName(currentPerso,row.id);
+  const parensContent = t?.customNameFragment
+  // const justTheParens = row.name.match(/\([^\)]*\)/);
+  // const parensContent = justTheParens ? justTheParens[0].slice(1, justTheParens[0].length - 1) : undefined;
   const niveau = getTalentLevel(currentPerso, talentId);
 
   return (
@@ -300,19 +263,33 @@ function TalentRowMultiple(props: { row: TalentDisplayRow, tpool: string }) {
   );
 }
 
-function TalentsGenerique(props: { standardTalentPool: TalentStandard[], title: string, tpool:string }) {
+const TalentsGenerique = (props: { standardTalentPool: TalentStandard[], title: string, tpool:string }) => {
   const standardTalentPool = props.standardTalentPool;
   const title = props.title;
   const tpool = props.tpool;
   const characterTalentsPrincipaux = useStore((state) => state.currentPerso.talents.principaux);
   const characterTalentsSecondaire = useStore((state) => state.currentPerso.talents.secondaires);
+  const setCurrentTalentPrincipalPaDepense = useStore((state) => state.setCurrentTalentPrincipalPaDepense);
+  const setCurrentTalentSecondairePaDepense = useStore((state) => state.setCurrentTalentSecondairePaDepense);
+  const setCurrentTalentPrincipalNameFragment = useStore((state) => state.setCurrentTalentPrincipalNameFragment);
+  const setCurrentTalentSecondaireNameFragment = useStore((state) => state.setCurrentTalentSecondaireNameFragment);
+  const setCurrentTalentSecondaire = useStore(state => state.setCurrentTalentSecondaire);
+  const setCurrentTalentPrincipal = useStore(state => state.setCurrentTalentPrincipal);
 
-  let characterTalents;
-
+  let characterTalents : TalentsCollection;
+  let setCurrentTalentPaDense : (talentId: string, val: number) => void;
+  let setCurrentTalentNameFragment : (talentId: string, val: string) => void;
+  let setCurrentTalent:(talentId: string, val: TalentExistant) => void;
   if(tpool==="Principal"){
     characterTalents = characterTalentsPrincipaux;
+    setCurrentTalentPaDense = setCurrentTalentPrincipalPaDepense;
+    setCurrentTalentNameFragment = setCurrentTalentPrincipalNameFragment;
+    setCurrentTalent = setCurrentTalentPrincipal
   }else{
     characterTalents = characterTalentsSecondaire;
+    setCurrentTalentPaDense = setCurrentTalentSecondairePaDepense;
+    setCurrentTalentNameFragment = setCurrentTalentSecondaireNameFragment
+    setCurrentTalent = setCurrentTalentSecondaire;
   }
   const currentPerso = useStore((state) => state.currentPerso);
 
@@ -334,20 +311,17 @@ function TalentsGenerique(props: { standardTalentPool: TalentStandard[], title: 
           {rows.map((row: TalentDisplayRow) => {
             switch (row.specialisationType) {
               case "Spécifique":
-                const primaryTalentId = row.id.split("-specifique")[0];
+                const primaryTalentId = row.id.split("_specifique")[0];
                 const isPrimary = primaryTalentId === row.id;
                 if (!isPrimary) {
-                  return (<TalentRowSpecifique row={row} key={row.id} tpool={tpool} />);
+                  return (<TalentRowSpecifique row={row} key={row.id} talentPool={characterTalents} setCurrentTalentPaDense={setCurrentTalentPaDense} setCurrentTalentNameFragment={setCurrentTalentNameFragment} />);
                 } else {
-                  return (<TalentRow row={row} key={row.id} tpool={tpool}/>);
+                  return (<TalentRow row={row} key={row.id} setCurrentTalentPaDense={setCurrentTalentPaDense}/>);
                 }
-                break;
               case "Multiple":
-                console.log("mutiple: "+row.id)
-                return(<TalentRowMultiple row={row} key={row.id} tpool={tpool} />)
-                break;
+                return(<TalentRowMultiple row={row} key={row.id} talentPool={characterTalents} setCurrentTalent={setCurrentTalent} />)
               default:
-                return (<TalentRow row={row} key={row.id} tpool={tpool} />);
+                return (<TalentRow row={row} key={row.id} setCurrentTalentPaDense={setCurrentTalentPaDense} />);
             }
           })}
         </tbody>
@@ -359,7 +333,7 @@ function TalentsGenerique(props: { standardTalentPool: TalentStandard[], title: 
 
 /* --------------------------------------------- */
 
-export function Talents(props: {}) {
+export const Talents = (props: {}) => {
   return (
     <Stack>
       <Title order={2}>Talents</Title>

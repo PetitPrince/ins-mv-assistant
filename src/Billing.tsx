@@ -6,7 +6,6 @@ import { showNotification } from '@mantine/notifications';
 import { TOUS_LES_TALENTS } from './App';
 import { getCaracteristiqueLevel, getTalentLevel, Personnage, useStore } from "./Store";
 import { FACTIONS } from './myConst';
-import { paToCarac } from './Caracteristiques';
 
 export interface BillingItem {
   key: string;
@@ -14,7 +13,7 @@ export interface BillingItem {
   cost: number | null;
 }
 
-let findDeepValueOfObjFromPathAndLeadingSep = function (obj: any, path: string, sep: string) {
+let findDeepValueOfObjFromPathAndLeadingSep = (obj: any, path: string, sep: string) => {
   //@ts-ignore
   // eslint-disable-next-line
   for (var i = 1, path = path.split(sep), len = path.length; i < len; i++) {
@@ -25,6 +24,7 @@ let findDeepValueOfObjFromPathAndLeadingSep = function (obj: any, path: string, 
 export const generateBillingItems2 = (originalPerso: Personnage, currentPerso: Personnage) => {
   const differences = createPatch(originalPerso, currentPerso);
   let billingItems: BillingItem[] = [];
+  // Base difference
   for (const diff of differences) {
     if (diff.op === "replace" || diff.op === "add") {
       const diffPathElements = diff.path.split("/"); // diff.path looks like "/caracteristiques/force"
@@ -112,17 +112,10 @@ export const generateBillingItems2 = (originalPerso: Personnage, currentPerso: P
               // Put the specialization name, otherwise default to "spécifique"
               const fragment = findDeepValueOfObjFromPathAndLeadingSep(currentPerso, diff.path, '/').customNameFragment;
               const specializationName = fragment ? fragment : "spécifique";
-              msgString = "Talent " + standardTalent.name + " (" + specializationName + "): " + originalValue + " → " + val;
+              msgString = "Talent " + standardTalent.name + " (" + specializationName + "): " + originalTalentValue + " → " + finalTalentValue;
             }else if(diff.path.includes("_")){ // TODO: not idea but this means there's a "multiple" talent somewhere
-              let existingTalent;
-              if (Object.hasOwn(currentPerso.talents.principaux, talentId)){
-                existingTalent = currentPerso.talents.principaux[talentId];
-              }else if(Object.hasOwn(currentPerso.talents.secondaires, talentId)){
-                existingTalent = currentPerso.talents.secondaires[talentId];
-              }else if(Object.hasOwn(currentPerso.talents.exotiques, talentId)){
-                existingTalent = currentPerso.talents.secondaires[talentId];
-              }
-              msgString = "Talent " + standardTalent.name + " (" + existingTalent?.customNameFragment + "): " + originalValue + " → " + val;
+              let existingTalent = findTalentInCaracterFromName(currentPerso, talentId);
+              msgString = "Talent " + standardTalent.name + " (" + existingTalent?.customNameFragment + "): " + originalTalentValue + " → " + finalTalentValue;
             }
             billingItems.push({
               key: diff.path,
@@ -139,6 +132,7 @@ export const generateBillingItems2 = (originalPerso: Personnage, currentPerso: P
       }
     }
   }
+
   return billingItems;
 }
 export const generateBillingItems = (originalPerso: Personnage, currentPerso: Personnage) => {
@@ -258,7 +252,19 @@ export const generateBillingItems = (originalPerso: Personnage, currentPerso: Pe
   return billingItems;
 };
 
-export function calcBillingItemSum(billingItems: BillingItem[]) {
+export const findTalentInCaracterFromName = (currentPerso: Personnage, talentId: string) => {
+  let existingTalent;
+  if (Object.hasOwn(currentPerso.talents.principaux, talentId)) {
+    existingTalent = currentPerso.talents.principaux[talentId];
+  } else if (Object.hasOwn(currentPerso.talents.secondaires, talentId)) {
+    existingTalent = currentPerso.talents.secondaires[talentId];
+  } else if (Object.hasOwn(currentPerso.talents.exotiques, talentId)) {
+    existingTalent = currentPerso.talents.secondaires[talentId];
+  }
+  return existingTalent;
+}
+
+export const calcBillingItemSum = (billingItems: BillingItem[]) => {
   let sum = 0;
   if (billingItems) {
     for (const billingItem of billingItems) {
@@ -270,9 +276,9 @@ export function calcBillingItemSum(billingItems: BillingItem[]) {
   return sum;
 }
 
-function prepareCostDisplay(cost: number | null | undefined){
+const prepareCostDisplay = (cost: number | null | undefined) =>{
   let costDisplay : string;
-  if (cost == null && cost == undefined) {
+  if (cost === null || cost === undefined) {
     costDisplay = "/";
   } else if (cost < 0) {
     costDisplay = "+" + String(cost).split('-')[1];
@@ -283,13 +289,59 @@ function prepareCostDisplay(cost: number | null | undefined){
 }
 
 
-export function BillingPanel(props:{}){
+export const BillingPanel = (props:{})=>{
 
   const originalPerso = useStore((state) => state.originalPerso);
   const currentPerso = useStore((state) => state.currentPerso);
   const currentPa = currentPerso.pa;
 
-  const billingItems = generateBillingItems2(originalPerso, currentPerso);
+  let billingItems = generateBillingItems2(originalPerso, currentPerso);
+
+  const secondaryTalentUpdates = billingItems.filter(x => x.key.includes("secondaires"));
+  const primaryTalentUpdates = billingItems.filter(x => x.key.includes("principaux"));
+
+  if (secondaryTalentUpdates.length > 0) { 
+    let deducPrimary = 0;
+      // In any case I have a deduction based on the PA spent on primary talents
+    primaryTalentUpdates.forEach((x)=>{deducPrimary+=x.cost?x.cost:0})
+
+    // Let's apply the deduction
+    const secondaryTalentCost = secondaryTalentUpdates.map(x => x.cost ? x.cost : 0).reduce((sum, val) => { return sum + val; }, 0);
+    const msgP = deducPrimary + " rangs offert par les dépenses dans les talents principaux";
+    if(deducPrimary){ // don't show if there's no deduction
+      billingItems.push({
+        key: "freeSecondaryTalentPointsFromPrimarySpending",
+        msg: msgP,
+        cost: -deducPrimary
+      });  
+    }
+    const costAfterDeduction = secondaryTalentCost-deducPrimary;
+
+    if(costAfterDeduction >0){
+      // half of the secondary talents point can be considered paid by the other half
+      
+      let deducSecondary = Math.floor(costAfterDeduction/2);
+      let remainingFreePoints = costAfterDeduction%2
+      const msgS = deducSecondary + " rangs offert par les dépenses dans les talents secondaires (reste +"+remainingFreePoints+")";
+      if(deducSecondary){ // don't show if there's no deduction
+        billingItems.push({
+          key: "freeSecondaryTalentPointsFromSecondaySpending",
+          msg: msgS,
+          cost: -deducSecondary
+        });
+  
+      }
+  
+    }
+
+
+
+
+
+    }
+  
+  // For each points spent
+
   const sum = calcBillingItemSum(billingItems);
 
   const availablePa = currentPa - sum;
@@ -380,14 +432,13 @@ export function BillingPanel(props:{}){
     <IconCheck size={16} />
   </ActionIcon>) : null;
 
-const forcePaDepense = useStore((state)=> state.currentPerso.caracteristiques.force.pa_depense)
 
   return (<Dialog opened={true} position={{ top: 20, right: 20 }}>
-    <ScrollArea.Autosize maxHeight={300}>
+    <ScrollArea.Autosize maxHeight={600}>
       <Table>
         <thead>
           <tr>
-            <th>PA {forcePaDepense}</th>
+            <th>PA</th>
             <th>Item</th>
             <th>Action</th>
           </tr>

@@ -8,7 +8,7 @@ interface SuperieurProps {
   faction: string;
   onBlur: (val: string) => void;
 }
-function Superieur(props: SuperieurProps) {
+const Superieur = (props: SuperieurProps) => {
   const { value, faction, onBlur } = props;
 
   let superieurs;
@@ -33,7 +33,7 @@ function Superieur(props: SuperieurProps) {
       onChange={onBlur} />
   );
 }
-export function Generalites(props: {}) {
+export const Generalites =(props: {}) => {
   const identite = useStore((state) => state.currentPerso.identite) ;
   const faction = useStore((state) => state.currentPerso.faction) ;
   const superieur = useStore((state) => state.currentPerso.superieur) ;

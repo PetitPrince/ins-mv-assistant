@@ -1,9 +1,7 @@
 import { NumberInput, NumberInputProps } from '@mantine/core';
 import { Stack, Group, Title } from '@mantine/core';
-import { useState } from 'react';
-import { INSMVNumberInput, TCaracteristiquesSet, CARACTERISTIQUES, ICaracteristiquesSet, ICaracteristiquesSet2 } from './App';
+import { INSMVNumberInput, CARACTERISTIQUES } from './App';
 import { getCaracteristiqueLevel, useStore } from "./Store";
-import shallow from 'zustand'
 
 interface INSMVCaraNumberInputProps extends NumberInputProps {
   initialValue: number;
@@ -26,10 +24,7 @@ const INSMVCaraPaDepenseNumberInput = (props: INSMVCaraNumberInputProps) => {
   );
 };
 
-export function paToCarac(pa: number) {
-  return 2 + Math.floor(10 * (pa / 4) / 5) * 5 / 10
-}
-export function Caracteristiques(props: {}) {
+export const Caracteristiques = (props: {}) => {
   const currentPerso = useStore(state => state.currentPerso);
   const { force, agilite, perception, volonte, presence, foi } = useStore(state => state.currentPerso.caracteristiques);
   const { force: og_force, agilite: og_agilite, perception: og_perception, volonte: og_volonte, presence: og_presence, foi: og_foi } = useStore(state => state.originalPerso.caracteristiques);

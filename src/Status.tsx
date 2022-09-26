@@ -1,7 +1,6 @@
 import { NumberInput, Stack, Group, Title, Table, Radio } from '@mantine/core';
-import { useStore } from "./Store";
+import { getCaracteristiqueLevel, useStore } from "./Store";
 import { FACTIONS } from './myConst';
-import { paToCarac } from './Caracteristiques';
 
 export const Blessures = (props: { force: number; faction: FACTIONS; }) => {
   const force = props.force;
@@ -65,20 +64,13 @@ export const Blessures = (props: { force: number; faction: FACTIONS; }) => {
     </Table>
   );
 }
-export function Status(props: {
-  // pa: number,
-  // paTotal: number,
-  // pp: number,
-  // ppMax: number,
-  // force: number,
-  // faction: FACTIONS,
-}) {
+export const Status = (props: {}) => {
 
   const pa = useStore(state => state.currentPerso.pa);
-  const force_pa = useStore(state => state.currentPerso.caracteristiques.force.pa_depense);
-  const force = paToCarac(force_pa);
+  const currentPerso = useStore(state => state.currentPerso)
   const faction = useStore(state => state.currentPerso.faction);
   const ppMax = useStore(state => state.currentPerso.ppMax);
+  const force = getCaracteristiqueLevel(currentPerso,"force");
   const setCurrentPa = useStore(state => state.setCurrentPa);
 
 
@@ -94,7 +86,6 @@ export function Status(props: {
     <Stack>
       <Title order={2}>Status</Title>
       <Group>
-
         <NumberInput label="Point d'Administration (PA) restant" value={pa}
           onChange={(val: number) => { setCurrentPa(val); }} />
         {/* <NumberInput label="PA accumulés" value={paTotal}/> */}

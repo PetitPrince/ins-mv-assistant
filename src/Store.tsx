@@ -1,8 +1,8 @@
 import { FACTIONS } from './myConst';
 import create from 'zustand';
 import produce from "immer";
-import { BillingItem, calcBillingItemSum, generateBillingItems, generateBillingItems2 } from './Billing';
-import { CARACTERISTIQUES, findStandardTalentById, ICaracteristiquesSet2, TalentExistant, TalentsCollection, TALENTS_PRINCIPAUX_STANDARD, TOUS_LES_TALENTS } from './App';
+import { BillingItem } from './Billing';
+import { CARACTERISTIQUES, findStandardTalentById, ICaracteristiquesSet2, TalentExistant, TalentsCollection } from './App';
 
 export interface Personnage {
   identite: string;
@@ -14,96 +14,18 @@ export interface Personnage {
   paTotal: number;
   pp: number;
   ppMax: number;
-  freeSecondayTalentPoints: number;
   talents: {
     principaux: TalentsCollection
     secondaires: TalentsCollection,
     exotiques: TalentsCollection,
   }
 }
-export class PersonnageX {
-  identite: string;
-  faction: FACTIONS;
-  superieur: string; // todo: enum
-  grade: number;
-  caracteristiques: ICaracteristiquesSet2;
-  pa: number;
-  paTotal: number;
-  pp: number;
-  ppMax: number;
-  freeSecondayTalentPoints: number;
-  talents: {
-    principaux: TalentsCollection
-    secondaires: TalentsCollection,
-    exotiques: TalentsCollection,
-  }
-  // TODO: talents, pouvoirs
 
-  constructor( dictLike:{
-    identite: string,
-    faction: FACTIONS,
-    superieur: string, // todo: enum
-    grade: number,
-    caracteristiques: ICaracteristiquesSet2,
-    pa: number,
-    paTotal: number,
-    pp: number,
-    ppMax: number,
-    freeSecondayTalentPoints: number,
-    talents: {
-      principaux: TalentsCollection
-      secondaires: TalentsCollection,
-      exotiques: TalentsCollection,
-    }
-  }){
-    const {identite, faction, superieur, grade, caracteristiques, pa, paTotal, pp, ppMax, freeSecondayTalentPoints, talents} = dictLike;
-    this.identite=identite;
-    this.faction = faction;
-    this.superieur = superieur;
-    this.grade = grade;
-    this.caracteristiques = caracteristiques;
-    this.pa = pa;
-    this.paTotal = paTotal;
-    this.pp = pp;
-    this.ppMax = ppMax;
-    this.freeSecondayTalentPoints = freeSecondayTalentPoints;
-    this.talents = talents
-  }
-
-  getCaracteristiqueLevel(caraName:string){ // TODO: should ensure caraname be an index of caracteristique
-    const caraPaDepense = this.caracteristiques[caraName].pa_depense;
-    return 2 + Math.floor(10 * (caraPaDepense / 4) / 5) * 5 / 10
-  }
-  getTalentLevel(talentId: string){
-    // todo: should ensure talent exists
-    let existingTalent;
-
-    if (Object.hasOwn(this.talents.principaux, talentId)){
-      existingTalent = this.talents.principaux[talentId];
-    }else if(Object.hasOwn(this.talents.principaux, talentId)){
-      existingTalent = this.talents.secondaires[talentId];
-    }else{
-      existingTalent = {pa_depense: 0}
-    }
-
-    let associatedCara = findStandardTalentById(talentId)?.associatedChara;
-
-    let levelFromAssociatedChara = 0;
-    if(associatedCara){
-      levelFromAssociatedChara = this.getCaracteristiqueLevel(associatedCara);
-    }
-
-    const levelFromPa = existingTalent.pa_depense/2;
-
-    return levelFromPa + levelFromAssociatedChara
-
-  }
-}
-export function getCaracteristiqueLevel(perso:Personnage, caraName?:string){
+export const getCaracteristiqueLevel = (perso:Personnage, caraName?:string) =>{
   const caraPaDepense =caraName ? perso.caracteristiques[caraName].pa_depense : 0;
   return 2 + Math.floor(10 * (caraPaDepense / 4) / 5) * 5 / 10
 }
-export function getTalentLevel(perso: Personnage, talentId: string){
+export const getTalentLevel = (perso: Personnage, talentId: string) =>{
   let existingTalent;
 
   if (Object.hasOwn(perso.talents.principaux, talentId)){
@@ -158,7 +80,6 @@ const emptyPersoDict = {
   paTotal: 0,
   pp: 0,
   ppMax: 0,
-  freeSecondayTalentPoints: 0,
   talents: {
     principaux: {
       // "combat-specifique": {
@@ -210,68 +131,13 @@ export const useStore = create<{
   setCurrentTalentSecondaire: (talentId: string, val: TalentExistant) => void;
   setCurrentTalentSecondairePaDepense: (talentId: string, val: number) => void;
   setCurrentTalentSecondaireNameFragment: (talentId: string, val: string) => void;
-  updateBilling: (originalPerso: Personnage, draftPerso: Personnage) => void;
 
 }>((set, get) => ({
   currentPerso: emptyPerso,
   originalPerso: emptyPerso,
   billingItems: [],
   paAfterBilling: 0,
-  freeTalentPoints: 0,
 
-
-
-  updateBilling: (originalPerso, draftPerso) => {
-    const updatedBillingItems = generateBillingItems(originalPerso, draftPerso);
-
-    // Calc the points that ca nbe freely spent on secondary talent
-    // Rule is 1 point bought (primary or secondary) = 1 point freely spent on secondary
-
-    // Initial state is whatever was left non spent (in case we're in the middle of creating a character)
-    let updatedFreeSecondaryTalentPoints = originalPerso.freeSecondayTalentPoints;
-
-    // Add whatever points spent on Talent Principaux
-    const updatesOnTalentsPrincipaux = updatedBillingItems.filter(billingItem => billingItem.key.startsWith("/talents/principaux"));
-    for (const updateOnTalentsPrincipaux of updatesOnTalentsPrincipaux) {
-      if (updateOnTalentsPrincipaux.cost != null && updateOnTalentsPrincipaux.cost != NaN) {
-        updatedFreeSecondaryTalentPoints += updateOnTalentsPrincipaux.cost;
-      }
-    }
-
-    //
-    const secondaryBills = updatedBillingItems.filter(x => x.key.includes("secondaires"));
-    if (secondaryBills.length > 0
-      && updatedFreeSecondaryTalentPoints > 0) {
-      const totalCostSecondaryBills = secondaryBills.map(x => x.cost ? x.cost : 0).reduce((sum, val) => { return sum + val; }, 0);
-      const remainingFreePoints = updatedFreeSecondaryTalentPoints - totalCostSecondaryBills;
-      const remainingFreePointsDisplay = remainingFreePoints < 0 ? 0 : remainingFreePoints;
-      const deduction = remainingFreePoints <= 0 ? updatedFreeSecondaryTalentPoints : remainingFreePoints;
-      const msg = updatedFreeSecondaryTalentPoints + " rangs offert par les dépenses dans les talents principaux (reste:" + remainingFreePointsDisplay + ")";
-      updatedBillingItems.push({
-        key: "freeTalentPoints",
-        msg: msg,
-        cost: -deduction,
-      });
-    }
-
-
-    // // Add whatever points spent on Talent secondaires ... but only those not using the free pool (i.e. have to be calc after ?)
-    // MEGA TODO: consider a Personnage not a collection of stat, but rather as a collection PA spent on that stat. In other words,
-    // the level of everything is a secondary by product of the PA billing
-    // const updatesOnTalentsSecondaires = updatedBillingItems.filter(billingItem => billingItem.key.startsWith("/talents/secondaires"));
-    // for (const updateOnTalentsSecondaires of updatesOnTalentsSecondaires) {
-    //   if (updateOnTalentsSecondaires.cost != null && updateOnTalentsSecondaires.cost != NaN) {
-    //     updatedFreeSecondaryTalentPoints += updateOnTalentsSecondaires.cost;
-    //   }
-    // }
-
-    set(produce(draftState => {
-      draftState.billingItems = updatedBillingItems;
-      draftState.currentPerso.freeTalentPoints = updatedFreeSecondaryTalentPoints;
-      draftState.paAfterBilling = get().currentPerso.pa - calcBillingItemSum(updatedBillingItems);
-    }
-    ));
-  },
   setPerso: (val) => {
     set(produce(draftState => { draftState.currentPerso = val; }));
   },

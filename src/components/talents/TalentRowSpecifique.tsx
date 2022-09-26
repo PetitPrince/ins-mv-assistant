@@ -13,7 +13,7 @@ import { TalentInvestiCollection } from "../../utils/const/Personnage";
 
 export const TalentRowSpecifique = (props: {
   row: TalentDisplayRow;
-  talentPool: TalentInvestiCollection;
+  talentsInvesti: TalentInvestiCollection;
   setCurrentTalentPaDense: (talentId: string, val: number) => void;
   setCurrentTalentNameFragment: (talentId: string, val: string) => void;
 }) => {
@@ -21,11 +21,11 @@ export const TalentRowSpecifique = (props: {
   const talentId = row.id;
   const primaryTalentId = talentId.split("-specifique")[0];
   const currentPerso = useStore((state) => state.currentPerso);
-  const talentPool = props.talentPool;
+  const talentsInvesti = props.talentsInvesti;
 
   // Check if the primary talent has a higher level than the specialized one
   // Output a warning in the UI if it's the case
-  const isPrimaryTalentDefined = Object.hasOwn(talentPool, primaryTalentId); // does the primary talent (talent id without the -specifique suffix) exists in the standard list of talent ?
+  const isPrimaryTalentDefined = Object.hasOwn(talentsInvesti, primaryTalentId); // does the primary talent (talent id without the -specifique suffix) exists in the standard list of talent ?
   let primaryTalentLevel = isPrimaryTalentDefined
     ? getTalentLevel(currentPerso, primaryTalentId)
     : 0;

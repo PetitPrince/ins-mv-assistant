@@ -3,5 +3,9 @@
         "activityBar.background": "#312D26",
         "titleBar.activeBackground": "#443F35",
         "titleBar.activeForeground": "#FBFBFA"
+    },
+    "editor.defaultFormatter": null,
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }

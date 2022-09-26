@@ -1,28 +1,8 @@
-import { NumberInput, NumberInputProps } from "@mantine/core";
+import { INSMVNumberInput } from "../../App";
+import { getCaracteristiqueLevel, useStore } from "../../store/Store";
+import { INSMVCaraPaDepenseNumberInput } from "./INSMVCaraPaDepenseNumberInput";
 import { Stack, Group, Title } from "@mantine/core";
-import { INSMVNumberInput, CARACTERISTIQUES } from "./App";
-import { getCaracteristiqueLevel, useStore } from "./Store";
-
-interface INSMVCaraNumberInputProps extends NumberInputProps {
-  initialValue: number;
-  availablePa: number;
-}
-const INSMVCaraPaDepenseNumberInput = (props: INSMVCaraNumberInputProps) => {
-  const { initialValue, availablePa, ...restOfTheProps } = props; // extracting  initialValue from props (I want to pass props forward to NumberInput)
-  const isModified = props.value !== initialValue;
-  const variant = isModified ? "filled" : "default";
-  const errorString = isModified && availablePa < 0 ? "  " : "";
-
-  return (
-    <NumberInput
-      // {...props}
-      {...restOfTheProps}
-      variant={variant}
-      // radius={radius}
-      error={errorString}
-    />
-  );
-};
+import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 
 export const Caracteristiques = (props: {}) => {
   const currentPerso = useStore((state) => state.currentPerso);
@@ -42,7 +22,7 @@ export const Caracteristiques = (props: {}) => {
   const storeCurrentCaracteristiquesPaDepense = useStore(
     (state) => state.setCurrentCaracteristiquesPaDepense
   );
-  const setPaDepense = (val: number, cara: CARACTERISTIQUES) => {
+  const setPaDepense = (val: number, cara: CARACTERISTIQUE_NAMES) => {
     storeCurrentCaracteristiquesPaDepense(val, cara);
   };
   const force_niveau = getCaracteristiqueLevel(currentPerso, "force");
@@ -70,7 +50,7 @@ export const Caracteristiques = (props: {}) => {
             label="Force - PA dépensé"
             value={force.pa_depense}
             onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUES.FORCE)
+              setPaDepense(val, CARACTERISTIQUE_NAMES.FORCE)
             }
           />
         </Group>
@@ -88,7 +68,7 @@ export const Caracteristiques = (props: {}) => {
             label="Agilite - PA dépensé"
             value={agilite.pa_depense}
             onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUES.AGILITE)
+              setPaDepense(val, CARACTERISTIQUE_NAMES.AGILITE)
             }
           />
         </Group>
@@ -106,7 +86,7 @@ export const Caracteristiques = (props: {}) => {
             label="Perception - PA dépensé"
             value={perception.pa_depense}
             onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUES.PERCEPTION)
+              setPaDepense(val, CARACTERISTIQUE_NAMES.PERCEPTION)
             }
           />
         </Group>
@@ -124,7 +104,7 @@ export const Caracteristiques = (props: {}) => {
             label="Volonté - PA dépensé"
             value={volonte.pa_depense}
             onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUES.VOLONTE)
+              setPaDepense(val, CARACTERISTIQUE_NAMES.VOLONTE)
             }
           />
         </Group>
@@ -142,7 +122,7 @@ export const Caracteristiques = (props: {}) => {
             label="Présence - PA dépensé"
             value={presence.pa_depense}
             onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUES.PRESENCE)
+              setPaDepense(val, CARACTERISTIQUE_NAMES.PRESENCE)
             }
           />
         </Group>
@@ -159,7 +139,7 @@ export const Caracteristiques = (props: {}) => {
             availablePa={availablePa}
             label="Foi - PA dépensé"
             value={foi.pa_depense}
-            onChange={(val: number) => setPaDepense(val, CARACTERISTIQUES.FOI)}
+            onChange={(val: number) => setPaDepense(val, CARACTERISTIQUE_NAMES.FOI)}
           />
         </Group>
       </Group>

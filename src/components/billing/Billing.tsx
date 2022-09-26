@@ -1,16 +1,18 @@
-import { ScrollArea, Table } from "@mantine/core";
-import { ActionIcon, Dialog } from "@mantine/core";
-import { IconCheck, IconX } from "@tabler/icons";
-import { applyPatch, createPatch } from "rfc6902";
-import { showNotification } from "@mantine/notifications";
-import { TOUS_LES_TALENTS } from "./App";
+import { TOUS_LES_TALENTS } from "../../utils/const/TalentStandard";
+import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import {
   getCaracteristiqueLevel,
   getTalentLevel,
-  Personnage,
   useStore,
-} from "./Store";
-import { FACTIONS } from "./myConst";
+} from "../../store/Store";
+import { Personnage } from "../../utils/const/Personnage";
+import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
+import { ScrollArea, Table } from "@mantine/core";
+import { ActionIcon, Dialog } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons";
+import { applyPatch, createPatch } from "rfc6902";
+import { findTalentInCaracterFromName } from "../../utils/helper/findTalentInCaracterFromName";
 
 export interface BillingItem {
   key: string;
@@ -18,19 +20,7 @@ export interface BillingItem {
   cost: number | null;
 }
 
-let findDeepValueOfObjFromPathAndLeadingSep = (
-  obj: any,
-  path: string,
-  sep: string
-) => {
-  //@ts-ignore
-  // eslint-disable-next-line
-  for (var i = 1, path = path.split(sep), len = path.length; i < len; i++) {
-    obj = obj[path[i]];
-  }
-  return obj;
-};
-export const generateBillingItems2 = (
+export const generateBillingItems = (
   originalPerso: Personnage,
   currentPerso: Personnage
 ) => {
@@ -56,9 +46,9 @@ export const generateBillingItems2 = (
       switch (diffCategory) {
         case "faction":
           let updatedCost = null; // TODO: check if creation or update (or rather, if update -> faction change shouldn't even be a possiblity)
-          if (val === FACTIONS.ANGES) {
+          if (val === FACTIONS_NAMES.ANGES) {
             updatedCost = -100;
-          } else if (val === FACTIONS.DEMONS) {
+          } else if (val === FACTIONS_NAMES.DEMONS) {
             updatedCost = -80;
           }
           billingItems.push({
@@ -191,165 +181,6 @@ export const generateBillingItems2 = (
 
   return billingItems;
 };
-export const generateBillingItems = (
-  originalPerso: Personnage,
-  currentPerso: Personnage
-) => {
-  const differences = createPatch(originalPerso, currentPerso);
-  // Using naively `[, patches]= produceWithPatches(perso, notUsed => {return draftPerso})` will not produce a minimal set of changes to
-  // get to the perso. It will instead says "Oh i'm replacing the old object by the new one", which is correct but not what I want for billing
-  // I want to get each differences and calc the cost
-  // For this I need to determine the path (cost differs according on what's updated)
-  // then determine the difference.
-  // For most of the changes I assume the type of difference is "replace"
-  // "add" should be only for talents (maybe?) and powers (for sure)
-  // "remove" shouldn't ever be used
-  let billingItems: BillingItem[] = [];
-
-  for (const diff of differences) {
-    console.log(diff);
-    if (diff.op === "replace" || diff.op === "add") {
-      const diffPathElements = diff.path.split("/"); // diff.path looks like "/caracteristiques/force"
-      const diffCategory = diffPathElements[1];
-      let originalValue = findDeepValueOfObjFromPathAndLeadingSep(
-        originalPerso,
-        diff.path,
-        "/"
-      );
-      const val = diff.op === "add" ? diff.value.niveau : diff.value;
-      switch (diffCategory) {
-        case "caracteristiques":
-          const caraName = diffPathElements[diffPathElements.length - 1]; // TODO: a neater way would be use a caraDisplay string instead of a the id
-          const valDiff = val - originalValue.niveau;
-          billingItems.push({
-            key: diff.path,
-            msg: caraName + ": " + originalValue.niveau + " → " + val,
-            cost: valDiff * 4,
-          });
-          break;
-        case "faction":
-          let updatedCost = null; // TODO: check if creation or update (or rather, if update -> faction change shouldn't even be a possiblity)
-          if (val === FACTIONS.ANGES) {
-            updatedCost = -100;
-          } else if (val === FACTIONS.DEMONS) {
-            updatedCost = -80;
-          }
-          billingItems.push({
-            key: diff.path,
-            msg: "Faction: " + originalValue + " → " + val,
-            cost: updatedCost,
-          });
-          break;
-        case "identite":
-          billingItems.push({
-            key: diff.path,
-            msg: "Identité: " + originalValue + " → " + val,
-            cost: null,
-          });
-          break;
-        case "superieur":
-          billingItems.push({
-            key: diff.path,
-            msg: "Supérieur: " + originalValue + " → " + val,
-            cost: null,
-          });
-          break;
-        case "grade":
-          billingItems.push({
-            key: diff.path,
-            msg: "Grade: " + originalValue + " → " + val,
-            cost: null,
-          });
-          break;
-        case "talents":
-          // Check if there's a standard talent existing
-          const talentId = diffPathElements[3];
-          let standardTalent = TOUS_LES_TALENTS.find((x) => x.id === talentId);
-          if (standardTalent === undefined) {
-            console.log("Cannot find talent with id " + talentId);
-          }
-
-          // If not, maybe it's a specialized / multiple one; find the primary talent
-          const standardTalentAgain = TOUS_LES_TALENTS.find(
-            (x) => x.id === talentId.split("_")[0]
-          );
-          if (standardTalentAgain === undefined) {
-            console.log(
-              "Cannot find primary talent for id " + talentId + ", breaking"
-            );
-            break;
-          }
-          standardTalent = standardTalentAgain;
-
-          // Calc cost here
-          const associatedCara = standardTalent.associatedChara;
-          if (diff.op === "add") {
-            // A new talent doesn't have an original value, so it's either the associated cara/2, or 1
-            if (associatedCara === "Aucune") {
-              originalValue = 1;
-            } else {
-              originalValue = getCaracteristiqueLevel(
-                currentPerso,
-                associatedCara
-              );
-            }
-          }
-          const cost = (val - originalValue) * 2;
-
-          // Craft message here
-          let msgString =
-            "Talent " + standardTalent.name + " " + originalValue + " → " + val;
-
-          if (diff.path.includes("specifique")) {
-            // Put the specialization name, otherwise default to "spécifique"
-            const fragment = findDeepValueOfObjFromPathAndLeadingSep(
-              currentPerso,
-              diff.path,
-              "/"
-            ).customNameFragment;
-            const specializationName = fragment ? fragment : "spécifique";
-            msgString =
-              "Talent " +
-              standardTalent.name +
-              " (" +
-              specializationName +
-              "): " +
-              originalValue +
-              " → " +
-              val;
-          }
-
-          billingItems.push({
-            key: diff.path,
-            msg: msgString,
-            cost: cost,
-          });
-          break;
-
-        default:
-          console.log("Unhandled billing category : " + diffCategory);
-          break;
-      }
-    }
-  }
-
-  return billingItems;
-};
-
-export const findTalentInCaracterFromName = (
-  currentPerso: Personnage,
-  talentId: string
-) => {
-  let existingTalent;
-  if (Object.hasOwn(currentPerso.talents.principaux, talentId)) {
-    existingTalent = currentPerso.talents.principaux[talentId];
-  } else if (Object.hasOwn(currentPerso.talents.secondaires, talentId)) {
-    existingTalent = currentPerso.talents.secondaires[talentId];
-  } else if (Object.hasOwn(currentPerso.talents.exotiques, talentId)) {
-    existingTalent = currentPerso.talents.secondaires[talentId];
-  }
-  return existingTalent;
-};
 
 export const calcBillingItemSum = (billingItems: BillingItem[]) => {
   let sum = 0;
@@ -380,7 +211,7 @@ export const BillingPanel = (props: {}) => {
   const currentPerso = useStore((state) => state.currentPerso);
   const currentPa = currentPerso.pa;
 
-  let billingItems = generateBillingItems2(originalPerso, currentPerso);
+  let billingItems = generateBillingItems(originalPerso, currentPerso);
 
   const secondaryTalentUpdates = billingItems.filter((x) =>
     x.key.includes("secondaires")

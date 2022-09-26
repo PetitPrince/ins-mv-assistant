@@ -1,22 +1,21 @@
+import { FACTIONS_NAMES } from "../../utils/const/Factions";
+import { SUPERIEURS_ANGES, SUPERIEURS_DEMONS } from "../../utils/const/Superieurs";
+import { useStore } from "../../store/Store";
 import { Autocomplete, Select, TextInput, Title } from "@mantine/core";
 import { NumberInput, Stack, Group } from "@mantine/core";
-import { FACTIONS, SUPERIEURS_ANGES, SUPERIEURS_DEMONS } from "./myConst";
-import { useStore } from "./Store";
 
-interface SuperieurProps {
-  value: string;
-  faction: string;
-  onBlur: (val: string) => void;
-}
-const Superieur = (props: SuperieurProps) => {
-  const { value, faction, onBlur } = props;
+const Superieur = (props: {}) => {
+  const value = useStore((state) => state.currentPerso.superieur);
+  const faction = useStore((state) => state.currentPerso.faction);
+
+  const setCurrentSuperieur = useStore((state) => state.setCurrentSuperieur);
 
   let superieurs;
   switch (faction) {
-    case FACTIONS.ANGES:
+    case FACTIONS_NAMES.ANGES:
       superieurs = SUPERIEURS_ANGES;
       break;
-    case FACTIONS.DEMONS:
+    case FACTIONS_NAMES.DEMONS:
       superieurs = SUPERIEURS_DEMONS;
       break;
     default:
@@ -30,19 +29,17 @@ const Superieur = (props: SuperieurProps) => {
       label="Supérieur"
       limit={1000}
       value={value}
-      onChange={onBlur}
+      onChange={(val: string) => setCurrentSuperieur(val)}
     />
   );
 };
 export const Generalites = (props: {}) => {
   const identite = useStore((state) => state.currentPerso.identite);
   const faction = useStore((state) => state.currentPerso.faction);
-  const superieur = useStore((state) => state.currentPerso.superieur);
   const grade = useStore((state) => state.currentPerso.grade);
 
   const setCurrentIdentite = useStore((state) => state.setCurrentIdentite);
   const setCurrentFaction = useStore((state) => state.setCurrentFaction);
-  const setCurrentSuperieur = useStore((state) => state.setCurrentSuperieur);
   const setCurrentGrade = useStore((state) => state.setCurrentGrade);
 
   return (
@@ -61,18 +58,14 @@ export const Generalites = (props: {}) => {
           label="Faction"
           value={faction}
           data={[
-            { value: FACTIONS.ANGES, label: "Anges" },
-            { value: FACTIONS.DEMONS, label: "Démons" },
-            { value: FACTIONS.TROISIEME_FORCE, label: "Troisième force" },
-            { value: FACTIONS.AUTRE, label: "Autre" },
+            { value: FACTIONS_NAMES.ANGES, label: "Anges" },
+            { value: FACTIONS_NAMES.DEMONS, label: "Démons" },
+            { value: FACTIONS_NAMES.TROISIEME_FORCE, label: "Troisième force" },
+            { value: FACTIONS_NAMES.AUTRE, label: "Autre" },
           ]}
-          onChange={(val: FACTIONS) => setCurrentFaction(val)}
+          onChange={(val: FACTIONS_NAMES) => setCurrentFaction(val)}
         />
-        <Superieur
-          value={superieur}
-          onBlur={(val: string) => setCurrentSuperieur(val)}
-          faction={faction}
-        />
+        <Superieur />
 
         <NumberInput
           label="Grade"

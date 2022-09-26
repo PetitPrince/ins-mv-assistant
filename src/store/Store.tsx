@@ -1,31 +1,10 @@
-import { FACTIONS } from "./myConst";
-import create from "zustand";
+import { findStandardTalentById } from "../utils/const/TalentStandard";
+import { BillingItem } from "../components/billing/Billing";
+import { FACTIONS_NAMES } from "../utils/const/Factions";
 import produce from "immer";
-import { BillingItem } from "./Billing";
-import {
-  CARACTERISTIQUES,
-  findStandardTalentById,
-  ICaracteristiquesSet2,
-  TalentExistant,
-  TalentsCollection,
-} from "./App";
-
-export interface Personnage {
-  identite: string;
-  faction: FACTIONS;
-  superieur: string; // todo: enum
-  grade: number;
-  caracteristiques: ICaracteristiquesSet2;
-  pa: number;
-  paTotal: number;
-  pp: number;
-  ppMax: number;
-  talents: {
-    principaux: TalentsCollection;
-    secondaires: TalentsCollection;
-    exotiques: TalentsCollection;
-  };
-}
+import create from "zustand";
+import { Personnage, TalentInvesti } from "../utils/const/Personnage";
+import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 
 export const getCaracteristiqueLevel = (
   perso: Personnage,
@@ -64,7 +43,7 @@ export const getTalentLevel = (perso: Personnage, talentId: string) => {
 // any operation in the app is done on the Personnage, and the billing sort out the rest
 const emptyPersoDict = {
   identite: "",
-  faction: FACTIONS.AUTRE,
+  faction: FACTIONS_NAMES.AUTRE,
   superieur: "",
   grade: 0,
   caracteristiques: {
@@ -125,29 +104,29 @@ export const useStore = create<{
   setPerso: (val: Personnage) => void;
   setOriginalPerso: (val: Personnage) => void;
   setCurrentIdentite: (val: string) => void;
-  setCurrentFaction: (val: FACTIONS) => void;
+  setCurrentFaction: (val: FACTIONS_NAMES) => void;
   setCurrentGrade: (val: number) => void;
   setCurrentSuperieur: (val: string) => void;
   setCurrentCaracteristiques: (
     val: number,
-    caracteristique: CARACTERISTIQUES
+    caracteristique: CARACTERISTIQUE_NAMES
   ) => void;
   setCurrentCaracteristiquesPaDepense: (
     val: number,
-    caracteristique: CARACTERISTIQUES
+    caracteristique: CARACTERISTIQUE_NAMES
   ) => void;
   setCurrentPa: (val: number) => void;
   setCurrentPaTotal: (val: number) => void;
   setCurrentPp: (val: number) => void;
   setCurrentPpMax: (val: number) => void;
   setCurrentFreeTalentPoints: (val: number) => void;
-  setCurrentTalentPrincipal: (talentId: string, val: TalentExistant) => void;
+  setCurrentTalentPrincipal: (talentId: string, val: TalentInvesti) => void;
   setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => void;
   setCurrentTalentPrincipalNameFragment: (
     talentId: string,
     val: string
   ) => void;
-  setCurrentTalentSecondaire: (talentId: string, val: TalentExistant) => void;
+  setCurrentTalentSecondaire: (talentId: string, val: TalentInvesti) => void;
   setCurrentTalentSecondairePaDepense: (talentId: string, val: number) => void;
   setCurrentTalentSecondaireNameFragment: (
     talentId: string,

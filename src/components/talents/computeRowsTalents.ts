@@ -1,5 +1,5 @@
 import { TalentStandard } from "../../utils/const/TalentStandard";
-import { getCaracteristiqueLevel } from "../../store/Store";
+import { getCaracteristiqueLevel, getTalentLevel } from "../../store/Store";
 import { Personnage, TalentInvestiCollection } from "../../utils/const/Personnage";
 import { TalentDisplayRow } from "./Talents";
 
@@ -35,7 +35,7 @@ export const computeRowsTalents = (
               " (" +
               existingTalent.customNameFragment +
               ")",
-            level: existingTalent.niveau,
+            level: getTalentLevel(currentPerso, existingTalentId), // TODO: it's a bit a roundabout way to get the current level
             pa_depense: existingTalent.pa_depense,
           });
         }
@@ -61,7 +61,7 @@ export const computeRowsTalents = (
           rows.push({
             ...standardTalent,
             name: displayName,
-            level: existingTalent.niveau,
+            level: getTalentLevel(currentPerso, id), // TODO: it's a bit a roundabout way to get the current level
             pa_depense: existingTalent.pa_depense,
           });
         } else {
@@ -84,7 +84,7 @@ export const computeRowsTalents = (
           const existingTalent = characterTalents[id];
           rows.push({
             ...standardTalent,
-            level: existingTalent.niveau,
+            level: getTalentLevel(currentPerso, id), // TODO: it's a bit a roundabout way to get the current level
             pa_depense: existingTalent.pa_depense,
           });
         } else {

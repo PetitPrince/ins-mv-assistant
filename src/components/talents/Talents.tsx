@@ -2,11 +2,12 @@ import {
   TalentStandard,
   TALENTS_EXOTIQUES_STANDARD,
   TALENTS_PRINCIPAUX_STANDARD,
-  TALENTS_SECONDAIRES_STANDARD
+  TALENTS_SECONDAIRES_STANDARD,
 } from "../../utils/const/TalentStandard";
 import { TalentsGenerique } from "./TalentsGenerique";
 import { Grid, Title } from "@mantine/core";
 import { Stack } from "@mantine/core";
+import icon from "@tabler/icons";
 
 export interface TalentDisplayRow extends TalentStandard {
   level: number | undefined;
@@ -25,12 +26,12 @@ export const Talents = (props: {}) => {
           />
         </Grid.Col>
         <Grid.Col span={4}>
-        <TalentsGenerique
+          <TalentsGenerique
             title="Talents exotique"
             talentsStandardCollection={TALENTS_EXOTIQUES_STANDARD}
             talentCategory="Exotique"
           />
-            </Grid.Col>
+        </Grid.Col>
         <Grid.Col span={4}>
           <TalentsGenerique
             title="Talents secondaires"

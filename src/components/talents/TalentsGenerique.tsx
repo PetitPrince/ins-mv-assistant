@@ -1,18 +1,27 @@
-import { TalentStandard } from "../../utils/const/TalentStandard";
 import { useStore } from "../../store/Store";
-import { TalentRow } from "./TalentRow";
-import { TalentRowMultiple } from "./TalentRowMultiple";
-import { TalentRowSpecifique } from "./TalentRowSpecifique";
-import { TalentDisplayRow } from "./Talents";
+import {
+  TalentInvesti,
+  TalentInvestiCollection,
+} from "../../utils/const/Personnage";
+import { TalentStandard } from "../../utils/const/TalentStandard";
 import { computeRowsTalents } from "./computeRowsTalents";
-import { Title } from "@mantine/core";
-import { Stack, Table } from "@mantine/core";
-import { TalentInvesti, TalentInvestiCollection } from "../../utils/const/Personnage";
-
-
+import {
+  Title,
+  Text,
+  Group,
+  NumberInput,
+  ActionIcon,
+  Popover,
+  TextInput,
+  Button,
+} from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { IconEdit } from "@tabler/icons";
+import { DataTable } from "mantine-datatable";
+import slugify from "slugify";
 
 export const TalentsGenerique = (props: {
-  talentsStandardCollection: TalentStandard[]
+  talentsStandardCollection: TalentStandard[];
   title: string;
   talentCategory: string;
 }) => {
@@ -61,79 +70,163 @@ export const TalentsGenerique = (props: {
   }
   const currentPerso = useStore((state) => state.currentPerso);
 
+  const setCurrentTalentMultiple = (
+    id: string,
+    val: number | undefined,
+    newCustomNameFragment?: string
+  ) => {
+    if (val !== undefined) {
+      let updatedCustomNameFragment;
+      if (
+        Object.hasOwn(characterTalents, id) &&
+        characterTalents[id].customNameFragment
+      ) {
+        updatedCustomNameFragment = characterTalents[id].customNameFragment;
+      }
+      if (newCustomNameFragment) {
+        updatedCustomNameFragment = newCustomNameFragment;
+      }
+      const newTal: TalentInvesti = updatedCustomNameFragment
+        ? {
+            customNameFragment: updatedCustomNameFragment,
+            niveau: 0,
+            pa_depense: val,
+          }
+        : {
+            niveau: 0,
+            pa_depense: val,
+          };
+      setCurrentTalent(id, newTal);
+    }
+  };
+
   let rows = computeRowsTalents(
     characterTalents,
     currentPerso,
     talentsStandardCollection
   );
-  // filter out talents exotique that aren't for that supérieur
-  let newExoticTalentForm;
-  if(talentCategory === "Exotique"){
-    rows=rows.filter(x=>x.superieur_exotique.includes(currentPerso.superieur))
-    newExoticTalentForm = (
-      <span>hi</span>
-    );
-  }
 
   return (
     <Stack>
       <Title order={3}>{title}</Title>
-      <Table verticalSpacing="xs">
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Niveau</th>
-            <th>Carac</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row: TalentDisplayRow) => {
-            switch (row.specialisationType) {
-              case "Spécifique":
-                const primaryTalentId = row.id.split("_specifique")[0];
-                const isPrimary = primaryTalentId === row.id;
-                if (!isPrimary) {
-                  return (
-                    <TalentRowSpecifique
-                      row={row}
-                      key={row.id}
-                      talentsInvesti={characterTalents}
-                      setCurrentTalentPaDense={setCurrentTalentPaDense}
-                      setCurrentTalentNameFragment={
-                        setCurrentTalentNameFragment
-                      }
-                    />
-                  );
+
+      <DataTable
+        columns={[
+          {
+            title: "Nom",
+            accessor: "name",
+            render: (record) => {
+              if (record.specialisationType === "Spécifique") {
+                const primaryTalentId = record.id.split("_specifique")[0];
+                const isPrimary = primaryTalentId === record.id;
+                if (isPrimary) {
+                  return <Text>{record.name}</Text>;
                 } else {
                   return (
-                    <TalentRow
-                      row={row}
-                      key={row.id}
-                      setCurrentTalentPaDense={setCurrentTalentPaDense}
-                    />
+                    <Group>
+                      <Text>{record.name}</Text>
+
+                      <Popover
+                        width={300}
+                        trapFocus
+                        position="bottom"
+                        shadow="md"
+                      >
+                        <Popover.Target>
+                          <ActionIcon>
+                            <IconEdit size={16} />
+                          </ActionIcon>
+                        </Popover.Target>
+                        <Popover.Dropdown>
+                          <form
+                            onSubmit={(event: any) => {
+                              const talentNameFragment =
+                                event.target.talentNameFragment.value;
+                              setCurrentTalentNameFragment(
+                                record.id,
+                                talentNameFragment
+                              );
+                              event.preventDefault();
+                              // close();
+                            }}
+                          >
+                            <TextInput
+                              label="Nom de la spécialisation"
+                              name="talentNameFragment"
+                              size="xs"
+                            />
+                            <Button type="submit">Changer</Button>
+                          </form>
+                        </Popover.Dropdown>
+                      </Popover>
+                    </Group>
                   );
                 }
-              case "Multiple":
+              } else if (record.specialisationType === "Multiple") {
+                return <Text>{record.name} ↓</Text>;
+              } else {
+                return <Text>{record.name}</Text>;
+              }
+            },
+          },
+          { title: "Niveau", accessor: "level" },
+          {
+            title: "PA Dépensé",
+            accessor: "pa_depense",
+            render: (record) => {
+              if (record.specialisationType !== "Multiple") {
                 return (
-                  <TalentRowMultiple
-                    row={row}
-                    key={row.id}
-                    talentsInvesti={characterTalents}
-                    setCurrentTalent={setCurrentTalent}
-                  />
+                  <Group>
+                    <NumberInput
+                      value={record.pa_depense}
+                      onChange={(val: number) => {
+                        setCurrentTalentPaDense(record.id, val);
+                      }}
+                    />
+                  </Group>
                 );
-              default:
-                return (
-                  <TalentRow
-                    row={row}
-                    key={row.id}
-                    setCurrentTalentPaDense={setCurrentTalentPaDense}
-                  />
-                );
+              }
+            },
+          },
+          { title: "Carac", accessor: "associatedChara" },
+        ]}
+        records={rows}
+        rowExpansion={{
+          // trigger: "always",
+
+          content: ({ record }) => {
+            if (record.specialisationType === "Multiple") {
+              return (
+                <form
+                  onSubmit={(event: any) => {
+                    let talentNameFragment =
+                      event.target.talentNameFragment.value;
+                    let newTalentFragmentName =
+                      record.id +
+                      "_" +
+                      slugify(talentNameFragment, { lower: true });
+                    setCurrentTalentMultiple(
+                      newTalentFragmentName,
+                      0,
+                      talentNameFragment
+                    );
+                    event.preventDefault();
+                  }}
+                >
+                  <Group>
+                    <Text>Nouveau talent</Text>
+
+                    <TextInput name="talentNameFragment" size="xs" />
+                    <Button size="xs" type="submit">
+                      Ajouter
+                    </Button>
+                  </Group>
+                </form>
+              );
             }
-          })}
-        </tbody>
-      </Table>
+          },
+        }}
+      />
     </Stack>
   );
 };

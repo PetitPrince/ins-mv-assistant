@@ -12,13 +12,13 @@ import { TalentInvesti, TalentInvestiCollection } from "../../utils/const/Person
 
 
 export const TalentsGenerique = (props: {
-  talentsStandardCollection: TalentStandard[];
+  talentsStandardCollection: TalentStandard[]
   title: string;
-  tpool: string;
+  talentCategory: string;
 }) => {
   const talentsStandardCollection = props.talentsStandardCollection;
   const title = props.title;
-  const tpool = props.tpool;
+  const talentCategory = props.talentCategory;
   const characterTalentsPrincipaux = useStore(
     (state) => state.currentPerso.talents.principaux
   );
@@ -48,7 +48,7 @@ export const TalentsGenerique = (props: {
   let setCurrentTalentPaDense: (talentId: string, val: number) => void;
   let setCurrentTalentNameFragment: (talentId: string, val: string) => void;
   let setCurrentTalent: (talentId: string, val: TalentInvesti) => void;
-  if (tpool === "Principal") {
+  if (talentCategory === "Principal") {
     characterTalents = characterTalentsPrincipaux;
     setCurrentTalentPaDense = setCurrentTalentPrincipalPaDepense;
     setCurrentTalentNameFragment = setCurrentTalentPrincipalNameFragment;
@@ -61,16 +61,24 @@ export const TalentsGenerique = (props: {
   }
   const currentPerso = useStore((state) => state.currentPerso);
 
-  const rows = computeRowsTalents(
+  let rows = computeRowsTalents(
     characterTalents,
     currentPerso,
     talentsStandardCollection
   );
+  // filter out talents exotique that aren't for that supérieur
+  let newExoticTalentForm;
+  if(talentCategory === "Exotique"){
+    rows=rows.filter(x=>x.superieur_exotique.includes(currentPerso.superieur))
+    newExoticTalentForm = (
+      <span>hi</span>
+    );
+  }
 
   return (
     <Stack>
       <Title order={3}>{title}</Title>
-      <Table>
+      <Table verticalSpacing="xs">
         <thead>
           <tr>
             <th>Nom</th>

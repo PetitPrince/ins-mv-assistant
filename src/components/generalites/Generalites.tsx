@@ -1,5 +1,5 @@
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
-import { SUPERIEURS_ANGES, SUPERIEURS_DEMONS } from "../../utils/const/Superieurs";
+import { SUPERIEURS_ANGES_AUTOCOMPLETE, SUPERIEURS_DEMONS_AUTOCOMPLETE } from "../../utils/const/Superieurs";
 import { useStore } from "../../store/Store";
 import { Autocomplete, Select, TextInput, Title } from "@mantine/core";
 import { NumberInput, Stack, Group } from "@mantine/core";
@@ -13,10 +13,10 @@ const Superieur = (props: {}) => {
   let superieurs;
   switch (faction) {
     case FACTIONS_NAMES.ANGES:
-      superieurs = SUPERIEURS_ANGES;
+      superieurs = SUPERIEURS_ANGES_AUTOCOMPLETE;
       break;
     case FACTIONS_NAMES.DEMONS:
-      superieurs = SUPERIEURS_DEMONS;
+      superieurs = SUPERIEURS_DEMONS_AUTOCOMPLETE;
       break;
     default:
       superieurs = [""];

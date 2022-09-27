@@ -8,13 +8,15 @@ export class TalentStandard {
   specialisationType: string;
   isInnate: boolean;
   talentType: string;
+  superieur_exotique: string;
   constructor(
     name: string,
     id: string,
     associatedChara: string,
     specialisationType: string,
     isInnate: boolean,
-    talentType: string
+    talentType: string,
+    superieur_exotique: string,
   ) {
     this.name = name;
     this.id = id;
@@ -22,6 +24,7 @@ export class TalentStandard {
     this.specialisationType = specialisationType;
     this.isInnate = isInnate;
     this.talentType = talentType;
+    this.superieur_exotique = superieur_exotique;
   }
 
   static fromJson(json: {
@@ -31,6 +34,7 @@ export class TalentStandard {
     inne: boolean;
     type: string;
     id: string;
+    superieur_exotique: string;
   }) {
     return new TalentStandard(
       json.nom,
@@ -38,7 +42,8 @@ export class TalentStandard {
       json.caracteristique_associe,
       json.specialisation,
       json.inne,
-      json.type
+      json.type,
+      json.superieur_exotique
     );
   }
 }
@@ -63,5 +68,10 @@ export const TALENTS_PRINCIPAUX_STANDARD = TOUS_LES_TALENTS.filter((talent) => {
 export const TALENTS_SECONDAIRES_STANDARD = TOUS_LES_TALENTS.filter(
   (talent) => {
     return talent.talentType === "Secondaire";
+  }
+);
+export const TALENTS_EXOTIQUES_STANDARD = TOUS_LES_TALENTS.filter(
+  (talent) => {
+    return talent.talentType === "Exotique";
   }
 );

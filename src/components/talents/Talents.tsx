@@ -1,5 +1,6 @@
 import {
   TalentStandard,
+  TALENTS_EXOTIQUES_STANDARD,
   TALENTS_PRINCIPAUX_STANDARD,
   TALENTS_SECONDAIRES_STANDARD
 } from "../../utils/const/TalentStandard";
@@ -20,17 +21,21 @@ export const Talents = (props: {}) => {
           <TalentsGenerique
             title="Talents principaux"
             talentsStandardCollection={TALENTS_PRINCIPAUX_STANDARD}
-            tpool="Principal"
+            talentCategory="Principal"
           />
         </Grid.Col>
-        {/* <Grid.Col span={4}>
-              <TalentsExotiques talentsExotiquesDuPerso={props.talentsExotiquesDuPerso} />
-            </Grid.Col>*/}
+        <Grid.Col span={4}>
+        <TalentsGenerique
+            title="Talents exotique"
+            talentsStandardCollection={TALENTS_EXOTIQUES_STANDARD}
+            talentCategory="Exotique"
+          />
+            </Grid.Col>
         <Grid.Col span={4}>
           <TalentsGenerique
             title="Talents secondaires"
             talentsStandardCollection={TALENTS_SECONDAIRES_STANDARD}
-            tpool="Secondaire"
+            talentCategory="Secondaire"
           />
         </Grid.Col>
       </Grid>

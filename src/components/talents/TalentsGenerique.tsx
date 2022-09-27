@@ -1,10 +1,11 @@
 import { useStore } from "../../store/Store";
+import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 import {
   TalentInvesti,
   TalentInvestiCollection,
 } from "../../utils/const/Personnage";
 import { TalentStandard } from "../../utils/const/TalentStandard";
-import { computeRowsTalents } from "./computeRowsTalents";
+import { computeRowsTalentsFromStandardTalents } from "./computeRowsTalents";
 import {
   Title,
   Text,
@@ -14,9 +15,11 @@ import {
   Popover,
   TextInput,
   Button,
+  Select,
 } from "@mantine/core";
 import { Stack } from "@mantine/core";
 import { IconEdit } from "@tabler/icons";
+import { current } from "immer";
 import { DataTable } from "mantine-datatable";
 import slugify from "slugify";
 
@@ -34,11 +37,21 @@ export const TalentsGenerique = (props: {
   const characterTalentsSecondaire = useStore(
     (state) => state.currentPerso.talents.secondaires
   );
+  const characterTalentsExotiques = useStore(
+    (state) => state.currentPerso.talents.exotiques
+  );
+
   const setCurrentTalentPrincipalPaDepense = useStore(
     (state) => state.setCurrentTalentPrincipalPaDepense
   );
   const setCurrentTalentSecondairePaDepense = useStore(
     (state) => state.setCurrentTalentSecondairePaDepense
+  );
+  const setCurrentTalentExotiquePaDepense = useStore(
+    (state) => state.setCurrentTalentExotiquePaDepense
+  );
+  const setCurrentTalentExotique = useStore(
+    (state) => state.setCurrentTalentExotique
   );
   const setCurrentTalentPrincipalNameFragment = useStore(
     (state) => state.setCurrentTalentPrincipalNameFragment
@@ -62,11 +75,23 @@ export const TalentsGenerique = (props: {
     setCurrentTalentPaDense = setCurrentTalentPrincipalPaDepense;
     setCurrentTalentNameFragment = setCurrentTalentPrincipalNameFragment;
     setCurrentTalent = setCurrentTalentPrincipal;
-  } else {
+  } else if (talentCategory === "Secondaire") {
     characterTalents = characterTalentsSecondaire;
     setCurrentTalentPaDense = setCurrentTalentSecondairePaDepense;
     setCurrentTalentNameFragment = setCurrentTalentSecondaireNameFragment;
     setCurrentTalent = setCurrentTalentSecondaire;
+  } else {
+    let charaExo: TalentInvestiCollection = {};
+    Object.entries(characterTalentsExotiques).map(([k, v]) => {
+      const lvl = v.level || 0;
+      charaExo[k] = {
+        pa_depense: v.pa_depense,
+        niveau: lvl,
+      };
+    });
+    characterTalents = charaExo;
+    setCurrentTalentPaDense = setCurrentTalentExotiquePaDepense;
+    // setCurrentTalentNameFragment = setCurrentTalentExotiqueNameFragment;
   }
   const currentPerso = useStore((state) => state.currentPerso);
 
@@ -100,17 +125,68 @@ export const TalentsGenerique = (props: {
     }
   };
 
-  let rows = computeRowsTalents(
+  let rows = computeRowsTalentsFromStandardTalents(
     characterTalents,
     currentPerso,
     talentsStandardCollection
   );
+  if (props.talentCategory === "Exotique") {
+    // Add the exotique talent... but not the one  that's standard
+    const currentTalentsExotiques = currentPerso.talents.exotiques;
+    const standardExoticTalentsIds = talentsStandardCollection.map((x) => x.id);
+    const filteredCurrentTalentsExotiques = Object.values(
+      currentTalentsExotiques
+    ).filter((x) => {
+      return !standardExoticTalentsIds.includes(x.id);
+    });
+    // const someFilteredEntries = Object.entries(currentTalentsExotiques).filter(
+    //   ([k, v]) => {
+    //     return !standardExoticTalentsIds.includes(k);
+    //   }
+    // );
+
+    if (currentPerso.superieur) {
+      rows = rows.filter((x) =>
+        x.superieur_exotique.includes(currentPerso.superieur)
+      );
+    } else {
+      rows = rows.filter((x) => !x.superieur_exotique);
+    }
+
+    filteredCurrentTalentsExotiques.forEach((x) => {
+      rows.push({
+        level: x.level,
+        id: x.id,
+        name: x.name,
+        pa_depense: x.pa_depense,
+        associatedChara: x.associatedChara,
+        specialisationType: x.specialisationType,
+        isInnate: x.isInnate,
+        talentType: x.talentType,
+        superieur_exotique: x.superieur_exotique,
+      });
+    });
+
+    //currentPerso.talents.exotiques
+    rows.push({
+      level: 0,
+      id: "new-exotic",
+      name: "nouveau",
+      pa_depense: 0,
+      associatedChara: "Aucune",
+      specialisationType: "Générique",
+      isInnate: false,
+      talentType: "Exotique",
+      superieur_exotique: "string",
+    });
+  }
 
   return (
     <Stack>
       <Title order={3}>{title}</Title>
 
       <DataTable
+        minHeight={150}
         columns={[
           {
             title: "Nom",
@@ -174,7 +250,12 @@ export const TalentsGenerique = (props: {
             title: "PA Dépensé",
             accessor: "pa_depense",
             render: (record) => {
-              if (record.specialisationType !== "Multiple") {
+              if (record.specialisationType === "Multiple") {
+              } else if (record.id === "new-exotic") {
+                <Group>
+                  <NumberInput value={record.pa_depense} disabled />
+                </Group>;
+              } else {
                 return (
                   <Group>
                     <NumberInput
@@ -217,6 +298,66 @@ export const TalentsGenerique = (props: {
                     <Text>Nouveau talent</Text>
 
                     <TextInput name="talentNameFragment" size="xs" />
+                    <Button size="xs" type="submit">
+                      Ajouter
+                    </Button>
+                  </Group>
+                </form>
+              );
+            } else if (record.id === "new-exotic") {
+              return (
+                <form
+                  onSubmit={(event: any) => {
+                    const newTalentName = event.target.talentNameFragment.value;
+                    let newTalentId = slugify(newTalentName, { lower: true });
+                    const newTalentCaraAssocie =
+                      event.target.cara_associe.value;
+                    const newTalent = {
+                      specialisationType: "Générique",
+                      name: newTalentName,
+                      id: newTalentId,
+                      associatedChara: newTalentCaraAssocie,
+                      isInnate: false,
+                      superieur_exotique: "",
+                      talentType: "Exotique",
+                      level: 0,
+                      pa_depense: 0,
+                    };
+
+                    setCurrentTalentExotique(newTalentId, newTalent);
+                    event.preventDefault();
+                  }}
+                >
+                  <Group>
+                    <Text>Nouveau talent</Text>
+
+                    <TextInput name="talentNameFragment" size="xs" />
+
+                    <Select
+                      label="Caracteristique associé"
+                      data={[
+                        { value: CARACTERISTIQUE_NAMES.FORCE, label: "Force" },
+                        {
+                          value: CARACTERISTIQUE_NAMES.AGILITE,
+                          label: "Agilité",
+                        },
+                        {
+                          value: CARACTERISTIQUE_NAMES.PERCEPTION,
+                          label: "Perception",
+                        },
+                        {
+                          value: CARACTERISTIQUE_NAMES.PRESENCE,
+                          label: "Présence",
+                        },
+                        {
+                          value: CARACTERISTIQUE_NAMES.VOLONTE,
+                          label: "Volonté",
+                        },
+                        { value: CARACTERISTIQUE_NAMES.FOI, label: "Foi" },
+                      ]}
+                      name="cara_associe"
+                    />
+
                     <Button size="xs" type="submit">
                       Ajouter
                     </Button>

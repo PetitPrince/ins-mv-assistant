@@ -13,6 +13,7 @@ export interface TalentDisplayRow extends TalentStandard {
   level: number | undefined;
   pa_depense: number;
 }
+
 export const Talents = (props: {}) => {
   return (
     <Stack>

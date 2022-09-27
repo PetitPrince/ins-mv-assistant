@@ -1,4 +1,6 @@
+import { TalentDisplayRow } from "../../components/talents/Talents";
 import { FACTIONS_NAMES } from "./Factions";
+import { TalentStandard } from "./TalentStandard";
 
 export interface TalentInvesti {
   pa_depense: number;
@@ -8,6 +10,10 @@ export interface TalentInvesti {
 export interface TalentInvestiCollection {
   [key: string]: TalentInvesti;
 }
+export interface TalentInvestiExotiqueCollection {
+  [key: string]: TalentDisplayRow;
+}
+
 export interface Caracteristique {
   // niveau: number,
   pa_depense: number;
@@ -35,6 +41,6 @@ export interface Personnage {
   talents: {
     principaux: TalentInvestiCollection;
     secondaires: TalentInvestiCollection;
-    exotiques: TalentInvestiCollection;
+    exotiques: TalentInvestiExotiqueCollection;
   };
 }

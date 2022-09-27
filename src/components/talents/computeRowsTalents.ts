@@ -1,9 +1,10 @@
 import { TalentStandard } from "../../utils/const/TalentStandard";
-import { getCaracteristiqueLevel, getTalentLevel } from "../../store/Store";
 import { Personnage, TalentInvestiCollection } from "../../utils/const/Personnage";
 import { TalentDisplayRow } from "./Talents";
+import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
+import { getTalentLevel } from "../../utils/helper/getTalentLevel";
 
-export const computeRowsTalents = (
+export const computeRowsTalentsFromStandardTalents = (
   characterTalents: TalentInvestiCollection,
   currentPerso: Personnage,
   standardTalentCollection: TalentStandard[]

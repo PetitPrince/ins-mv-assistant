@@ -1,18 +1,17 @@
-import { TOUS_LES_TALENTS } from "../../utils/const/TalentStandard";
+import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
-import {
-  getCaracteristiqueLevel,
-  getTalentLevel,
-  useStore,
-} from "../../store/Store";
 import { Personnage } from "../../utils/const/Personnage";
+import { TOUS_LES_TALENTS } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
+import { findTalentInCaracterFromName } from "../../utils/helper/findTalentInCaracterFromName";
+import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
+import { getTalentLevel } from "../../utils/helper/getTalentLevel";
 import { ScrollArea, Table } from "@mantine/core";
 import { ActionIcon, Dialog } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
+import { current } from "immer";
 import { applyPatch, createPatch } from "rfc6902";
-import { findTalentInCaracterFromName } from "../../utils/helper/findTalentInCaracterFromName";
 
 export interface BillingItem {
   key: string;
@@ -99,24 +98,32 @@ export const generateBillingItems = (
         case "talents":
           {
             const talentId = diffPathElements[3];
-            let standardTalent = TOUS_LES_TALENTS.find(
+
+            // First find the start talent to get its name
+            let talentName = "";
+
+            const standardTalent = TOUS_LES_TALENTS.find(
               (x) => x.id === talentId
             );
-            if (standardTalent === undefined) {
-              console.log("Cannot find talent with id " + talentId);
-            }
-
-            // If not, maybe it's a specialized / multiple one; find the primary talent
-            const standardTalentAgain = TOUS_LES_TALENTS.find(
+            const standardTalentOnlyThePrimaries = TOUS_LES_TALENTS.find(
               (x) => x.id === talentId.split("_")[0]
             );
-            if (standardTalentAgain === undefined) {
-              console.log(
-                "Cannot find primary talent for id " + talentId + ", breaking"
-              );
-              break;
+
+            if (standardTalentOnlyThePrimaries !== undefined) {
+              talentName = standardTalentOnlyThePrimaries.name;
+              // console.log("Cannot find primary talent for id " + talentId);
+            } else if (standardTalent !== undefined) {
+              talentName = standardTalent.name;
+            } else if (diff.op === "add" && diff.path.includes("exotiques")) {
+              if (
+                Object.keys(currentPerso.talents.exotiques).includes(talentId)
+              ) {
+                talentName = currentPerso.talents.exotiques[talentId].name;
+              }
             }
-            standardTalent = standardTalentAgain;
+            if (standardTalent === undefined) {
+              // console.log("Cannot find talent with id " + talentId);
+            }
 
             // Calc cost here
             let originalTalentValue = getTalentLevel(originalPerso, talentId);
@@ -126,7 +133,7 @@ export const generateBillingItems = (
             // Craft message here
             let msgString =
               "Talent " +
-              standardTalent.name +
+              talentName +
               " " +
               originalTalentValue +
               " → " +
@@ -141,7 +148,7 @@ export const generateBillingItems = (
               const specializationName = fragment ? fragment : "spécifique";
               msgString =
                 "Talent " +
-                standardTalent.name +
+                talentName +
                 " (" +
                 specializationName +
                 "): " +
@@ -156,7 +163,7 @@ export const generateBillingItems = (
               );
               msgString =
                 "Talent " +
-                standardTalent.name +
+                talentName +
                 " (" +
                 existingTalent?.customNameFragment +
                 "): " +
@@ -164,6 +171,7 @@ export const generateBillingItems = (
                 " → " +
                 finalTalentValue;
             }
+
             billingItems.push({
               key: diff.path,
               msg: msgString,

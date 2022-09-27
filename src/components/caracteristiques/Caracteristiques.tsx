@@ -1,8 +1,9 @@
 import { INSMVNumberInput } from "../../App";
-import { getCaracteristiqueLevel, useStore } from "../../store/Store";
+import { useStore } from "../../store/Store";
+import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
+import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
 import { INSMVCaraPaDepenseNumberInput } from "./INSMVCaraPaDepenseNumberInput";
 import { Stack, Group, Title } from "@mantine/core";
-import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 
 export const Caracteristiques = (props: {}) => {
   const currentPerso = useStore((state) => state.currentPerso);
@@ -139,7 +140,9 @@ export const Caracteristiques = (props: {}) => {
             availablePa={availablePa}
             label="Foi - PA dépensé"
             value={foi.pa_depense}
-            onChange={(val: number) => setPaDepense(val, CARACTERISTIQUE_NAMES.FOI)}
+            onChange={(val: number) =>
+              setPaDepense(val, CARACTERISTIQUE_NAMES.FOI)
+            }
           />
         </Group>
       </Group>

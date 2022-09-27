@@ -1,44 +1,10 @@
-import { findStandardTalentById } from "../utils/const/TalentStandard";
 import { BillingItem } from "../components/billing/Billing";
+import { TalentDisplayRow } from "../components/talents/Talents";
+import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../utils/const/Factions";
+import { Personnage, TalentInvesti } from "../utils/const/Personnage";
 import produce from "immer";
 import create from "zustand";
-import { Personnage, TalentInvesti } from "../utils/const/Personnage";
-import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
-
-export const getCaracteristiqueLevel = (
-  perso: Personnage,
-  caraName?: string
-) => {
-  const caraPaDepense = caraName
-    ? perso.caracteristiques[caraName].pa_depense
-    : 0;
-  return 2 + (Math.floor((10 * (caraPaDepense / 4)) / 5) * 5) / 10;
-};
-export const getTalentLevel = (perso: Personnage, talentId: string) => {
-  let existingTalent;
-
-  if (Object.hasOwn(perso.talents.principaux, talentId)) {
-    existingTalent = perso.talents.principaux[talentId];
-  } else if (Object.hasOwn(perso.talents.secondaires, talentId)) {
-    existingTalent = perso.talents.secondaires[talentId];
-  } else if (Object.hasOwn(perso.talents.exotiques, talentId)) {
-    existingTalent = perso.talents.secondaires[talentId];
-  } else {
-    existingTalent = { pa_depense: 0 };
-  }
-
-  let associatedCara = findStandardTalentById(talentId)?.associatedChara;
-
-  let levelFromAssociatedChara = 0;
-  if (associatedCara !== "Aucune") {
-    levelFromAssociatedChara =
-      getCaracteristiqueLevel(perso, associatedCara) / 2;
-  }
-
-  const levelFromPa = existingTalent.pa_depense / 2;
-  return levelFromPa + levelFromAssociatedChara;
-};
 
 // any operation in the app is done on the Personnage, and the billing sort out the rest
 const emptyPersoDict = {
@@ -132,6 +98,8 @@ export const useStore = create<{
     talentId: string,
     val: string
   ) => void;
+  setCurrentTalentExotique: (talentId: string, val: TalentDisplayRow) => void;
+  setCurrentTalentExotiquePaDepense: (talentId: string, val: number) => void;
 }>((set, get) => ({
   currentPerso: emptyPerso,
   originalPerso: emptyPerso,
@@ -249,9 +217,9 @@ export const useStore = create<{
         })
       );
     } else {
-      const newTalent = {
+      const newTalent: TalentInvesti = {
         pa_depense: val,
-        nivea: 1,
+        niveau: 1,
       };
       set(
         produce((draftState) => {
@@ -274,9 +242,9 @@ export const useStore = create<{
         })
       );
     } else {
-      const newTalent = {
+      const newTalent: TalentInvesti = {
         pa_depense: 0,
-        nivea: 1,
+        niveau: 1,
         customNameFragment: val,
       };
       set(
@@ -305,9 +273,9 @@ export const useStore = create<{
         })
       );
     } else {
-      const newTalent = {
+      const newTalent: TalentInvesti = {
         pa_depense: val,
-        nivea: 1,
+        niveau: 1,
       };
       set(
         produce((draftState) => {
@@ -330,9 +298,9 @@ export const useStore = create<{
         })
       );
     } else {
-      const newTalent = {
+      const newTalent: TalentInvesti = {
         pa_depense: 0,
-        nivea: 1,
+        niveau: 1,
         customNameFragment: val,
       };
       set(
@@ -340,6 +308,28 @@ export const useStore = create<{
           draftState.currentPerso.talents.secondaires[talentId] = newTalent;
         })
       );
+    }
+  },
+
+  setCurrentTalentExotique(talentId, val) {
+    set(
+      produce((draftState) => {
+        draftState.currentPerso.talents.exotiques[talentId] = val;
+      })
+    );
+  },
+  setCurrentTalentExotiquePaDepense(talentId, val) {
+    const hasTalent = Object.keys(
+      get().currentPerso.talents.exotiques
+    ).includes(talentId);
+    if (hasTalent) {
+      set(
+        produce((draftState) => {
+          draftState.currentPerso.talents.exotiques[talentId].pa_depense = val;
+        })
+      );
+    } else {
+      console.log("Cannot find talent with " + talentId);
     }
   },
 }));

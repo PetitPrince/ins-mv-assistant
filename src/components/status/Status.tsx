@@ -1,5 +1,6 @@
+import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
-import { getCaracteristiqueLevel, useStore } from "../../store/Store";
+import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
 import { Blessures } from "./Blessures";
 import { NumberInput, Stack, Group, Title } from "@mantine/core";
 
@@ -8,7 +9,10 @@ export const Status = (props: {}) => {
   const currentPerso = useStore((state) => state.currentPerso);
   const faction = useStore((state) => state.currentPerso.faction);
   const ppMax = useStore((state) => state.currentPerso.ppMax);
-  const force = getCaracteristiqueLevel(currentPerso, CARACTERISTIQUE_NAMES.FORCE);
+  const force = getCaracteristiqueLevel(
+    currentPerso,
+    CARACTERISTIQUE_NAMES.FORCE
+  );
 
   const setCurrentPa = useStore((state) => state.setCurrentPa);
   const storePpMax = useStore((state) => state.setCurrentPpMax);

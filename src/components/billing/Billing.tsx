@@ -10,7 +10,6 @@ import { ScrollArea, Table } from "@mantine/core";
 import { ActionIcon, Dialog } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
-import { current } from "immer";
 import { applyPatch, createPatch } from "rfc6902";
 
 export interface BillingItem {

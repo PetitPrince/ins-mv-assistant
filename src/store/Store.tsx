@@ -69,7 +69,7 @@ export const useStore = create<{
   billingItems: BillingItem[];
   paAfterBilling: number;
 
-  setPerso: (val: Personnage) => void;
+  setCurrentPerso: (val: Personnage) => void;
   setOriginalPerso: (val: Personnage) => void;
   setCurrentIdentite: (val: string) => void;
   setCurrentFaction: (val: FACTIONS_NAMES) => void;
@@ -110,7 +110,7 @@ export const useStore = create<{
   billingItems: [],
   paAfterBilling: 0,
 
-  setPerso: (val) => {
+  setCurrentPerso: (val) => {
     set(
       produce((draftState) => {
         draftState.currentPerso = val;

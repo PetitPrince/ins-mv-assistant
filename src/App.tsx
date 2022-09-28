@@ -7,10 +7,17 @@ import { Status } from "./components/status/Status";
 import { Talents } from "./components/talents/Talents";
 import { useStore } from "./store/Store";
 import { FACTIONS_NAMES } from "./utils/const/Factions";
-import { MantineProvider, NumberInputProps } from "@mantine/core";
+import {
+  Button,
+  FileButton,
+  Group,
+  MantineProvider,
+  NumberInputProps,
+} from "@mantine/core";
 import { NumberInput, Stack } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
+import { saveAs } from "file-saver";
 import "immer";
 import { enablePatches } from "immer";
 import { mountStoreDevtool } from "simple-zustand-devtools";
@@ -45,10 +52,37 @@ export const INSMVNumberInput = (props: NumberInputProps) => {
   return <NumberInput {...props} step={0.5} precision={1} />;
 };
 
+export const IOPanel = (props: {}) => {
+  const currentPerso = useStore((state) => state.currentPerso);
+  const setCurrentPerso = useStore((state) => state.setCurrentPerso);
+
+  const clickToSave = () => {
+    let blob = new Blob([JSON.stringify(currentPerso)], {
+      type: "text/json;charset=utf-8",
+    });
+    saveAs(blob, "perso.json");
+  };
+  const loadThePerso = (foo: File) => {
+    foo.text().then((fooText) => {
+      setCurrentPerso(JSON.parse(fooText));
+    });
+  };
+  return (
+    <Group>
+      <Button onClick={clickToSave}>Exporter brouillon</Button>
+      <FileButton onChange={loadThePerso}>
+        {(props) => <Button {...props}>Importer brouillon</Button>}
+      </FileButton>
+    </Group>
+  );
+};
+
 const FeuilleDePerso = (props: {}) => {
   return (
     <Stack>
       <BillingPanel />
+
+      <IOPanel />
 
       <Generalites />
 

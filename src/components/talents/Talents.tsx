@@ -5,6 +5,8 @@ import {
   TALENTS_SECONDAIRES_STANDARD,
 } from "../../utils/const/TalentStandard";
 import { TalentsGenerique } from "./TalentsGenerique";
+import "./TalentsRefactor";
+import { Talents2Component } from "./TalentsRefactor";
 import { Group, Title } from "@mantine/core";
 import { Stack } from "@mantine/core";
 
@@ -18,6 +20,7 @@ export const Talents = (props: {}) => {
     <Stack>
       <Title order={2}>Talents</Title>
       {/* <Group sx={{ "align-items": "flex-start" }}> */}
+      <Talents2Component />
       <TalentsGenerique
         title="Talents principaux"
         talentsStandardCollection={TALENTS_PRINCIPAUX_STANDARD}

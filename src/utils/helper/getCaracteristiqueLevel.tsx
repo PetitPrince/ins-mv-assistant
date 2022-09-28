@@ -9,3 +9,7 @@ export const getCaracteristiqueLevel = (
     : 0;
   return 2 + (Math.floor((10 * (caraPaDepense / 4)) / 5) * 5) / 10;
 };
+
+export const calcCaracteristiqueLevelFromPaDepense = (pa_depense: number) => {
+  return 1 + (Math.floor((10 * (pa_depense / 4)) / 5) * 5) / 10;
+};

@@ -5,4 +5,5 @@ export enum CARACTERISTIQUE_NAMES {
   VOLONTE = "volonte",
   PRESENCE = "presence",
   FOI = "foi",
+  AUCUNE = "aucune",
 }

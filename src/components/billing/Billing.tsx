@@ -1,12 +1,15 @@
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Personnage } from "../../utils/const/Personnage";
-import { TOUS_LES_TALENTS } from "../../utils/const/TalentStandard";
+import { Talent2, TOUS_LES_TALENTS } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
 import { findTalentInCaracterFromName } from "../../utils/helper/findTalentInCaracterFromName";
 import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
 import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
-import { getTalentLevel } from "../../utils/helper/getTalentLevel";
+import {
+  calcTalentLevelFromPaDepense,
+  getTalentLevel,
+} from "../../utils/helper/getTalentLevel";
 import { Aside, ScrollArea, Table } from "@mantine/core";
 import { ActionIcon, Dialog } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
@@ -91,6 +94,24 @@ export const generateBillingItems = (
                 getCaracteristiqueLevel(originalPerso, caraName) +
                 " → " +
                 getCaracteristiqueLevel(currentPerso, caraName),
+              cost: valDiff,
+            });
+          }
+          break;
+        case "talents2":
+          if (diff.op === "add") {
+            const newTalent: Talent2 = diff.value;
+            const finalLvl = calcTalentLevelFromPaDepense(
+              newTalent.pa_depense,
+              newTalent,
+              currentPerso.caracteristiques
+            );
+            const msgString =
+              "Talent " + newTalent.name + ":" + 0 + " → " + finalLvl;
+            const valDiff = newTalent.pa_depense;
+            billingItems.push({
+              key: diff.path,
+              msg: msgString,
               cost: valDiff,
             });
           }

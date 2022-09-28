@@ -18,10 +18,12 @@ import {
   TextInput,
   Button,
   Select,
+  SegmentedControl,
 } from "@mantine/core";
 import { Stack } from "@mantine/core";
 import { IconEdit } from "@tabler/icons";
 import { DataTable } from "mantine-datatable";
+import { useState } from "react";
 import slugify from "slugify";
 
 export const TalentsGenerique = (props: {
@@ -29,6 +31,7 @@ export const TalentsGenerique = (props: {
   title: string;
   talentCategory: string;
 }) => {
+  const [talentPaFilter, setTalentPaFilter] = useState("all");
   const talentsStandardCollection = props.talentsStandardCollection;
   const title = props.title;
   const talentCategory = props.talentCategory;
@@ -250,9 +253,27 @@ export const TalentsGenerique = (props: {
       );
     }
   };
+
+  switch (talentPaFilter) {
+    case "paidonly":
+      rows = rows.filter((x) => x.pa_depense);
+      break;
+
+    default:
+      break;
+  }
+
   return (
     <Stack>
       <Title order={3}>{title}</Title>
+      <SegmentedControl
+        data={[
+          { label: "Tous les talents", value: "all" },
+          { label: "Seulement ceux avec des PA dépensé", value: "paidonly" },
+        ]}
+        value={talentPaFilter}
+        onChange={setTalentPaFilter}
+      />
 
       <DataTable
         minHeight={150}
@@ -260,19 +281,22 @@ export const TalentsGenerique = (props: {
           {
             title: "Nom",
             accessor: "name",
+            width: 150,
             render: renderNameColumn,
           },
           {
             title: "Niveau",
             accessor: "level",
+            width: 80,
             render: renderLevelColumn,
           },
           {
             title: "PA Dépensé",
             accessor: "pa_depense",
+            width: 100,
             render: renderPaDepenseColumn,
           },
-          { title: "Carac", accessor: "associatedChara" },
+          { title: "Caractéristique associée", accessor: "associatedChara" },
         ]}
         records={rows}
         rowExpansion={{

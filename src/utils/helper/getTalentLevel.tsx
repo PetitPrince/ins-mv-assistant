@@ -1,6 +1,14 @@
-import { Personnage } from "../const/Personnage";
-import { findStandardTalentById } from "../const/TalentStandard";
-import { getCaracteristiqueLevel } from "./getCaracteristiqueLevel";
+import { CARACTERISTIQUE_NAMES } from "../const/Caracteristiques_names";
+import {
+  Caracteristique,
+  CaracteristiquesSet,
+  Personnage,
+} from "../const/Personnage";
+import { findStandardTalentById, Talent2 } from "../const/TalentStandard";
+import {
+  calcCaracteristiqueLevelFromPaDepense,
+  getCaracteristiqueLevel,
+} from "./getCaracteristiqueLevel";
 
 export const getTalentLevel = (perso: Personnage, talentId: string) => {
   let existingTalent;
@@ -25,4 +33,24 @@ export const getTalentLevel = (perso: Personnage, talentId: string) => {
 
   const levelFromPa = existingTalent.pa_depense / 2;
   return levelFromPa + levelFromAssociatedChara;
+};
+
+export const calcTalentLevelFromPaDepense = (
+  pa_depense: number,
+  talent: Talent2,
+  caracteristiques?: CaracteristiquesSet
+) => {
+  let levelsFromCara = 0;
+  if (
+    talent.associatedChara !== CARACTERISTIQUE_NAMES.AUCUNE &&
+    caracteristiques !== undefined
+  ) {
+    let associatedCaraPaDepense =
+      caracteristiques[talent.associatedChara].pa_depense;
+    levelsFromCara = calcCaracteristiqueLevelFromPaDepense(
+      associatedCaraPaDepense
+    );
+  }
+  const levelFromPa = (Math.floor((10 * (pa_depense / 2)) / 5) * 5) / 10;
+  return levelsFromCara + levelFromPa;
 };

@@ -4,6 +4,11 @@ import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../utils/const/Factions";
 import { Personnage, TalentInvesti } from "../utils/const/Personnage";
 import { Pouvoir } from "../utils/const/Pouvoir";
+import {
+  Talent2,
+  TALENT_SPECIALISATION_TYPE_NAME,
+  TALENT_TYPE_NAME,
+} from "../utils/const/TalentStandard";
 import produce from "immer";
 import create from "zustand";
 
@@ -58,6 +63,52 @@ const emptyPersoDict = {
     },
     exotiques: {},
   },
+  talents2: {
+    principaux: [
+      {
+        name: "Tir",
+        id: "tir",
+        associatedChara: CARACTERISTIQUE_NAMES.PERCEPTION,
+        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE,
+        isInnate: true,
+        talentType: TALENT_TYPE_NAME.PRINCIPALE,
+        superieur_exotique: "",
+        pa_depense: 4,
+      },
+      {
+        name: "Tir    ",
+        id: "tir_specifique",
+        associatedChara: CARACTERISTIQUE_NAMES.PERCEPTION,
+        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE,
+        isInnate: true,
+        talentType: TALENT_TYPE_NAME.PRINCIPALE,
+        superieur_exotique: "",
+        pa_depense: 6,
+      },
+      {
+        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE,
+        name: "Torture",
+        id: "torture",
+        associatedChara: CARACTERISTIQUE_NAMES.AUCUNE,
+        isInnate: false,
+        superieur_exotique: "Joseph",
+        talentType: TALENT_TYPE_NAME.EXOTIQUE,
+        pa_depense: 8,
+      },
+      {
+        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE,
+        name: "Acrobatie   ",
+        id: "acrobatie",
+        associatedChara: CARACTERISTIQUE_NAMES.AGILITE,
+        isInnate: false,
+        superieur_exotique: "",
+        talentType: TALENT_TYPE_NAME.SECONDAIRE,
+        pa_depense: 4,
+      },
+    ],
+    secondaires: [],
+    exotiques: [],
+  },
   pouvoirs: {},
 };
 // export const emptyPerso = new Personnage(emptyPersoDict);
@@ -69,6 +120,12 @@ export const useStore = create<{
   billingItems: BillingItem[];
   paAfterBilling: number;
 
+  setCurrentTalentPrincipal2PaDepense: (talentId: string, val: number) => void;
+  addCurrentTalentPrincipal2: (newTalent: Talent2) => void;
+  setCurrentTalentPrincipal2NameFragment: (
+    talentId: string,
+    nameFragment: string
+  ) => void;
   setCurrentPerso: (val: Personnage) => void;
   setOriginalPerso: (val: Personnage) => void;
   setCurrentIdentite: (val: string) => void;
@@ -109,6 +166,43 @@ export const useStore = create<{
   originalPerso: emptyPerso,
   billingItems: [],
   paAfterBilling: 0,
+
+  setCurrentTalentPrincipal2PaDepense: (talentId: string, val: number) => {
+    const updatedTalentPrincipalArray = produce((draftState) => {
+      const index = draftState.currentPerso.talents2.principaux.findIndex(
+        (talent: Talent2) => talent.id === talentId
+      );
+      if (index !== -1)
+        draftState.currentPerso.talents2.principaux[index].pa_depense = val;
+    });
+    set(updatedTalentPrincipalArray);
+  },
+
+  setCurrentTalentPrincipal2NameFragment: (
+    talentId: string,
+    nameFragment: string
+  ) => {
+    console.log("-");
+    console.log(talentId);
+    console.log(nameFragment);
+    const updatedTalentPrincipalArray = produce((draftState) => {
+      const index = draftState.currentPerso.talents2.principaux.findIndex(
+        (talent: Talent2) => talent.id === talentId
+      );
+      if (index !== -1)
+        draftState.currentPerso.talents2.principaux[index].customNameFragment =
+          nameFragment;
+    });
+    set(updatedTalentPrincipalArray);
+  },
+
+  addCurrentTalentPrincipal2: (newTalent: Talent2) => {
+    set(
+      produce((draftState) => {
+        draftState.currentPerso.talents2.principaux.push(newTalent);
+      })
+    );
+  },
 
   setCurrentPerso: (val) => {
     set(

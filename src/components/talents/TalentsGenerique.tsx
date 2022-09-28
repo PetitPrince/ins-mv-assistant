@@ -303,7 +303,6 @@ export const TalentsGenerique = (props: {
                 >
                   <Group>
                     <Text>Nouveau talent</Text>
-
                     <TextInput name="talentNameFragment" size="xs" />
                     <Button size="xs" type="submit">
                       Ajouter

@@ -3,6 +3,7 @@ import { TalentDisplayRow } from "../components/talents/Talents";
 import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../utils/const/Factions";
 import { Personnage, TalentInvesti } from "../utils/const/Personnage";
+import { Pouvoir } from "../utils/const/Pouvoir";
 import produce from "immer";
 import create from "zustand";
 
@@ -57,6 +58,7 @@ const emptyPersoDict = {
     },
     exotiques: {},
   },
+  pouvoirs: {},
 };
 // export const emptyPerso = new Personnage(emptyPersoDict);
 export const emptyPerso = emptyPersoDict;
@@ -86,6 +88,8 @@ export const useStore = create<{
   setCurrentPp: (val: number) => void;
   setCurrentPpMax: (val: number) => void;
   setCurrentFreeTalentPoints: (val: number) => void;
+  setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
+  setCurrentPouvoir: (pouvoirId: string, val: Pouvoir) => void;
   setCurrentTalentPrincipal: (talentId: string, val: TalentInvesti) => void;
   setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => void;
   setCurrentTalentPrincipalNameFragment: (
@@ -206,6 +210,21 @@ export const useStore = create<{
       })
     );
   },
+  setCurrentPouvoirPaDepense(pouvoirId, val) {
+    set(
+      produce((draftState) => {
+        draftState.currentPerso.pouvoirs[pouvoirId].pa_depense = val;
+      })
+    );
+  },
+  setCurrentPouvoir(pouvoirId, val) {
+    set(
+      produce((draftState) => {
+        draftState.currentPerso.pouvoirs[pouvoirId] = val;
+      })
+    );
+  },
+
   setCurrentTalentPrincipalPaDepense(talentId, val) {
     const hasTalent = Object.keys(
       get().currentPerso.talents.principaux

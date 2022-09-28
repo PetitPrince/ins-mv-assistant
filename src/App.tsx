@@ -2,10 +2,11 @@ import "./App.css";
 import { BillingPanel } from "./components/billing/Billing";
 import { Caracteristiques } from "./components/caracteristiques/Caracteristiques";
 import { Generalites } from "./components/generalites/Generalites";
+import { Pouvoirs } from "./components/pouvoir/Pouvoirs";
 import { Status } from "./components/status/Status";
 import { Talents } from "./components/talents/Talents";
-import { FACTIONS_NAMES } from "./utils/const/Factions";
 import { useStore } from "./store/Store";
+import { FACTIONS_NAMES } from "./utils/const/Factions";
 import { MantineProvider, NumberInputProps } from "@mantine/core";
 import { NumberInput, Stack } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
@@ -54,6 +55,7 @@ const FeuilleDePerso = (props: {}) => {
       <Caracteristiques />
       <Status />
       <Talents />
+      <Pouvoirs />
     </Stack>
   );
 };

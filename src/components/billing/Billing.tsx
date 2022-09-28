@@ -5,6 +5,7 @@ import { TOUS_LES_TALENTS } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
 import { findTalentInCaracterFromName } from "../../utils/helper/findTalentInCaracterFromName";
 import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
+import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
 import { getTalentLevel } from "../../utils/helper/getTalentLevel";
 import { ScrollArea, Table } from "@mantine/core";
 import { ActionIcon, Dialog } from "@mantine/core";
@@ -178,6 +179,26 @@ export const generateBillingItems = (
             });
           }
 
+          break;
+        case "pouvoirs":
+          if (diff.op === "replace" || diff.op === "add") {
+            const valDiff = val - originalValue;
+            const pouvoirId = diffPathElements[2];
+            const pouvoirName = currentPerso.pouvoirs[pouvoirId].nom;
+            const oldPouvoirLevel = Object.hasOwn(
+              originalPerso.pouvoirs,
+              pouvoirId
+            )
+              ? getPouvoirLevel(originalPerso, pouvoirId)
+              : 0;
+            const newPouvoirLevel = getPouvoirLevel(currentPerso, pouvoirId);
+            billingItems.push({
+              key: diff.path,
+              msg:
+                pouvoirName + ": " + oldPouvoirLevel + " → " + newPouvoirLevel,
+              cost: valDiff,
+            });
+          }
           break;
         default:
           console.log("Unhandled billing category : " + diffCategory);

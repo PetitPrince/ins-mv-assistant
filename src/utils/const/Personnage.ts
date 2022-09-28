@@ -1,6 +1,5 @@
 import { TalentDisplayRow } from "../../components/talents/Talents";
 import { FACTIONS_NAMES } from "./Factions";
-import { TalentStandard } from "./TalentStandard";
 
 export interface TalentInvesti {
   pa_depense: number;

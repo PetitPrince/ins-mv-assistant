@@ -5,6 +5,7 @@ import {
   TalentInvestiCollection,
 } from "../../utils/const/Personnage";
 import { TalentStandard } from "../../utils/const/TalentStandard";
+import { getTalentLevel } from "../../utils/helper/getTalentLevel";
 import { computeRowsTalentsFromStandardTalents } from "./computeRowsTalents";
 import {
   Title,
@@ -19,7 +20,6 @@ import {
 } from "@mantine/core";
 import { Stack } from "@mantine/core";
 import { IconEdit } from "@tabler/icons";
-import { current } from "immer";
 import { DataTable } from "mantine-datatable";
 import slugify from "slugify";
 
@@ -82,7 +82,7 @@ export const TalentsGenerique = (props: {
     setCurrentTalent = setCurrentTalentSecondaire;
   } else {
     let charaExo: TalentInvestiCollection = {};
-    Object.entries(characterTalentsExotiques).map(([k, v]) => {
+    Object.entries(characterTalentsExotiques).forEach(([k, v]) => {
       const lvl = v.level || 0;
       charaExo[k] = {
         pa_depense: v.pa_depense,
@@ -245,7 +245,14 @@ export const TalentsGenerique = (props: {
               }
             },
           },
-          { title: "Niveau", accessor: "level" },
+          {
+            title: "Niveau",
+            accessor: "level",
+            render: (record) => {
+              const computedLevel = getTalentLevel(currentPerso, record.id);
+              return <Text>{computedLevel}</Text>;
+            },
+          },
           {
             title: "PA Dépensé",
             accessor: "pa_depense",

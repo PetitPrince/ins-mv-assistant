@@ -7,7 +7,6 @@ import {
 import { TalentsGenerique } from "./TalentsGenerique";
 import { Grid, Title } from "@mantine/core";
 import { Stack } from "@mantine/core";
-import icon from "@tabler/icons";
 
 export interface TalentDisplayRow extends TalentStandard {
   level: number | undefined;

@@ -1,9 +1,11 @@
 import { INSMVNumberInput } from "../../App";
 import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
+import { Caracteristique } from "../../utils/const/Personnage";
 import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
+import { CaracteristiqueCard } from "./CaracteristiqueCard";
 import { INSMVCaraPaDepenseNumberInput } from "./INSMVCaraPaDepenseNumberInput";
-import { Stack, Group, Title } from "@mantine/core";
+import { Stack, Group, Title, Space, Container } from "@mantine/core";
 
 export const Caracteristiques = (props: {}) => {
   const currentPerso = useStore((state) => state.currentPerso);
@@ -37,114 +39,60 @@ export const Caracteristiques = (props: {}) => {
     <Stack>
       <Title order={2}>Caractéristiques</Title>
       <Group>
-        <Group spacing="xs">
-          <INSMVNumberInput
-            label="Force"
-            hideControls
-            value={force_niveau}
-            readOnly
-            variant="unstyled"
-          />
-          <INSMVCaraPaDepenseNumberInput
-            initialValue={og_force.pa_depense}
-            availablePa={availablePa}
-            label="Force - PA dépensé"
-            value={force.pa_depense}
-            onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUE_NAMES.FORCE)
-            }
-          />
-        </Group>
-        <Group spacing="xs">
-          <INSMVNumberInput
-            label="Agilite"
-            hideControls
-            value={agilite_niveau}
-            readOnly
-            variant="unstyled"
-          />
-          <INSMVCaraPaDepenseNumberInput
-            initialValue={og_agilite.pa_depense}
-            availablePa={availablePa}
-            label="Agilite - PA dépensé"
-            value={agilite.pa_depense}
-            onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUE_NAMES.AGILITE)
-            }
-          />
-        </Group>
-        <Group spacing="xs">
-          <INSMVNumberInput
-            label="Perception"
-            hideControls
-            value={perception_niveau}
-            readOnly
-            variant="unstyled"
-          />
-          <INSMVCaraPaDepenseNumberInput
-            initialValue={og_perception.pa_depense}
-            availablePa={availablePa}
-            label="Perception - PA dépensé"
-            value={perception.pa_depense}
-            onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUE_NAMES.PERCEPTION)
-            }
-          />
-        </Group>
-        <Group spacing="xs">
-          <INSMVNumberInput
-            label="Volonté"
-            hideControls
-            value={volonte_niveau}
-            readOnly
-            variant="unstyled"
-          />
-          <INSMVCaraPaDepenseNumberInput
-            initialValue={og_volonte.pa_depense}
-            availablePa={availablePa}
-            label="Volonté - PA dépensé"
-            value={volonte.pa_depense}
-            onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUE_NAMES.VOLONTE)
-            }
-          />
-        </Group>
-        <Group spacing="xs">
-          <INSMVNumberInput
-            label="Présence"
-            hideControls
-            value={presence_niveau}
-            readOnly
-            variant="unstyled"
-          />
-          <INSMVCaraPaDepenseNumberInput
-            initialValue={og_presence.pa_depense}
-            availablePa={availablePa}
-            label="Présence - PA dépensé"
-            value={presence.pa_depense}
-            onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUE_NAMES.PRESENCE)
-            }
-          />
-        </Group>
-        <Group spacing="xs">
-          <INSMVNumberInput
-            label="Foi"
-            hideControls
-            value={foi_niveau}
-            readOnly
-            variant="unstyled"
-          />
-          <INSMVCaraPaDepenseNumberInput
-            initialValue={og_foi.pa_depense}
-            availablePa={availablePa}
-            label="Foi - PA dépensé"
-            value={foi.pa_depense}
-            onChange={(val: number) =>
-              setPaDepense(val, CARACTERISTIQUE_NAMES.FOI)
-            }
-          />
-        </Group>
+        <CaracteristiqueCard
+          caracName="Force"
+          caracNiveau={force_niveau}
+          og_pa_depense={og_force.pa_depense}
+          availablePa={availablePa}
+          cara_pa_depense={force.pa_depense}
+          setPaDepense={setPaDepense}
+          caraNameEnum={CARACTERISTIQUE_NAMES.FORCE}
+        />
+        <CaracteristiqueCard
+          caracName="Agilité"
+          caracNiveau={agilite_niveau}
+          og_pa_depense={og_agilite.pa_depense}
+          availablePa={availablePa}
+          cara_pa_depense={agilite.pa_depense}
+          setPaDepense={setPaDepense}
+          caraNameEnum={CARACTERISTIQUE_NAMES.AGILITE}
+        />
+        <CaracteristiqueCard
+          caracName="Perception"
+          caracNiveau={perception_niveau}
+          og_pa_depense={og_perception.pa_depense}
+          availablePa={availablePa}
+          cara_pa_depense={perception.pa_depense}
+          setPaDepense={setPaDepense}
+          caraNameEnum={CARACTERISTIQUE_NAMES.PERCEPTION}
+        />
+        <CaracteristiqueCard
+          caracName="Volonté"
+          caracNiveau={volonte_niveau}
+          og_pa_depense={og_volonte.pa_depense}
+          availablePa={availablePa}
+          cara_pa_depense={volonte.pa_depense}
+          setPaDepense={setPaDepense}
+          caraNameEnum={CARACTERISTIQUE_NAMES.VOLONTE}
+        />
+        <CaracteristiqueCard
+          caracName="Présence"
+          caracNiveau={presence_niveau}
+          og_pa_depense={og_presence.pa_depense}
+          availablePa={availablePa}
+          cara_pa_depense={presence.pa_depense}
+          setPaDepense={setPaDepense}
+          caraNameEnum={CARACTERISTIQUE_NAMES.PRESENCE}
+        />
+        <CaracteristiqueCard
+          caracName="Foi"
+          caracNiveau={foi_niveau}
+          og_pa_depense={og_foi.pa_depense}
+          availablePa={availablePa}
+          cara_pa_depense={foi.pa_depense}
+          setPaDepense={setPaDepense}
+          caraNameEnum={CARACTERISTIQUE_NAMES.FOI}
+        />
       </Group>
     </Stack>
   );

@@ -8,11 +8,16 @@ import { Talents } from "./components/talents/Talents";
 import { useStore } from "./store/Store";
 import { FACTIONS_NAMES } from "./utils/const/Factions";
 import {
+  AppShell,
+  Aside,
   Button,
   FileButton,
   Group,
+  Header,
   MantineProvider,
+  Navbar,
   NumberInputProps,
+  Title,
 } from "@mantine/core";
 import { NumberInput, Stack } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
@@ -79,18 +84,34 @@ export const IOPanel = (props: {}) => {
 
 const FeuilleDePerso = (props: {}) => {
   return (
-    <Stack>
-      <BillingPanel />
+    <AppShell
+      padding="md"
+      aside={<BillingPanel />}
+      header={
+        <Header height={60} p="xs">
+          <Title>INS/MV Assistant</Title>
+        </Header>
+      }
+      styles={(theme) => ({
+        main: {
+          backgroundColor:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[8]
+              : theme.colors.gray[0],
+        },
+      })}
+    >
+      <Stack>
+        <IOPanel />
 
-      <IOPanel />
+        <Generalites />
 
-      <Generalites />
-
-      <Caracteristiques />
-      <Status />
-      <Talents />
-      <Pouvoirs />
-    </Stack>
+        <Caracteristiques />
+        <Status />
+        <Talents />
+        <Pouvoirs />
+      </Stack>
+    </AppShell>
   );
 };
 

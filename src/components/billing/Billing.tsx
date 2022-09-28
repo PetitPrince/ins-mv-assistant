@@ -7,7 +7,7 @@ import { findTalentInCaracterFromName } from "../../utils/helper/findTalentInCar
 import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
 import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
 import { getTalentLevel } from "../../utils/helper/getTalentLevel";
-import { ScrollArea, Table } from "@mantine/core";
+import { Aside, ScrollArea, Table } from "@mantine/core";
 import { ActionIcon, Dialog } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
@@ -396,7 +396,7 @@ export const BillingPanel = (props: {}) => {
   ) : null;
 
   return (
-    <Dialog opened={true} position={{ top: 20, right: 20 }}>
+    <Aside width={{ base: 300 }} height={500} p="xs">
       <ScrollArea.Autosize maxHeight={600}>
         <Table>
           <thead>
@@ -454,6 +454,6 @@ export const BillingPanel = (props: {}) => {
           </tr>
         </tbody>
       </Table>
-    </Dialog>
+    </Aside>
   );
 };

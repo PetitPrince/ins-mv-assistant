@@ -6,6 +6,7 @@ import {
 } from "../../utils/const/Personnage";
 import { TalentStandard } from "../../utils/const/TalentStandard";
 import { getTalentLevel } from "../../utils/helper/getTalentLevel";
+import { TalentDisplayRow } from "./Talents";
 import { computeRowsTalentsFromStandardTalents } from "./computeRowsTalents";
 import {
   Title,
@@ -181,6 +182,74 @@ export const TalentsGenerique = (props: {
     });
   }
 
+  const renderNameColumn = (record: TalentDisplayRow) => {
+    if (record.specialisationType === "Spécifique") {
+      const primaryTalentId = record.id.split("_specifique")[0];
+      const isPrimary = primaryTalentId === record.id;
+      if (isPrimary) {
+        return <Text>{record.name}</Text>;
+      } else {
+        return (
+          <Group>
+            <Text>{record.name}</Text>
+
+            <Popover width={300} trapFocus position="bottom" shadow="md">
+              <Popover.Target>
+                <ActionIcon>
+                  <IconEdit size={16} />
+                </ActionIcon>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <form
+                  onSubmit={(event: any) => {
+                    const talentNameFragment =
+                      event.target.talentNameFragment.value;
+                    setCurrentTalentNameFragment(record.id, talentNameFragment);
+                    event.preventDefault();
+                    // close();
+                  }}
+                >
+                  <TextInput
+                    label="Nom de la spécialisation"
+                    name="talentNameFragment"
+                    size="xs"
+                  />
+                  <Button type="submit">Changer</Button>
+                </form>
+              </Popover.Dropdown>
+            </Popover>
+          </Group>
+        );
+      }
+    } else if (record.specialisationType === "Multiple") {
+      return <Text>{record.name} ↓</Text>;
+    } else {
+      return <Text>{record.name}</Text>;
+    }
+  };
+  const renderLevelColumn = (record: TalentDisplayRow) => {
+    const computedLevel = getTalentLevel(currentPerso, record.id);
+    return <Text>{computedLevel}</Text>;
+  };
+  const renderPaDepenseColumn = (record: TalentDisplayRow) => {
+    if (record.specialisationType === "Multiple") {
+    } else if (record.id === "new-exotic") {
+      <Group>
+        <NumberInput value={record.pa_depense} disabled />
+      </Group>;
+    } else {
+      return (
+        <Group>
+          <NumberInput
+            value={record.pa_depense}
+            onChange={(val: number) => {
+              setCurrentTalentPaDense(record.id, val);
+            }}
+          />
+        </Group>
+      );
+    }
+  };
   return (
     <Stack>
       <Title order={3}>{title}</Title>
@@ -191,90 +260,17 @@ export const TalentsGenerique = (props: {
           {
             title: "Nom",
             accessor: "name",
-            render: (record) => {
-              if (record.specialisationType === "Spécifique") {
-                const primaryTalentId = record.id.split("_specifique")[0];
-                const isPrimary = primaryTalentId === record.id;
-                if (isPrimary) {
-                  return <Text>{record.name}</Text>;
-                } else {
-                  return (
-                    <Group>
-                      <Text>{record.name}</Text>
-
-                      <Popover
-                        width={300}
-                        trapFocus
-                        position="bottom"
-                        shadow="md"
-                      >
-                        <Popover.Target>
-                          <ActionIcon>
-                            <IconEdit size={16} />
-                          </ActionIcon>
-                        </Popover.Target>
-                        <Popover.Dropdown>
-                          <form
-                            onSubmit={(event: any) => {
-                              const talentNameFragment =
-                                event.target.talentNameFragment.value;
-                              setCurrentTalentNameFragment(
-                                record.id,
-                                talentNameFragment
-                              );
-                              event.preventDefault();
-                              // close();
-                            }}
-                          >
-                            <TextInput
-                              label="Nom de la spécialisation"
-                              name="talentNameFragment"
-                              size="xs"
-                            />
-                            <Button type="submit">Changer</Button>
-                          </form>
-                        </Popover.Dropdown>
-                      </Popover>
-                    </Group>
-                  );
-                }
-              } else if (record.specialisationType === "Multiple") {
-                return <Text>{record.name} ↓</Text>;
-              } else {
-                return <Text>{record.name}</Text>;
-              }
-            },
+            render: renderNameColumn,
           },
           {
             title: "Niveau",
             accessor: "level",
-            render: (record) => {
-              const computedLevel = getTalentLevel(currentPerso, record.id);
-              return <Text>{computedLevel}</Text>;
-            },
+            render: renderLevelColumn,
           },
           {
             title: "PA Dépensé",
             accessor: "pa_depense",
-            render: (record) => {
-              if (record.specialisationType === "Multiple") {
-              } else if (record.id === "new-exotic") {
-                <Group>
-                  <NumberInput value={record.pa_depense} disabled />
-                </Group>;
-              } else {
-                return (
-                  <Group>
-                    <NumberInput
-                      value={record.pa_depense}
-                      onChange={(val: number) => {
-                        setCurrentTalentPaDense(record.id, val);
-                      }}
-                    />
-                  </Group>
-                );
-              }
-            },
+            render: renderPaDepenseColumn,
           },
           { title: "Carac", accessor: "associatedChara" },
         ]}

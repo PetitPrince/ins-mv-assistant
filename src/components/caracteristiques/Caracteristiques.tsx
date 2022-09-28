@@ -2,13 +2,15 @@ import { INSMVNumberInput } from "../../App";
 import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 import { Caracteristique } from "../../utils/const/Personnage";
-import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
+import {
+  calcCaracteristiqueLevelFromPaDepense,
+  getCaracteristiqueLevel,
+} from "../../utils/helper/getCaracteristiqueLevel";
 import { CaracteristiqueCard } from "./CaracteristiqueCard";
 import { INSMVCaraPaDepenseNumberInput } from "./INSMVCaraPaDepenseNumberInput";
 import { Stack, Group, Title, Space, Container } from "@mantine/core";
 
 export const Caracteristiques = (props: {}) => {
-  const currentPerso = useStore((state) => state.currentPerso);
   const { force, agilite, perception, volonte, presence, foi } = useStore(
     (state) => state.currentPerso.caracteristiques
   );
@@ -28,12 +30,20 @@ export const Caracteristiques = (props: {}) => {
   const setPaDepense = (val: number, cara: CARACTERISTIQUE_NAMES) => {
     storeCurrentCaracteristiquesPaDepense(val, cara);
   };
-  const force_niveau = getCaracteristiqueLevel(currentPerso, "force");
-  const agilite_niveau = getCaracteristiqueLevel(currentPerso, "agilite");
-  const perception_niveau = getCaracteristiqueLevel(currentPerso, "perception");
-  const volonte_niveau = getCaracteristiqueLevel(currentPerso, "volonte");
-  const presence_niveau = getCaracteristiqueLevel(currentPerso, "presence");
-  const foi_niveau = getCaracteristiqueLevel(currentPerso, "foi");
+  const force_niveau = calcCaracteristiqueLevelFromPaDepense(force.pa_depense);
+  const agilite_niveau = calcCaracteristiqueLevelFromPaDepense(
+    agilite.pa_depense
+  );
+  const perception_niveau = calcCaracteristiqueLevelFromPaDepense(
+    perception.pa_depense
+  );
+  const volonte_niveau = calcCaracteristiqueLevelFromPaDepense(
+    volonte.pa_depense
+  );
+  const presence_niveau = calcCaracteristiqueLevelFromPaDepense(
+    presence.pa_depense
+  );
+  const foi_niveau = calcCaracteristiqueLevelFromPaDepense(foi.pa_depense);
 
   return (
     <Stack>

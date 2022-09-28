@@ -1,6 +1,9 @@
 import { useStore } from "../../store/Store";
 import { Pouvoir, PouvoirCollection } from "../../utils/const/Pouvoir";
-import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
+import {
+  calcPouvoirLevelFromPaDepense,
+  getPouvoirLevel,
+} from "../../utils/helper/getPouvoirLevel";
 import {
   Stack,
   Title,
@@ -15,7 +18,8 @@ import { DataTable } from "mantine-datatable";
 import slugify from "slugify";
 
 export const Pouvoirs = (props: {}) => {
-  const currentPerso = useStore((state) => state.currentPerso);
+  const currentPouvoirs = useStore((state) => state.currentPerso.pouvoirs);
+
   const setCurrentPouvoirPaDepense = useStore(
     (state) => state.setCurrentPouvoirPaDepense
   );
@@ -25,10 +29,11 @@ export const Pouvoirs = (props: {}) => {
     initialValues: { nom: "", coutEnPP: 0, coutEnPa: 0 },
   });
 
-  let currentPouvoirs: PouvoirCollection = currentPerso.pouvoirs;
-
   const levelRenderer = (record: Pouvoir) => {
-    const computedLevel = getPouvoirLevel(currentPerso, record.id);
+    const computedLevel = calcPouvoirLevelFromPaDepense(
+      record.pa_depense,
+      record.coutEnPa
+    );
     return <Text>{computedLevel}</Text>;
   };
   const paRenderer = (record: Pouvoir) => {

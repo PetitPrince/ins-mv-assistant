@@ -157,7 +157,7 @@ export const Talents = (props: {}) => {
   }
   return (
     <Stack>
-      <Title order={2}>Talents (total dépensé: {sum} )</Title>
+      <Title order={2}>Talents</Title>
       {/* <Group sx={{ "align-items": "flex-start" }}> */}
       {errMsg ? (
         <Alert

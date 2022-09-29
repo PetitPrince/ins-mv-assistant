@@ -11,6 +11,7 @@ export const PaDepenseCell = (props: {
   id: string;
   talent: Talent;
   cara: CaracteristiquesSet;
+  additionalErrMsg: string;
   updatePaOrCreateTalent: (id: string, updatedPa: number) => void;
   faction: FACTIONS_NAMES;
 }) => {
@@ -21,6 +22,9 @@ export const PaDepenseCell = (props: {
   const appMode = useStore((state) => state.appMode);
 
   let errorMsgs: string[] = [];
+  if (props.additionalErrMsg) {
+    errorMsgs.push(props.additionalErrMsg);
+  }
 
   if (
     appMode === APPMODE.CREATE &&

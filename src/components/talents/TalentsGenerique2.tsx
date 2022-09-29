@@ -6,6 +6,7 @@ import {
   TALENT_SPECIALISATION_TYPE_NAME,
   TALENT_TYPE_NAME,
 } from "../../utils/const/TalentStandard";
+import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
 import {
   findTalentInCollection,
   talentExistsInCollection,
@@ -151,48 +152,77 @@ export const TalentsGenerique2 = (props: {
     </form>
   );
 
-  const displayRows = rows.map((row: Talent) => (
-    <tr key={row.id}>
-      <td>
-        <ActionsCell
-          specialisationType={row.specialisationType}
-          id={row.id}
-          currentTalentCollection={currentTalentCollection}
-          standardTalentCollection={standardTalentCollection}
-          setCurrentTalentNameFragment={setCurrentTalentNameFragment}
-          setCurrentTalentPaDepense={setCurrentTalentPaDepense}
-          addCurrentTalent={addCurrentTalent}
-        />
-      </td>
-      <td>
-        <NameCell
-          name={row.name}
-          id={row.id}
-          customNameFragment={row.customNameFragment}
-        />
-      </td>
-      <td>
-        <LevelCell
-          pa_depense={row.pa_depense}
-          talent={row}
-          cara={currentPersoCara}
-        />
-      </td>
-      <td>
-        <CaraCell cara={row.associatedChara} />
-      </td>
-      <td>
-        <PaDepenseCell
-          pa_depense={row.pa_depense}
-          talent={row}
-          cara={currentPersoCara}
-          faction={faction}
-          id={row.id}
-          updatePaOrCreateTalent={updatePaOrCreateTalent}
-        />
-      </td>
-    </tr>
-  ));
+  const displayRows = rows.map((row: Talent) => {
+    let errMsg = "";
+
+    if (row.specialisationType === TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE) {
+      if (!row.id.includes("_specifique")) {
+        const specificTalent = rows
+          .filter((x) => x.id.startsWith(row.id))
+          .filter((x) => x.id !== row.id)[0];
+        if (specificTalent) {
+          const baseTalentLevel = calcTalentLevelFromPaDepense(
+            row.pa_depense,
+            row,
+            currentPersoCara
+          );
+          const specificTalentLevel = calcTalentLevelFromPaDepense(
+            specificTalent.pa_depense,
+            specificTalent,
+            currentPersoCara
+          );
+          if (baseTalentLevel > specificTalentLevel) {
+            errMsg =
+              "Le talent spécifique général ne peut pas dépasser la spécialité";
+          }
+        }
+      }
+    }
+
+    return (
+      <tr key={row.id}>
+        <td>
+          <ActionsCell
+            specialisationType={row.specialisationType}
+            id={row.id}
+            currentTalentCollection={currentTalentCollection}
+            standardTalentCollection={standardTalentCollection}
+            setCurrentTalentNameFragment={setCurrentTalentNameFragment}
+            setCurrentTalentPaDepense={setCurrentTalentPaDepense}
+            addCurrentTalent={addCurrentTalent}
+          />
+        </td>
+        <td>
+          <NameCell
+            name={row.name}
+            id={row.id}
+            customNameFragment={row.customNameFragment}
+          />
+        </td>
+        <td>
+          <LevelCell
+            pa_depense={row.pa_depense}
+            talent={row}
+            cara={currentPersoCara}
+          />
+        </td>
+        <td>
+          <CaraCell cara={row.associatedChara} />
+        </td>
+        <td>
+          <PaDepenseCell
+            pa_depense={row.pa_depense}
+            talent={row}
+            cara={currentPersoCara}
+            faction={faction}
+            id={row.id}
+            additionalErrMsg={errMsg}
+            updatePaOrCreateTalent={updatePaOrCreateTalent}
+          />
+        </td>
+      </tr>
+    );
+  });
 
   return (
     <Stack>

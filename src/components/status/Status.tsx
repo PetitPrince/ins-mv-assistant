@@ -21,6 +21,7 @@ export const calcPPFromPaDepense = (
 
 export const Status = (props: {}) => {
   const pa = useStore((state) => state.currentPerso.pa);
+  const paTotal = useStore((state) => state.currentPerso.paTotal);
   const force_pa_depense = useStore(
     (state) => state.currentPerso.caracteristiques.force.pa_depense
   );
@@ -40,20 +41,27 @@ export const Status = (props: {}) => {
   const force = calcCaracteristiqueLevelFromPaDepense(force_pa_depense);
   const volonte = calcCaracteristiqueLevelFromPaDepense(volonte_pa_depense);
   const foi = calcCaracteristiqueLevelFromPaDepense(foi_pa_depense);
-  const pp_base = volonte + foi;
   const ppMax = calcPPFromPaDepense(volonte, foi, pp_pa_depense);
 
   return (
     <Stack>
       <Title order={2}>Status</Title>
       <Group>
-        <NumberInput
-          label="Point d'Administration (PA) restant"
-          value={pa}
-          onChange={(val: number) => {
-            setCurrentPa(val);
-          }}
-        />
+        <Stack>
+          <NumberInput
+            label="Point d'Administration (PA) restant"
+            value={pa}
+            onChange={(val: number) => {
+              setCurrentPa(val);
+            }}
+          />
+          <NumberInput
+            label="PA dépense"
+            value={paTotal}
+            hideControls
+            readOnly
+          />
+        </Stack>
         {/* <NumberInput label="PA accumulés" value={paTotal}/> */}
         {/* <NumberInput label="Point de Pouvoir (PP)" value={props.pp}
                     onChange={(val: number) => { setPp(val) }}/> */}

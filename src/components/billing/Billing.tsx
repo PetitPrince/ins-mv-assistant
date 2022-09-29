@@ -48,11 +48,11 @@ export const generateBillingItems = (
       switch (diffCategory) {
         case "faction":
           let updatedCost = null; // TODO: check if creation or update (or rather, if update -> faction change shouldn't even be a possiblity)
-          if (val === FACTIONS_NAMES.ANGES) {
-            updatedCost = -100;
-          } else if (val === FACTIONS_NAMES.DEMONS) {
-            updatedCost = -80;
-          }
+          // if (val === FACTIONS_NAMES.ANGES) {
+          //   updatedCost = -100;
+          // } else if (val === FACTIONS_NAMES.DEMONS) {
+          //   updatedCost = -80;
+          // }
           billingItems.push({
             key: diff.path,
             msg: "Faction: " + originalValue + " → " + val,
@@ -204,6 +204,10 @@ export const generateBillingItems = (
             });
           }
           break;
+        case "pa":
+          break;
+        case "paTotal":
+          break;
         default:
           console.log("Unhandled billing category : " + diffCategory);
           break;
@@ -308,6 +312,8 @@ export const BillingPanel = (props: {}) => {
   const setPerso = useStore((state) => state.setCurrentPerso);
   const setOriginalPerso = useStore((state) => state.setOriginalPerso);
   const setCurrentPa = useStore((state) => state.setCurrentPa);
+  const setCurrentPaTotal = useStore((state) => state.setCurrentPaTotal);
+  const currentPaTotal = useStore((state) => state.currentPerso.paTotal);
 
   const deleteOneBillingLine = (key: string, billingMsg: string) => {
     // key looks lioke "/caracteristiques/volonte/pa_depense"
@@ -343,8 +349,11 @@ export const BillingPanel = (props: {}) => {
         applyPatch(persoCopy, differenceWithOnlyTheOneSelected);
 
         persoCopy.pa = paAfterTransaction; // Don't forget to update the PA
+        persoCopy.paTotal = currentPaTotal + cost;
         setOriginalPerso(persoCopy);
         setCurrentPa(paAfterTransaction);
+        setCurrentPaTotal(currentPaTotal + cost);
+
         showNotification({
           title: "Ligne appliquée",
           message: "C'est celle là: " + billingMsg,
@@ -378,8 +387,11 @@ export const BillingPanel = (props: {}) => {
 
   const commitAllBillingLine = () => {
     if (availablePa >= 0) {
+      const unused = createPatch(originalPerso, currentPerso);
+      const cost = currentPa - availablePa;
       setOriginalPerso(currentPerso);
       setCurrentPa(availablePa);
+      setCurrentPaTotal(currentPaTotal + cost);
       showNotification({
         message: "Toutes les modifications ont été appliquées",
         color: "green",

@@ -1,13 +1,15 @@
-import { FACTIONS_NAMES } from "../../utils/const/Factions";
-import { SUPERIEURS_ANGES_AUTOCOMPLETE, SUPERIEURS_DEMONS_AUTOCOMPLETE } from "../../utils/const/Superieurs";
 import { useStore } from "../../store/Store";
+import { FACTIONS_NAMES } from "../../utils/const/Factions";
+import {
+  SUPERIEURS_ANGES_AUTOCOMPLETE,
+  SUPERIEURS_DEMONS_AUTOCOMPLETE,
+} from "../../utils/const/Superieurs";
 import { Autocomplete, Select, TextInput, Title } from "@mantine/core";
 import { NumberInput, Stack, Group } from "@mantine/core";
 
 const Superieur = (props: {}) => {
   const value = useStore((state) => state.currentPerso.superieur);
   const faction = useStore((state) => state.currentPerso.faction);
-
   const setCurrentSuperieur = useStore((state) => state.setCurrentSuperieur);
 
   let superieurs;
@@ -42,6 +44,21 @@ export const Generalites = (props: {}) => {
   const setCurrentFaction = useStore((state) => state.setCurrentFaction);
   const setCurrentGrade = useStore((state) => state.setCurrentGrade);
 
+  const setCurrentPa = useStore((state) => state.setCurrentPa);
+  const changeFaction = (newFaction: FACTIONS_NAMES) => {
+    setCurrentFaction(newFaction);
+    switch (newFaction) {
+      case FACTIONS_NAMES.ANGES:
+        setCurrentPa(100);
+        break;
+      case FACTIONS_NAMES.DEMONS:
+        setCurrentPa(80);
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <Stack>
       <Title order={2}>Généralités</Title>
@@ -63,7 +80,7 @@ export const Generalites = (props: {}) => {
             { value: FACTIONS_NAMES.TROISIEME_FORCE, label: "Troisième force" },
             { value: FACTIONS_NAMES.AUTRE, label: "Autre" },
           ]}
-          onChange={(val: FACTIONS_NAMES) => setCurrentFaction(val)}
+          onChange={(val: FACTIONS_NAMES) => changeFaction(val)}
         />
         <Superieur />
 

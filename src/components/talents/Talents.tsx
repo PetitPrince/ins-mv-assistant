@@ -6,12 +6,13 @@ import {
 } from "../../utils/const/TalentStandard";
 import "./TalentsGenerique";
 import { TalentsGenerique } from "./TalentsGenerique";
+import { TalentsGenerique2 } from "./TalentsGenerique2";
 import { Title } from "@mantine/core";
 import { Stack } from "@mantine/core";
 
-export const Talents = (props: {}) => {
+const TalentsPrincipaux = (props: {}) => {
   const currentTalentCollection_principal = useStore(
-    (state) => state.currentPerso.talents2.principaux
+    (state) => state.currentPerso.talents.principaux
   );
   const setCurrentTalentPaDepense_principal = useStore(
     (state) => state.setCurrentTalentPrincipalPaDepense
@@ -23,8 +24,28 @@ export const Talents = (props: {}) => {
     (state) => state.setCurrentTalentPrincipalNameFragment
   );
 
+  const currentPersoCara = useStore(
+    (state) => state.currentPerso.caracteristiques
+  );
+  const currentPersoSuperieur = useStore(
+    (state) => state.currentPerso.superieur
+  );
+  return (
+    <TalentsGenerique2
+      title={"Talents principaux"}
+      currentTalentCollection={currentTalentCollection_principal}
+      setCurrentTalentNameFragment={setCurrentTalentNameFragment_principal}
+      addCurrentTalent={addCurrentTalent_principal}
+      setCurrentTalentPaDepense={setCurrentTalentPaDepense_principal}
+      standardTalentCollection={TALENTS_PRINCIPAUX_STANDARD}
+      currentPersoCara={currentPersoCara}
+      currentPersoSuperieur={currentPersoSuperieur}
+    />
+  );
+};
+const TalentsSecondaires = (props: {}) => {
   const currentTalentCollection_secondaire = useStore(
-    (state) => state.currentPerso.talents2.secondaires
+    (state) => state.currentPerso.talents.secondaires
   );
   const setCurrentTalentPaDepense_secondaire = useStore(
     (state) => state.setCurrentTalentSecondairePaDepense
@@ -35,9 +56,28 @@ export const Talents = (props: {}) => {
   const setCurrentTalentNameFragment_secondaire = useStore(
     (state) => state.setCurrentTalentSecondaireNameFragment
   );
-
+  const currentPersoCara = useStore(
+    (state) => state.currentPerso.caracteristiques
+  );
+  const currentPersoSuperieur = useStore(
+    (state) => state.currentPerso.superieur
+  );
+  return (
+    <TalentsGenerique2
+      title={"Talents secondaire"}
+      currentTalentCollection={currentTalentCollection_secondaire}
+      setCurrentTalentNameFragment={setCurrentTalentNameFragment_secondaire}
+      addCurrentTalent={addCurrentTalent_secondaire}
+      setCurrentTalentPaDepense={setCurrentTalentPaDepense_secondaire}
+      standardTalentCollection={TALENTS_SECONDAIRES_STANDARD}
+      currentPersoCara={currentPersoCara}
+      currentPersoSuperieur={currentPersoSuperieur}
+    />
+  );
+};
+const TalentsExotiques = (props: {}) => {
   const currentTalentCollection_exotique = useStore(
-    (state) => state.currentPerso.talents2.exotiques
+    (state) => state.currentPerso.talents.exotiques
   );
   const setCurrentTalentPaDepense_exotique = useStore(
     (state) => state.setCurrentTalentExotiquePaDepense
@@ -48,36 +88,36 @@ export const Talents = (props: {}) => {
   const setCurrentTalentNameFragment_exotique = useStore(
     (state) => state.setCurrentTalentExotiqueNameFragment
   );
+  const currentPersoCara = useStore(
+    (state) => state.currentPerso.caracteristiques
+  );
+  const currentPersoSuperieur = useStore(
+    (state) => state.currentPerso.superieur
+  );
 
+  return (
+    <TalentsGenerique2
+      title={"Talents exotiques"}
+      currentTalentCollection={currentTalentCollection_exotique}
+      setCurrentTalentNameFragment={setCurrentTalentNameFragment_exotique}
+      addCurrentTalent={addCurrentTalent_exotique}
+      setCurrentTalentPaDepense={setCurrentTalentPaDepense_exotique}
+      standardTalentCollection={TALENTS_EXOTIQUES_STANDARD}
+      currentPersoCara={currentPersoCara}
+      currentPersoSuperieur={currentPersoSuperieur}
+    />
+  );
+};
+
+export const Talents = (props: {}) => {
   return (
     <Stack>
       <Title order={2}>Talents</Title>
       {/* <Group sx={{ "align-items": "flex-start" }}> */}
-      <TalentsGenerique
-        title={"Talents principaux"}
-        currentTalentCollection={currentTalentCollection_principal}
-        setCurrentTalentNameFragment={setCurrentTalentNameFragment_principal}
-        addCurrentTalent={addCurrentTalent_principal}
-        setCurrentTalentPaDepense={setCurrentTalentPaDepense_principal}
-        standardTalentCollection={TALENTS_PRINCIPAUX_STANDARD}
-      />
 
-      <TalentsGenerique
-        title={"Talents secondaire"}
-        currentTalentCollection={currentTalentCollection_secondaire}
-        setCurrentTalentNameFragment={setCurrentTalentNameFragment_secondaire}
-        addCurrentTalent={addCurrentTalent_secondaire}
-        setCurrentTalentPaDepense={setCurrentTalentPaDepense_secondaire}
-        standardTalentCollection={TALENTS_SECONDAIRES_STANDARD}
-      />
-      <TalentsGenerique
-        title={"Talents exotiques"}
-        currentTalentCollection={currentTalentCollection_exotique}
-        setCurrentTalentNameFragment={setCurrentTalentNameFragment_exotique}
-        addCurrentTalent={addCurrentTalent_exotique}
-        setCurrentTalentPaDepense={setCurrentTalentPaDepense_exotique}
-        standardTalentCollection={TALENTS_EXOTIQUES_STANDARD}
-      />
+      <TalentsPrincipaux />
+      <TalentsSecondaires />
+      <TalentsExotiques />
     </Stack>
   );
 };

@@ -25,7 +25,7 @@ export interface Personnage {
   pa: number;
   paTotal: number;
   pp_pa_depense: number;
-  talents2: {
+  talents: {
     principaux: Talent[];
     secondaires: Talent[];
     exotiques: Talent[];

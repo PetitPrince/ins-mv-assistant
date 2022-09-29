@@ -1,5 +1,6 @@
 import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
+import { CaracteristiquesSet } from "../../utils/const/Personnage";
 import {
   Talent,
   TALENT_SPECIALISATION_TYPE_NAME,
@@ -25,10 +26,29 @@ import {
 import { Stack } from "@mantine/core";
 import { IconBug, IconEdit, IconRowInsertTop } from "@tabler/icons";
 import { DataTable } from "mantine-datatable";
+import React from "react";
 import slugify from "slugify";
 
+function findMatchingStandardTalentInCollection(
+  talentCollection: Talent[],
+  standardTalentCollection: Talent[]
+) {
+  const talentPrincipauxStandardIds = standardTalentCollection.map((x) => x.id);
+  let toAdd: Talent[] = [];
+  for (const onetalent of talentCollection) {
+    if (talentPrincipauxStandardIds.includes(onetalent.id)) {
+      const idx = standardTalentCollection.findIndex(
+        (x) => x.id === onetalent.id
+      );
+      standardTalentCollection[idx] = onetalent;
+    } else {
+      toAdd.push(onetalent);
+    }
+  }
+  return toAdd;
+}
+
 const EditNameFragment = (props: {
-  hidden: boolean;
   recordId: string;
   currentTalentCollection: Talent[];
   standardTalentCollection: Talent[];
@@ -65,7 +85,7 @@ const EditNameFragment = (props: {
   return (
     <Popover width={300} trapFocus position="bottom" shadow="md">
       <Popover.Target>
-        <ActionIcon hidden={props.hidden}>
+        <ActionIcon>
           <IconEdit size={16} />
         </ActionIcon>
       </Popover.Target>
@@ -93,7 +113,6 @@ const EditNameFragment = (props: {
 };
 
 const AddNewMutiple = (props: {
-  hidden: boolean;
   recordId: string;
   currentTalentCollection: Talent[];
   standardTalentCollection: Talent[];
@@ -129,7 +148,7 @@ const AddNewMutiple = (props: {
   return (
     <Popover width={300} trapFocus position="bottom" shadow="md">
       <Popover.Target>
-        <ActionIcon hidden={props.hidden}>
+        <ActionIcon>
           <IconRowInsertTop size={16} />
         </ActionIcon>
       </Popover.Target>
@@ -166,6 +185,8 @@ export const TalentsGenerique = (props: {
   addCurrentTalent: (newTalent: Talent) => void;
   setCurrentTalentPaDepense: (talentId: string, val: number) => void;
   standardTalentCollection: Talent[];
+  currentPersoCara: CaracteristiquesSet;
+  currentPersoSuperieur: string;
 }) => {
   const title = props.title;
   const currentTalentCollection = props.currentTalentCollection;
@@ -174,12 +195,8 @@ export const TalentsGenerique = (props: {
   const setCurrentTalentNameFragment = props.setCurrentTalentNameFragment;
   const standardTalentCollection = props.standardTalentCollection;
 
-  const currentPersoCara = useStore(
-    (state) => state.currentPerso.caracteristiques
-  );
-  const currentPersoSuperieur = useStore(
-    (state) => state.currentPerso.superieur
-  );
+  const currentPersoCara = props.currentPersoCara;
+  const currentPersoSuperieur = props.currentPersoSuperieur;
   const updatePaOrCreateTalent = (talentId: string, updatedPa: number) => {
     if (talentExistsInCollection(currentTalentCollection, talentId)) {
       setCurrentTalentPaDepense(talentId, updatedPa);
@@ -198,18 +215,13 @@ export const TalentsGenerique = (props: {
     }
   };
 
-  const talentPrincipauxStandardIds = standardTalentCollection.map((x) => x.id);
   let talentsStandards: Talent[] = standardTalentCollection;
-  let toAdd: Talent[] = [];
-  for (const onetalent of currentTalentCollection) {
-    if (talentPrincipauxStandardIds.includes(onetalent.id)) {
-      const idx = talentsStandards.findIndex((x) => x.id === onetalent.id);
-      talentsStandards[idx] = onetalent;
-    } else {
-      toAdd.push(onetalent);
-    }
-  }
-  let rows = talentsStandards.concat(toAdd);
+  let updatedStandardTalent: Talent[] = findMatchingStandardTalentInCollection(
+    currentTalentCollection,
+    standardTalentCollection
+  );
+  let rows = talentsStandards.concat(updatedStandardTalent);
+
   if (title.includes("exotique")) {
     if (currentPersoSuperieur) {
       rows = rows.filter((x) =>
@@ -247,46 +259,55 @@ export const TalentsGenerique = (props: {
 
     return <Text>{talentLevel}</Text>;
   };
-  const renderPaDepenseColumn = (record: Talent) => {
+  const RenderPaDepenseColumnMem = React.memo((props: { record: Talent }) => {
     return (
       <NumberInput
-        value={record.pa_depense}
+        value={props.record.pa_depense}
         onChange={(updatedPa: number) => {
-          updatePaOrCreateTalent(record.id, updatedPa);
+          updatePaOrCreateTalent(props.record.id, updatedPa);
         }}
       />
     );
+  });
+
+  const renderPaDepenseColumn = (record: Talent) => {
+    return <RenderPaDepenseColumnMem record={record} />;
   };
   const renderActionColumn = (record: Talent) => {
-    const shouldHideEditButton = !(
+    const shouldShowEditButton =
       record.specialisationType ===
         TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE &&
-      record.id.includes("specifique")
-    );
-    const shouldHideAddButton = !(
-      record.specialisationType === TALENT_SPECIALISATION_TYPE_NAME.MULTIPLE
-    );
+      record.id.includes("specifique");
+    const editNameFragment = shouldShowEditButton ? (
+      <EditNameFragment
+        recordId={record.id}
+        currentTalentCollection={currentTalentCollection}
+        setCurrentTalentNameFragment={setCurrentTalentNameFragment}
+        addCurrentTalent={addCurrentTalent}
+        standardTalentCollection={standardTalentCollection}
+      />
+    ) : null;
+
+    const shouldShowAddButton =
+      record.specialisationType === TALENT_SPECIALISATION_TYPE_NAME.MULTIPLE;
+    const addNewMultiple = shouldShowAddButton ? (
+      <AddNewMutiple
+        recordId={record.id}
+        currentTalentCollection={currentTalentCollection}
+        setCurrentTalentNameFragment={setCurrentTalentNameFragment}
+        addCurrentTalent={addCurrentTalent}
+        standardTalentCollection={standardTalentCollection}
+      />
+    ) : null;
+
     return (
       <Group spacing={4} position="left" noWrap>
-        <EditNameFragment
-          hidden={shouldHideEditButton}
-          recordId={record.id}
-          currentTalentCollection={currentTalentCollection}
-          setCurrentTalentNameFragment={setCurrentTalentNameFragment}
-          addCurrentTalent={addCurrentTalent}
-          standardTalentCollection={standardTalentCollection}
-        />
-        <AddNewMutiple
-          hidden={shouldHideAddButton}
-          recordId={record.id}
-          currentTalentCollection={currentTalentCollection}
-          setCurrentTalentNameFragment={setCurrentTalentNameFragment}
-          addCurrentTalent={addCurrentTalent}
-          standardTalentCollection={standardTalentCollection}
-        />
+        {editNameFragment}
+        {addNewMultiple}
+        {/* 
         <ActionIcon color="blue" onClick={() => console.log(record)}>
           <IconBug size={16} />
-        </ActionIcon>
+        </ActionIcon> */}
       </Group>
     );
   };

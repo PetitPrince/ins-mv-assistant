@@ -116,7 +116,7 @@ export const generateBillingItems = (
             });
           }
           break;
-        case "talents2":
+        case "talents":
           if (diff.op === "add") {
             const newTalent: Talent = diff.value;
             const finalLvl = calcTalentLevelFromPaDepense(
@@ -137,7 +137,7 @@ export const generateBillingItems = (
               finalLvl;
             const valDiff = newTalent.pa_depense;
             billingItems.push({
-              key: diff.path,
+              key: diff.path + newTalent.id,
               msg: msgString,
               cost: valDiff,
             });
@@ -173,7 +173,7 @@ export const generateBillingItems = (
               finalLvl;
 
             billingItems.push({
-              key: diff.path,
+              key: diff.path + currentTalent.id,
               msg: msgString,
               cost: valDiff,
             });
@@ -431,7 +431,6 @@ export const BillingPanel = (props: {}) => {
               if (Object.keys(billingItem).length) {
                 const cost = billingItem.cost;
                 const costDisplay = prepareCostDisplay(cost);
-
                 return (
                   <tr key={billingItem.key}>
                     <td>{costDisplay}</td>

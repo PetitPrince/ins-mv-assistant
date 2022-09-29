@@ -25,6 +25,7 @@ import { saveAs } from "file-saver";
 import "immer";
 import { enablePatches } from "immer";
 import { mountStoreDevtool } from "simple-zustand-devtools";
+import slugify from "slugify";
 
 enablePatches();
 
@@ -37,25 +38,30 @@ export const INSMVNumberInput = (props: NumberInputProps) => {
 };
 
 export const IOPanel = (props: {}) => {
-  const currentPerso = useStore((state) => state.currentPerso);
+  const originalPerso = useStore((state) => state.originalPerso);
   const setCurrentPerso = useStore((state) => state.setCurrentPerso);
+  const setOriginalPerso = useStore((state) => state.setOriginalPerso);
 
   const clickToSave = () => {
-    let blob = new Blob([JSON.stringify(currentPerso)], {
+    let blob = new Blob([JSON.stringify(originalPerso)], {
       type: "text/json;charset=utf-8",
     });
-    saveAs(blob, "perso.json");
+    saveAs(blob, slugify(originalPerso.identite) + ".json");
   };
-  const loadThePerso = (foo: File) => {
-    foo.text().then((fooText) => {
-      setCurrentPerso(JSON.parse(fooText));
+  const loadThePerso = (loadedJson: File) => {
+    loadedJson.text().then((jsonText) => {
+      const parsedJson = JSON.parse(jsonText);
+      setCurrentPerso(parsedJson);
+      setOriginalPerso(parsedJson);
     });
   };
   return (
     <Group>
-      <Button onClick={clickToSave}>Exporter brouillon</Button>
+      <Button onClick={clickToSave}>
+        Exporter personnage (sans modification en cours)
+      </Button>
       <FileButton onChange={loadThePerso}>
-        {(props) => <Button {...props}>Importer brouillon</Button>}
+        {(props) => <Button {...props}>Importer personnage</Button>}
       </FileButton>
     </Group>
   );
@@ -80,6 +86,7 @@ const FeuilleDePerso = (props: {}) => {
                 { label: "Aventure", value: APPMODE.PLAY },
               ]}
             />
+            <IOPanel />
           </Group>
         </Header>
       }
@@ -93,8 +100,6 @@ const FeuilleDePerso = (props: {}) => {
       })}
     >
       <Stack>
-        <IOPanel />
-
         <Generalites />
 
         <Caracteristiques />

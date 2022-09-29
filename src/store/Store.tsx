@@ -1,14 +1,9 @@
 import { BillingItem } from "../components/billing/Billing";
-import { TalentDisplayRow } from "../components/talents/Talents";
 import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../utils/const/Factions";
-import { Personnage, TalentInvesti } from "../utils/const/Personnage";
+import { Personnage } from "../utils/const/Personnage";
 import { Pouvoir } from "../utils/const/Pouvoir";
-import {
-  Talent2,
-  TALENT_SPECIALISATION_TYPE_NAME,
-  TALENT_TYPE_NAME,
-} from "../utils/const/TalentStandard";
+import { Talent2 } from "../utils/const/TalentStandard";
 import produce from "immer";
 import create from "zustand";
 
@@ -20,7 +15,7 @@ const emptyPersoDict = {
   grade: 0,
   caracteristiques: {
     force: {
-      pa_depense: 0,
+      pa_depense: 6,
     },
     agilite: {
       pa_depense: 0,
@@ -64,48 +59,7 @@ const emptyPersoDict = {
     exotiques: {},
   },
   talents2: {
-    principaux: [
-      {
-        name: "Tir",
-        id: "tir",
-        associatedChara: CARACTERISTIQUE_NAMES.PERCEPTION,
-        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE,
-        isInnate: true,
-        talentType: TALENT_TYPE_NAME.PRINCIPALE,
-        superieur_exotique: "",
-        pa_depense: 4,
-      },
-      {
-        name: "Tir    ",
-        id: "tir_specifique",
-        associatedChara: CARACTERISTIQUE_NAMES.PERCEPTION,
-        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE,
-        isInnate: true,
-        talentType: TALENT_TYPE_NAME.PRINCIPALE,
-        superieur_exotique: "",
-        pa_depense: 6,
-      },
-      {
-        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE,
-        name: "Torture",
-        id: "torture",
-        associatedChara: CARACTERISTIQUE_NAMES.AUCUNE,
-        isInnate: false,
-        superieur_exotique: "Joseph",
-        talentType: TALENT_TYPE_NAME.EXOTIQUE,
-        pa_depense: 8,
-      },
-      {
-        specialisationType: TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE,
-        name: "Acrobatie   ",
-        id: "acrobatie",
-        associatedChara: CARACTERISTIQUE_NAMES.AGILITE,
-        isInnate: false,
-        superieur_exotique: "",
-        talentType: TALENT_TYPE_NAME.SECONDAIRE,
-        pa_depense: 4,
-      },
-    ],
+    principaux: [],
     secondaires: [],
     exotiques: [],
   },
@@ -126,6 +80,19 @@ export const useStore = create<{
     talentId: string,
     nameFragment: string
   ) => void;
+  setCurrentTalentSecondaire2PaDepense: (talentId: string, val: number) => void;
+  addCurrentTalentSecondaire2: (newTalent: Talent2) => void;
+  setCurrentTalentSecondaire2NameFragment: (
+    talentId: string,
+    nameFragment: string
+  ) => void;
+  setCurrentTalentExotique2PaDepense: (talentId: string, val: number) => void;
+  addCurrentTalentExotique2: (newTalent: Talent2) => void;
+  setCurrentTalentExotique2NameFragment: (
+    talentId: string,
+    nameFragment: string
+  ) => void;
+
   setCurrentPerso: (val: Personnage) => void;
   setOriginalPerso: (val: Personnage) => void;
   setCurrentIdentite: (val: string) => void;
@@ -147,20 +114,6 @@ export const useStore = create<{
   setCurrentFreeTalentPoints: (val: number) => void;
   setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
   setCurrentPouvoir: (pouvoirId: string, val: Pouvoir) => void;
-  setCurrentTalentPrincipal: (talentId: string, val: TalentInvesti) => void;
-  setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => void;
-  setCurrentTalentPrincipalNameFragment: (
-    talentId: string,
-    val: string
-  ) => void;
-  setCurrentTalentSecondaire: (talentId: string, val: TalentInvesti) => void;
-  setCurrentTalentSecondairePaDepense: (talentId: string, val: number) => void;
-  setCurrentTalentSecondaireNameFragment: (
-    talentId: string,
-    val: string
-  ) => void;
-  setCurrentTalentExotique: (talentId: string, val: TalentDisplayRow) => void;
-  setCurrentTalentExotiquePaDepense: (talentId: string, val: number) => void;
 }>((set, get) => ({
   currentPerso: emptyPerso,
   originalPerso: emptyPerso,
@@ -182,9 +135,6 @@ export const useStore = create<{
     talentId: string,
     nameFragment: string
   ) => {
-    console.log("-");
-    console.log(talentId);
-    console.log(nameFragment);
     const updatedTalentPrincipalArray = produce((draftState) => {
       const index = draftState.currentPerso.talents2.principaux.findIndex(
         (talent: Talent2) => talent.id === talentId
@@ -200,6 +150,73 @@ export const useStore = create<{
     set(
       produce((draftState) => {
         draftState.currentPerso.talents2.principaux.push(newTalent);
+      })
+    );
+  },
+  setCurrentTalentSecondaire2PaDepense: (talentId: string, val: number) => {
+    const updatedTalentSecondaireArray = produce((draftState) => {
+      const index = draftState.currentPerso.talents2.secondaires.findIndex(
+        (talent: Talent2) => talent.id === talentId
+      );
+      if (index !== -1)
+        draftState.currentPerso.talents2.secondaires[index].pa_depense = val;
+    });
+    set(updatedTalentSecondaireArray);
+  },
+
+  setCurrentTalentSecondaire2NameFragment: (
+    talentId: string,
+    nameFragment: string
+  ) => {
+    const updatedTalentSecondaireArray = produce((draftState) => {
+      const index = draftState.currentPerso.talents2.secondaires.findIndex(
+        (talent: Talent2) => talent.id === talentId
+      );
+      if (index !== -1)
+        draftState.currentPerso.talents2.secondaires[index].customNameFragment =
+          nameFragment;
+    });
+    set(updatedTalentSecondaireArray);
+  },
+
+  addCurrentTalentSecondaire2: (newTalent: Talent2) => {
+    set(
+      produce((draftState) => {
+        draftState.currentPerso.talents2.secondaires.push(newTalent);
+      })
+    );
+  },
+
+  setCurrentTalentExotique2PaDepense: (talentId: string, val: number) => {
+    const updatedTalentExotiqueArray = produce((draftState) => {
+      const index = draftState.currentPerso.talents2.exotiques.findIndex(
+        (talent: Talent2) => talent.id === talentId
+      );
+      if (index !== -1)
+        draftState.currentPerso.talents2.exotiques[index].pa_depense = val;
+    });
+    set(updatedTalentExotiqueArray);
+  },
+
+  setCurrentTalentExotique2NameFragment: (
+    talentId: string,
+    nameFragment: string
+  ) => {
+    const updatedTalentExotiqueArray = produce((draftState) => {
+      const index = draftState.currentPerso.talents2.exotiques.findIndex(
+        (talent: Talent2) => talent.id === talentId
+      );
+      if (index !== -1)
+        draftState.currentPerso.talents2.exotiques[index].customNameFragment =
+          nameFragment;
+    });
+    set(updatedTalentExotiqueArray);
+  },
+
+  addCurrentTalentExotique2: (newTalent: Talent2) => {
+    set(
+      produce((draftState) => {
+        draftState.currentPerso.talents2.exotiques.push(newTalent);
       })
     );
   },
@@ -297,13 +314,6 @@ export const useStore = create<{
       })
     );
   },
-  setCurrentTalentPrincipal(talentId, val) {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.talents.principaux[talentId] = val;
-      })
-    );
-  },
   setCurrentPouvoirPaDepense(pouvoirId, val) {
     set(
       produce((draftState) => {
@@ -317,132 +327,5 @@ export const useStore = create<{
         draftState.currentPerso.pouvoirs[pouvoirId] = val;
       })
     );
-  },
-
-  setCurrentTalentPrincipalPaDepense(talentId, val) {
-    const hasTalent = Object.keys(
-      get().currentPerso.talents.principaux
-    ).includes(talentId);
-    if (hasTalent) {
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.principaux[talentId].pa_depense = val;
-        })
-      );
-    } else {
-      const newTalent: TalentInvesti = {
-        pa_depense: val,
-        niveau: 1,
-      };
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.principaux[talentId] = newTalent;
-        })
-      );
-    }
-  },
-
-  setCurrentTalentPrincipalNameFragment(talentId, val) {
-    const hasTalent = Object.keys(
-      get().currentPerso.talents.principaux
-    ).includes(talentId);
-    if (hasTalent) {
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.principaux[
-            talentId
-          ].customNameFragment = val;
-        })
-      );
-    } else {
-      const newTalent: TalentInvesti = {
-        pa_depense: 0,
-        niveau: 1,
-        customNameFragment: val,
-      };
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.principaux[talentId] = newTalent;
-        })
-      );
-    }
-  },
-  setCurrentTalentSecondaire(talentId, val) {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.talents.secondaires[talentId] = val;
-      })
-    );
-  },
-  setCurrentTalentSecondairePaDepense(talentId, val) {
-    const hasTalent = Object.keys(
-      get().currentPerso.talents.secondaires
-    ).includes(talentId);
-    if (hasTalent) {
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.secondaires[talentId].pa_depense =
-            val;
-        })
-      );
-    } else {
-      const newTalent: TalentInvesti = {
-        pa_depense: val,
-        niveau: 1,
-      };
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.secondaires[talentId] = newTalent;
-        })
-      );
-    }
-  },
-
-  setCurrentTalentSecondaireNameFragment(talentId, val) {
-    const hasTalent = Object.keys(
-      get().currentPerso.talents.secondaires
-    ).includes(talentId);
-    if (hasTalent) {
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.secondaires[
-            talentId
-          ].customNameFragment = val;
-        })
-      );
-    } else {
-      const newTalent: TalentInvesti = {
-        pa_depense: 0,
-        niveau: 1,
-        customNameFragment: val,
-      };
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.secondaires[talentId] = newTalent;
-        })
-      );
-    }
-  },
-
-  setCurrentTalentExotique(talentId, val) {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.talents.exotiques[talentId] = val;
-      })
-    );
-  },
-  setCurrentTalentExotiquePaDepense(talentId, val) {
-    const hasTalent = Object.keys(
-      get().currentPerso.talents.exotiques
-    ).includes(talentId);
-    if (hasTalent) {
-      set(
-        produce((draftState) => {
-          draftState.currentPerso.talents.exotiques[talentId].pa_depense = val;
-        })
-      );
-    } else {
-      console.log("Cannot find talent with " + talentId);
-    }
   },
 }));

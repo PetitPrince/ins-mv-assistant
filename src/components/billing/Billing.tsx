@@ -1,17 +1,13 @@
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Personnage } from "../../utils/const/Personnage";
-import { Talent2, TOUS_LES_TALENTS } from "../../utils/const/TalentStandard";
+import { Talent2 } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
-import { findTalentInCaracterFromName } from "../../utils/helper/findTalentInCaracterFromName";
 import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
 import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
-import {
-  calcTalentLevelFromPaDepense,
-  getTalentLevel,
-} from "../../utils/helper/getTalentLevel";
+import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
 import { Aside, ScrollArea, Table } from "@mantine/core";
-import { ActionIcon, Dialog } from "@mantine/core";
+import { ActionIcon } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { applyPatch, createPatch } from "rfc6902";
@@ -106,92 +102,53 @@ export const generateBillingItems = (
               newTalent,
               currentPerso.caracteristiques
             );
+            const nameFragment = newTalent.customNameFragment
+              ? " (" + newTalent.customNameFragment + ")"
+              : "";
             const msgString =
-              "Talent " + newTalent.name + ":" + 0 + " → " + finalLvl;
+              "Talent " +
+              newTalent.name +
+              nameFragment +
+              ":" +
+              0 +
+              " → " +
+              finalLvl;
             const valDiff = newTalent.pa_depense;
             billingItems.push({
               key: diff.path,
               msg: msgString,
               cost: valDiff,
             });
-          }
-          break;
-        case "talents":
-          {
-            const talentId = diffPathElements[3];
-
-            // First find the start talent to get its name
-            let talentName = "";
-
-            const standardTalent = TOUS_LES_TALENTS.find(
-              (x) => x.id === talentId
-            );
-            const standardTalentOnlyThePrimaries = TOUS_LES_TALENTS.find(
-              (x) => x.id === talentId.split("_")[0]
+          } else if (diff.op === "replace") {
+            const currentTalent = findDeepValueOfObjFromPathAndLeadingSep(
+              currentPerso,
+              diff.path.split("/").slice(0, -1).join("/"),
+              "/"
             );
 
-            if (standardTalentOnlyThePrimaries !== undefined) {
-              talentName = standardTalentOnlyThePrimaries.name;
-              // console.log("Cannot find primary talent for id " + talentId);
-            } else if (standardTalent !== undefined) {
-              talentName = standardTalent.name;
-            } else if (diff.op === "add" && diff.path.includes("exotiques")) {
-              if (
-                Object.keys(currentPerso.talents.exotiques).includes(talentId)
-              ) {
-                talentName = currentPerso.talents.exotiques[talentId].name;
-              }
-            }
-            if (standardTalent === undefined) {
-              // console.log("Cannot find talent with id " + talentId);
-            }
+            const originalLvl = calcTalentLevelFromPaDepense(
+              originalValue,
+              currentTalent,
+              currentPerso.caracteristiques
+            );
+            const finalLvl = calcTalentLevelFromPaDepense(
+              val,
+              currentTalent,
+              currentPerso.caracteristiques
+            );
+            const valDiff = val - originalValue;
 
-            // Calc cost here
-            let originalTalentValue = getTalentLevel(originalPerso, talentId);
-            let finalTalentValue = getTalentLevel(currentPerso, talentId);
-            let valDiff = val - originalValue;
-
-            // Craft message here
-            let msgString =
+            const nameFragment = currentTalent.customNameFragment
+              ? " (" + currentTalent.customNameFragment + ")"
+              : "";
+            const msgString =
               "Talent " +
-              talentName +
-              " " +
-              originalTalentValue +
+              currentTalent.name +
+              nameFragment +
+              ":" +
+              originalLvl +
               " → " +
-              finalTalentValue;
-            if (diff.path.includes("specifique")) {
-              // Put the specialization name, otherwise default to "spécifique"
-              const fragment = findDeepValueOfObjFromPathAndLeadingSep(
-                currentPerso,
-                diff.path,
-                "/"
-              ).customNameFragment;
-              const specializationName = fragment ? fragment : "spécifique";
-              msgString =
-                "Talent " +
-                talentName +
-                " (" +
-                specializationName +
-                "): " +
-                originalTalentValue +
-                " → " +
-                finalTalentValue;
-            } else if (diff.path.includes("_")) {
-              // TODO: not ideal but this means there's a "multiple" talent somewhere
-              let existingTalent = findTalentInCaracterFromName(
-                currentPerso,
-                talentId
-              );
-              msgString =
-                "Talent " +
-                talentName +
-                " (" +
-                existingTalent?.customNameFragment +
-                "): " +
-                originalTalentValue +
-                " → " +
-                finalTalentValue;
-            }
+              finalLvl;
 
             billingItems.push({
               key: diff.path,
@@ -199,8 +156,8 @@ export const generateBillingItems = (
               cost: valDiff,
             });
           }
-
           break;
+
         case "pouvoirs":
           if (diff.op === "replace" || diff.op === "add") {
             const valDiff = val - originalValue;

@@ -88,6 +88,7 @@ export interface Talent2 {
 export enum TALENT_SPECIALISATION_TYPE_NAME {
   SPECIFIQUE = "Spécifique",
   GENERIQUE = "Générique",
+  MULTIPLE = "Multiple",
 }
 export enum TALENT_TYPE_NAME {
   PRINCIPALE = "Principal",
@@ -137,6 +138,9 @@ const jsonToTalent = (json: {
       break;
     case TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE:
       spe = TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE;
+      break;
+    case TALENT_SPECIALISATION_TYPE_NAME.MULTIPLE:
+      spe = TALENT_SPECIALISATION_TYPE_NAME.MULTIPLE;
       break;
     default:
       spe = TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE;

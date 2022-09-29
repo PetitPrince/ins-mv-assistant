@@ -5,35 +5,32 @@ import {
   Personnage,
 } from "../const/Personnage";
 import { findStandardTalentById, Talent2 } from "../const/TalentStandard";
-import {
-  calcCaracteristiqueLevelFromPaDepense,
-  getCaracteristiqueLevel,
-} from "./getCaracteristiqueLevel";
+import { calcCaracteristiqueLevelFromPaDepense } from "./getCaracteristiqueLevel";
 
-export const getTalentLevel = (perso: Personnage, talentId: string) => {
-  let existingTalent;
+// export const getTalentLevel = (perso: Personnage, talentId: string) => {
+//   let existingTalent;
 
-  if (Object.hasOwn(perso.talents.principaux, talentId)) {
-    existingTalent = perso.talents.principaux[talentId];
-  } else if (Object.hasOwn(perso.talents.secondaires, talentId)) {
-    existingTalent = perso.talents.secondaires[talentId];
-  } else if (Object.hasOwn(perso.talents.exotiques, talentId)) {
-    existingTalent = perso.talents.exotiques[talentId];
-  } else {
-    existingTalent = { pa_depense: 0 };
-  }
+//   if (Object.hasOwn(perso.talents.principaux, talentId)) {
+//     existingTalent = perso.talents.principaux[talentId];
+//   } else if (Object.hasOwn(perso.talents.secondaires, talentId)) {
+//     existingTalent = perso.talents.secondaires[talentId];
+//   } else if (Object.hasOwn(perso.talents.exotiques, talentId)) {
+//     existingTalent = perso.talents.exotiques[talentId];
+//   } else {
+//     existingTalent = { pa_depense: 0 };
+//   }
 
-  let associatedCara = findStandardTalentById(talentId)?.associatedChara;
+//   let associatedCara = findStandardTalentById(talentId)?.associatedChara;
 
-  let levelFromAssociatedChara = 0;
-  if (associatedCara !== "Aucune") {
-    levelFromAssociatedChara =
-      getCaracteristiqueLevel(perso, associatedCara) / 2;
-  }
+//   let levelFromAssociatedChara = 0;
+//   if (associatedCara !== "Aucune") {
+//     levelFromAssociatedChara =
+//       getCaracteristiqueLevel(perso, associatedCara) / 2;
+//   }
 
-  const levelFromPa = existingTalent.pa_depense / 2;
-  return levelFromPa + levelFromAssociatedChara;
-};
+//   const levelFromPa = existingTalent.pa_depense / 2;
+//   return levelFromPa + levelFromAssociatedChara;
+// };
 
 export const calcTalentLevelFromPaDepense = (
   pa_depense: number,

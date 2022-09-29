@@ -73,7 +73,7 @@ export const Pouvoirs = (props: {}) => {
       <Title order={4}>Nouveau pouvoir</Title>
       <form
         onSubmit={form.onSubmit((values) => {
-          const pouvoirId = slugify(values.nom);
+          const pouvoirId = slugify(values.nom, { lower: true });
           const newPouvoir = {
             id: pouvoirId,
             nom: values.nom,

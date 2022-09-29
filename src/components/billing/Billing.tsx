@@ -1,7 +1,7 @@
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Personnage } from "../../utils/const/Personnage";
-import { Talent2 } from "../../utils/const/TalentStandard";
+import { Talent } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
 import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
 import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
@@ -96,7 +96,7 @@ export const generateBillingItems = (
           break;
         case "talents2":
           if (diff.op === "add") {
-            const newTalent: Talent2 = diff.value;
+            const newTalent: Talent = diff.value;
             const finalLvl = calcTalentLevelFromPaDepense(
               newTalent.pa_depense,
               newTalent,

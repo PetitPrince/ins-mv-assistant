@@ -1,6 +1,6 @@
 import { CARACTERISTIQUE_NAMES } from "../const/Caracteristiques_names";
 import { CaracteristiquesSet } from "../const/Personnage";
-import { Talent2 } from "../const/TalentStandard";
+import { Talent } from "../const/TalentStandard";
 import { calcCaracteristiqueLevelFromPaDepense } from "./getCaracteristiqueLevel";
 
 // export const getTalentLevel = (perso: Personnage, talentId: string) => {
@@ -30,7 +30,7 @@ import { calcCaracteristiqueLevelFromPaDepense } from "./getCaracteristiqueLevel
 
 export const calcTalentLevelFromPaDepense = (
   pa_depense: number,
-  talent: Talent2,
+  talent: Talent,
   caracteristiques?: CaracteristiquesSet
 ) => {
   let levelsFromCara = 0;

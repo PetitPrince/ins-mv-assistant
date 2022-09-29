@@ -13,7 +13,7 @@ interface LoadedTalentJson {
 //@ts-ignore
 const talentsJsonCasted: LoadedTalentJson[] = talentsJson;
 
-export interface Talent2 {
+export interface Talent {
   name: string;
   id: string;
   associatedChara: CARACTERISTIQUE_NAMES;
@@ -101,7 +101,7 @@ const jsonToTalent = (json: {
       break;
   }
 
-  const newTalent: Talent2 = {
+  const newTalent: Talent = {
     name: json.nom,
     id: json.id,
     associatedChara: assoc_cara,
@@ -114,18 +114,16 @@ const jsonToTalent = (json: {
   return newTalent;
 };
 export const TOUS_LES_TALENTS2 = talentsJsonCasted.map(jsonToTalent);
-export const TALENTS_PRINCIPAUX_STANDARD2 = TOUS_LES_TALENTS2.filter(
+export const TALENTS_PRINCIPAUX_STANDARD = TOUS_LES_TALENTS2.filter(
   (talent) => {
     return talent.talentType === TALENT_TYPE_NAME.PRINCIPALE;
   }
 );
-export const TALENTS_SECONDAIRES_STANDARD2 = TOUS_LES_TALENTS2.filter(
+export const TALENTS_SECONDAIRES_STANDARD = TOUS_LES_TALENTS2.filter(
   (talent) => {
     return talent.talentType === TALENT_TYPE_NAME.SECONDAIRE;
   }
 );
-export const TALENTS_EXOTIQUES_STANDARD2 = TOUS_LES_TALENTS2.filter(
-  (talent) => {
-    return talent.talentType === TALENT_TYPE_NAME.EXOTIQUE;
-  }
-);
+export const TALENTS_EXOTIQUES_STANDARD = TOUS_LES_TALENTS2.filter((talent) => {
+  return talent.talentType === TALENT_TYPE_NAME.EXOTIQUE;
+});

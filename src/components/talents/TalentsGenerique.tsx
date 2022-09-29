@@ -1,7 +1,7 @@
 import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 import {
-  Talent2,
+  Talent,
   TALENT_SPECIALISATION_TYPE_NAME,
   TALENT_TYPE_NAME,
 } from "../../utils/const/TalentStandard";
@@ -30,13 +30,13 @@ import slugify from "slugify";
 const EditNameFragment = (props: {
   hidden: boolean;
   recordId: string;
-  currentTalentCollection: Talent2[];
-  standardTalentCollection: Talent2[];
+  currentTalentCollection: Talent[];
+  standardTalentCollection: Talent[];
   setCurrentTalentNameFragment: (
     talentId: string,
     nameFragment: string
   ) => void;
-  addCurrentTalent: (newTalent: Talent2) => void;
+  addCurrentTalent: (newTalent: Talent) => void;
 }) => {
   const setCurrentTalentNameFragment = props.setCurrentTalentNameFragment;
   const addCurrentTalent = props.addCurrentTalent;
@@ -53,7 +53,7 @@ const EditNameFragment = (props: {
         props.standardTalentCollection
       );
       if (talentInStandardRepo) {
-        const newTalent: Talent2 = {
+        const newTalent: Talent = {
           ...talentInStandardRepo,
           customNameFragment: nameFragment,
         };
@@ -95,13 +95,13 @@ const EditNameFragment = (props: {
 const AddNewMutiple = (props: {
   hidden: boolean;
   recordId: string;
-  currentTalentCollection: Talent2[];
-  standardTalentCollection: Talent2[];
+  currentTalentCollection: Talent[];
+  standardTalentCollection: Talent[];
   setCurrentTalentNameFragment: (
     talentId: string,
     nameFragment: string
   ) => void;
-  addCurrentTalent: (newTalent: Talent2) => void;
+  addCurrentTalent: (newTalent: Talent) => void;
 }) => {
   const addCurrentTalent = props.addCurrentTalent;
 
@@ -116,7 +116,7 @@ const AddNewMutiple = (props: {
         props.standardTalentCollection
       );
       if (talentInStandardRepo) {
-        const newTalent: Talent2 = {
+        const newTalent: Talent = {
           ...talentInStandardRepo,
           customNameFragment: nameFragment,
           id: "hobby_" + slugify(nameFragment, { lower: true }),
@@ -156,16 +156,16 @@ const AddNewMutiple = (props: {
   );
 };
 
-export const Talents2Component = (props: {
+export const TalentsGenerique = (props: {
   title: string;
-  currentTalentCollection: Talent2[];
+  currentTalentCollection: Talent[];
   setCurrentTalentNameFragment: (
     talentId: string,
     nameFragment: string
   ) => void;
-  addCurrentTalent: (newTalent: Talent2) => void;
+  addCurrentTalent: (newTalent: Talent) => void;
   setCurrentTalentPaDepense: (talentId: string, val: number) => void;
-  standardTalentCollection: Talent2[];
+  standardTalentCollection: Talent[];
 }) => {
   const title = props.title;
   const currentTalentCollection = props.currentTalentCollection;
@@ -189,7 +189,7 @@ export const Talents2Component = (props: {
         standardTalentCollection
       );
       if (talentInStandardRepo) {
-        const newTalent: Talent2 = {
+        const newTalent: Talent = {
           ...talentInStandardRepo,
           pa_depense: updatedPa,
         };
@@ -199,8 +199,8 @@ export const Talents2Component = (props: {
   };
 
   const talentPrincipauxStandardIds = standardTalentCollection.map((x) => x.id);
-  let talentsStandards: Talent2[] = standardTalentCollection;
-  let toAdd: Talent2[] = [];
+  let talentsStandards: Talent[] = standardTalentCollection;
+  let toAdd: Talent[] = [];
   for (const onetalent of currentTalentCollection) {
     if (talentPrincipauxStandardIds.includes(onetalent.id)) {
       const idx = talentsStandards.findIndex((x) => x.id === onetalent.id);
@@ -221,7 +221,7 @@ export const Talents2Component = (props: {
   }
   rows.sort(alphaSort);
 
-  const renderNameColumn = (record: Talent2) => {
+  const renderNameColumn = (record: Talent) => {
     let nameFragment;
     if (record.customNameFragment) {
       nameFragment = " (" + record.customNameFragment + ")";
@@ -238,7 +238,7 @@ export const Talents2Component = (props: {
       </Text>
     );
   };
-  const renderLevelColumn = (record: Talent2) => {
+  const renderLevelColumn = (record: Talent) => {
     const talentLevel = calcTalentLevelFromPaDepense(
       record.pa_depense,
       record,
@@ -247,7 +247,7 @@ export const Talents2Component = (props: {
 
     return <Text>{talentLevel}</Text>;
   };
-  const renderPaDepenseColumn = (record: Talent2) => {
+  const renderPaDepenseColumn = (record: Talent) => {
     return (
       <NumberInput
         value={record.pa_depense}
@@ -257,7 +257,7 @@ export const Talents2Component = (props: {
       />
     );
   };
-  const renderActionColumn = (record: Talent2) => {
+  const renderActionColumn = (record: Talent) => {
     const shouldHideEditButton = !(
       record.specialisationType ===
         TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE &&
@@ -290,7 +290,7 @@ export const Talents2Component = (props: {
       </Group>
     );
   };
-  const renderCaraAssocColumn = (record: Talent2) => {
+  const renderCaraAssocColumn = (record: Talent) => {
     let caraAbbrev;
     switch (record.associatedChara) {
       case CARACTERISTIQUE_NAMES.FORCE:
@@ -326,7 +326,7 @@ export const Talents2Component = (props: {
 
     const newTalentSpecialisation = event.target.specialisation.value;
 
-    const newTalent: Talent2 = {
+    const newTalent: Talent = {
       name: newTalentName,
       id: newTalentId,
       specialisationType: newTalentSpecialisation,

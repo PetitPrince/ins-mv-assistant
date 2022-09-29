@@ -3,7 +3,7 @@ import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../utils/const/Factions";
 import { Personnage } from "../utils/const/Personnage";
 import { Pouvoir } from "../utils/const/Pouvoir";
-import { Talent2 } from "../utils/const/TalentStandard";
+import { Talent } from "../utils/const/TalentStandard";
 import produce from "immer";
 import create from "zustand";
 
@@ -74,21 +74,21 @@ export const useStore = create<{
   billingItems: BillingItem[];
   paAfterBilling: number;
 
-  setCurrentTalentPrincipal2PaDepense: (talentId: string, val: number) => void;
-  addCurrentTalentPrincipal2: (newTalent: Talent2) => void;
-  setCurrentTalentPrincipal2NameFragment: (
+  setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => void;
+  addCurrentTalentPrincipal: (newTalent: Talent) => void;
+  setCurrentTalentPrincipalNameFragment: (
     talentId: string,
     nameFragment: string
   ) => void;
-  setCurrentTalentSecondaire2PaDepense: (talentId: string, val: number) => void;
-  addCurrentTalentSecondaire2: (newTalent: Talent2) => void;
-  setCurrentTalentSecondaire2NameFragment: (
+  setCurrentTalentSecondairePaDepense: (talentId: string, val: number) => void;
+  addCurrentTalentSecondaire: (newTalent: Talent) => void;
+  setCurrentTalentSecondaireNameFragment: (
     talentId: string,
     nameFragment: string
   ) => void;
-  setCurrentTalentExotique2PaDepense: (talentId: string, val: number) => void;
-  addCurrentTalentExotique2: (newTalent: Talent2) => void;
-  setCurrentTalentExotique2NameFragment: (
+  setCurrentTalentExotiquePaDepense: (talentId: string, val: number) => void;
+  addCurrentTalentExotique: (newTalent: Talent) => void;
+  setCurrentTalentExotiqueNameFragment: (
     talentId: string,
     nameFragment: string
   ) => void;
@@ -120,10 +120,10 @@ export const useStore = create<{
   billingItems: [],
   paAfterBilling: 0,
 
-  setCurrentTalentPrincipal2PaDepense: (talentId: string, val: number) => {
+  setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => {
     const updatedTalentPrincipalArray = produce((draftState) => {
       const index = draftState.currentPerso.talents2.principaux.findIndex(
-        (talent: Talent2) => talent.id === talentId
+        (talent: Talent) => talent.id === talentId
       );
       if (index !== -1)
         draftState.currentPerso.talents2.principaux[index].pa_depense = val;
@@ -131,13 +131,13 @@ export const useStore = create<{
     set(updatedTalentPrincipalArray);
   },
 
-  setCurrentTalentPrincipal2NameFragment: (
+  setCurrentTalentPrincipalNameFragment: (
     talentId: string,
     nameFragment: string
   ) => {
     const updatedTalentPrincipalArray = produce((draftState) => {
       const index = draftState.currentPerso.talents2.principaux.findIndex(
-        (talent: Talent2) => talent.id === talentId
+        (talent: Talent) => talent.id === talentId
       );
       if (index !== -1)
         draftState.currentPerso.talents2.principaux[index].customNameFragment =
@@ -146,17 +146,17 @@ export const useStore = create<{
     set(updatedTalentPrincipalArray);
   },
 
-  addCurrentTalentPrincipal2: (newTalent: Talent2) => {
+  addCurrentTalentPrincipal: (newTalent: Talent) => {
     set(
       produce((draftState) => {
         draftState.currentPerso.talents2.principaux.push(newTalent);
       })
     );
   },
-  setCurrentTalentSecondaire2PaDepense: (talentId: string, val: number) => {
+  setCurrentTalentSecondairePaDepense: (talentId: string, val: number) => {
     const updatedTalentSecondaireArray = produce((draftState) => {
       const index = draftState.currentPerso.talents2.secondaires.findIndex(
-        (talent: Talent2) => talent.id === talentId
+        (talent: Talent) => talent.id === talentId
       );
       if (index !== -1)
         draftState.currentPerso.talents2.secondaires[index].pa_depense = val;
@@ -164,13 +164,13 @@ export const useStore = create<{
     set(updatedTalentSecondaireArray);
   },
 
-  setCurrentTalentSecondaire2NameFragment: (
+  setCurrentTalentSecondaireNameFragment: (
     talentId: string,
     nameFragment: string
   ) => {
     const updatedTalentSecondaireArray = produce((draftState) => {
       const index = draftState.currentPerso.talents2.secondaires.findIndex(
-        (talent: Talent2) => talent.id === talentId
+        (talent: Talent) => talent.id === talentId
       );
       if (index !== -1)
         draftState.currentPerso.talents2.secondaires[index].customNameFragment =
@@ -179,7 +179,7 @@ export const useStore = create<{
     set(updatedTalentSecondaireArray);
   },
 
-  addCurrentTalentSecondaire2: (newTalent: Talent2) => {
+  addCurrentTalentSecondaire: (newTalent: Talent) => {
     set(
       produce((draftState) => {
         draftState.currentPerso.talents2.secondaires.push(newTalent);
@@ -187,10 +187,10 @@ export const useStore = create<{
     );
   },
 
-  setCurrentTalentExotique2PaDepense: (talentId: string, val: number) => {
+  setCurrentTalentExotiquePaDepense: (talentId: string, val: number) => {
     const updatedTalentExotiqueArray = produce((draftState) => {
       const index = draftState.currentPerso.talents2.exotiques.findIndex(
-        (talent: Talent2) => talent.id === talentId
+        (talent: Talent) => talent.id === talentId
       );
       if (index !== -1)
         draftState.currentPerso.talents2.exotiques[index].pa_depense = val;
@@ -198,13 +198,13 @@ export const useStore = create<{
     set(updatedTalentExotiqueArray);
   },
 
-  setCurrentTalentExotique2NameFragment: (
+  setCurrentTalentExotiqueNameFragment: (
     talentId: string,
     nameFragment: string
   ) => {
     const updatedTalentExotiqueArray = produce((draftState) => {
       const index = draftState.currentPerso.talents2.exotiques.findIndex(
-        (talent: Talent2) => talent.id === talentId
+        (talent: Talent) => talent.id === talentId
       );
       if (index !== -1)
         draftState.currentPerso.talents2.exotiques[index].customNameFragment =
@@ -213,7 +213,7 @@ export const useStore = create<{
     set(updatedTalentExotiqueArray);
   },
 
-  addCurrentTalentExotique2: (newTalent: Talent2) => {
+  addCurrentTalentExotique: (newTalent: Talent) => {
     set(
       produce((draftState) => {
         draftState.currentPerso.talents2.exotiques.push(newTalent);

@@ -1,4 +1,5 @@
 import { useStore } from "../../store/Store";
+import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import {
   TALENTS_EXOTIQUES_STANDARD,
   TALENTS_PRINCIPAUX_STANDARD,
@@ -7,8 +8,9 @@ import {
 import "./TalentsGenerique";
 import { TalentsGenerique } from "./TalentsGenerique";
 import { TalentsGenerique2 } from "./TalentsGenerique2";
-import { Title } from "@mantine/core";
+import { Alert, Title } from "@mantine/core";
 import { Stack } from "@mantine/core";
+import { IconAlertCircle } from "@tabler/icons";
 
 const TalentsPrincipaux = (props: {}) => {
   const faction = useStore((state) => state.currentPerso.faction);
@@ -118,11 +120,56 @@ const TalentsExotiques = (props: {}) => {
 };
 
 export const Talents = (props: {}) => {
+  const talents = useStore((state) => state.currentPerso.talents);
+  const faction = useStore((state) => state.currentPerso.faction);
+  const paDepenseTalentsPrincipaux = talents.principaux.reduce(
+    (totalValue, currentValue) => {
+      return totalValue + currentValue.pa_depense;
+    },
+    0
+  );
+  const paDepenseTalentsSecondaire = talents.secondaires.reduce(
+    (totalValue, currentValue) => {
+      return totalValue + currentValue.pa_depense;
+    },
+    0
+  );
+  const paDepenseTalentsExotique = talents.exotiques.reduce(
+    (totalValue, currentValue) => {
+      return totalValue + currentValue.pa_depense;
+    },
+    0
+  );
+
+  const sum =
+    paDepenseTalentsPrincipaux +
+    paDepenseTalentsSecondaire +
+    paDepenseTalentsExotique;
+
+  let errMsg = "";
+  if (faction === FACTIONS_NAMES.ANGES && (sum < 25 || sum > 50)) {
+    errMsg =
+      "Les anges doivent dépenser entre 25 et 50 PA dans les talents (en moyenne 32).";
+  }
+  if (faction === FACTIONS_NAMES.DEMONS && (sum < 20 || sum > 40)) {
+    errMsg =
+      "Les démons doivent dépenser entre 20 et 40 PA dans les talents (en moyenne 28).";
+  }
   return (
     <Stack>
-      <Title order={2}>Talents</Title>
+      <Title order={2}>Talents (total dépensé: {sum} )</Title>
       {/* <Group sx={{ "align-items": "flex-start" }}> */}
-
+      {errMsg ? (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="Limite de dépense"
+          color="yellow"
+        >
+          {errMsg}
+        </Alert>
+      ) : (
+        ""
+      )}
       <TalentsPrincipaux />
       <TalentsSecondaires />
       <TalentsExotiques />

@@ -1,3 +1,4 @@
+import { APPMODE } from "../APPMODE";
 import { BillingItem } from "../components/billing/Billing";
 import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../utils/const/Factions";
@@ -51,6 +52,9 @@ export const useStore = create<{
   originalPerso: Personnage;
   billingItems: BillingItem[];
   paAfterBilling: number;
+  appMode: APPMODE;
+
+  setAppMode: (appMode: string) => void;
 
   setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => void;
   addCurrentTalentPrincipal: (newTalent: Talent) => void;
@@ -96,6 +100,15 @@ export const useStore = create<{
   originalPerso: emptyPerso,
   billingItems: [],
   paAfterBilling: 0,
+  appMode: APPMODE.CREATE,
+
+  setAppMode: (appMode) => {
+    set(
+      produce((draftState) => {
+        draftState.appMode = appMode;
+      })
+    );
+  },
 
   setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => {
     const updatedTalentPrincipalArray = produce((draftState) => {

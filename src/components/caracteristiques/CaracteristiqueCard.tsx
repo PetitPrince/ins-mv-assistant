@@ -26,7 +26,7 @@ export const CaracteristiqueCard = (props: {
 
   const isModified = cara_pa_depense !== og_pa_depense;
   let errorMsg = "";
-  if (currentGrade == 0 && caracNiveau > 5.5) {
+  if (currentGrade === 0 && caracNiveau > 5.5) {
     errorMsg = "Un grade 0 ne peut pas dépasser 5+";
   }
 

@@ -1,8 +1,10 @@
 import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
+import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { CaracteristiqueCard } from "./CaracteristiqueCard";
-import { Stack, Group, Title } from "@mantine/core";
+import { Stack, Group, Title, Alert } from "@mantine/core";
+import { IconAlertCircle } from "@tabler/icons";
 
 export const Caracteristiques = (props: {}) => {
   const { force, agilite, perception, volonte, presence, foi } = useStore(
@@ -18,6 +20,7 @@ export const Caracteristiques = (props: {}) => {
   } = useStore((state) => state.originalPerso.caracteristiques);
   const availablePa = useStore((state) => state.paAfterBilling);
   const currentGrade = useStore((state) => state.currentPerso.grade);
+  const faction = useStore((state) => state.currentPerso.faction);
 
   const storeCurrentCaracteristiquesPaDepense = useStore(
     (state) => state.setCurrentCaracteristiquesPaDepense
@@ -40,9 +43,36 @@ export const Caracteristiques = (props: {}) => {
   );
   const foi_niveau = calcCaracteristiqueLevelFromPaDepense(foi.pa_depense);
 
+  const sum =
+    force.pa_depense +
+    agilite.pa_depense +
+    perception.pa_depense +
+    volonte.pa_depense +
+    presence.pa_depense +
+    foi.pa_depense;
+  let errMsg = "";
+  if (faction === FACTIONS_NAMES.ANGES && (sum < 20 || sum > 50)) {
+    errMsg =
+      "Les anges doivent dépenser entre 20 et 50 PA dans les caractéristiques (en moyenne 40).";
+  }
+  if (faction === FACTIONS_NAMES.DEMONS && (sum < 16 || sum > 40)) {
+    errMsg =
+      "Les démons doivent dépenser entre 16 et 40 PA dans les caractéristiques (en moyenne 24).";
+  }
   return (
     <Stack>
       <Title order={2}>Caractéristiques</Title>
+      {errMsg ? (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="Limite de dépense"
+          color="yellow"
+        >
+          {errMsg}
+        </Alert>
+      ) : (
+        ""
+      )}
       <Group>
         <CaracteristiqueCard
           caracName="Force"

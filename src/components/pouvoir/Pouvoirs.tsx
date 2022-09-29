@@ -1,3 +1,4 @@
+import { APPMODE } from "../../APPMODE";
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Pouvoir } from "../../utils/const/Pouvoir";
@@ -11,8 +12,10 @@ import {
   TextInput,
   Button,
   Table,
+  Alert,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { IconAlertCircle } from "@tabler/icons";
 import { DataTable } from "mantine-datatable";
 import slugify from "slugify";
 
@@ -31,6 +34,7 @@ const PaDepensecell = (props: {
   coutEnPa: number;
   setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
 }) => {
+  const appmode = useStore((state) => state.appMode);
   const computedLevel = calcPouvoirLevelFromPaDepense(
     props.pa_depense,
     props.coutEnPa
@@ -39,10 +43,18 @@ const PaDepensecell = (props: {
   if (computedLevel < 1) {
     errorMsgs.push("Niveau minimum 1");
   }
-  if (props.faction === FACTIONS_NAMES.ANGES && computedLevel > 2.5) {
+  if (
+    appmode === APPMODE.CREATE &&
+    props.faction === FACTIONS_NAMES.ANGES &&
+    computedLevel > 2.5
+  ) {
     errorMsgs.push("Niveau maximum à la création pour les anges 2.5");
   }
-  if (props.faction === FACTIONS_NAMES.DEMONS && computedLevel > 2) {
+  if (
+    appmode === APPMODE.CREATE &&
+    props.faction === FACTIONS_NAMES.DEMONS &&
+    computedLevel > 2
+  ) {
     errorMsgs.push("Niveau maximum à la création pour les démons 2");
   }
   const errorMsg = errorMsgs.join(" + ");
@@ -61,6 +73,7 @@ const PaDepensecell = (props: {
 };
 
 export const Pouvoirs = (props: {}) => {
+  const appmode = useStore((state) => state.appMode);
   const currentPouvoirs = useStore((state) => state.currentPerso.pouvoirs);
   const faction = useStore((state) => state.currentPerso.faction);
   const setCurrentPouvoirPaDepense = useStore(
@@ -71,6 +84,30 @@ export const Pouvoirs = (props: {}) => {
   const form = useForm({
     initialValues: { nom: "", coutEnPP: 0, coutEnPa: 0 },
   });
+  const paDepensePouvoirs = Object.values(currentPouvoirs).reduce(
+    (totalValue, currentValue) => {
+      return totalValue + currentValue.pa_depense;
+    },
+    0
+  );
+
+  let errMsg = "";
+  if (
+    appmode === APPMODE.CREATE &&
+    faction === FACTIONS_NAMES.ANGES &&
+    (paDepensePouvoirs < 20 || paDepensePouvoirs > 35)
+  ) {
+    errMsg =
+      "Les anges doivent dépenser entre 20 et 35 PA dans les pouvoirs (en moyenne 24).";
+  }
+  if (
+    appmode === APPMODE.CREATE &&
+    faction === FACTIONS_NAMES.DEMONS &&
+    (paDepensePouvoirs < 20 || paDepensePouvoirs > 28)
+  ) {
+    errMsg =
+      "Les démons doivent dépenser entre 20 et 28 PA dans les pouvoirs (en moyenne 24).";
+  }
 
   const displayRows = Object.values(currentPouvoirs).map((row: Pouvoir) => (
     <tr key={row.id}>
@@ -95,6 +132,17 @@ export const Pouvoirs = (props: {}) => {
   return (
     <Stack>
       <Title order={3}>Pouvoirs</Title>
+      {errMsg ? (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="Limite de dépense"
+          color="yellow"
+        >
+          {errMsg}
+        </Alert>
+      ) : (
+        ""
+      )}
       <Table>
         <thead>
           <tr>

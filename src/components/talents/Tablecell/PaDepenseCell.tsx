@@ -1,3 +1,5 @@
+import { APPMODE } from "../../../APPMODE";
+import { useStore } from "../../../store/Store";
 import { FACTIONS_NAMES } from "../../../utils/const/Factions";
 import { CaracteristiquesSet } from "../../../utils/const/Personnage";
 import { Talent } from "../../../utils/const/TalentStandard";
@@ -16,13 +18,23 @@ export const PaDepenseCell = (props: {
     props;
   const talentLevel = calcTalentLevelFromPaDepense(pa_depense, talent, cara);
 
+  const appMode = useStore((state) => state.appMode);
+
   let errorMsgs: string[] = [];
 
-  if (faction === FACTIONS_NAMES.ANGES && talentLevel > 7.5) {
+  if (
+    appMode === APPMODE.CREATE &&
+    faction === FACTIONS_NAMES.ANGES &&
+    talentLevel > 7.5
+  ) {
     // TODO: no restriction after the perso is created
     errorMsgs.push("Niveau maximum pour les anges à la création est de 7.5");
   }
-  if (faction === FACTIONS_NAMES.DEMONS && talentLevel > 70) {
+  if (
+    appMode === APPMODE.CREATE &&
+    faction === FACTIONS_NAMES.DEMONS &&
+    talentLevel > 70
+  ) {
     errorMsgs.push("Niveau maximum pour les démons à la création est de 7");
   }
   const errorMsg = errorMsgs.join(" + ");

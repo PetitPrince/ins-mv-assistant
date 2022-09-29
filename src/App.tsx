@@ -1,3 +1,4 @@
+import { APPMODE } from "./APPMODE";
 import "./App.css";
 import { BillingPanel } from "./components/billing/Billing";
 import { Caracteristiques } from "./components/caracteristiques/Caracteristiques";
@@ -26,26 +27,6 @@ import { enablePatches } from "immer";
 import { mountStoreDevtool } from "simple-zustand-devtools";
 
 enablePatches();
-
-const unPerso = {
-  identite: "Jean la Mèche",
-  faction: FACTIONS_NAMES.DEMONS,
-  superieur: "Baal",
-  grade: 3,
-
-  caracteristiques: {
-    force: 4,
-    agilite: 6,
-    perception: 5,
-    volonte: 7,
-    presence: 1.5,
-    foi: 5,
-  },
-  pa: 12,
-  paTotal: 9001,
-  pp: 60,
-  ppMax: 50, // max PP is governed by faith + bought PP; not sure if it's the best to store it raw like this
-};
 
 if (process.env.NODE_ENV === "development") {
   mountStoreDevtool("Store", useStore);
@@ -81,6 +62,8 @@ export const IOPanel = (props: {}) => {
 };
 
 const FeuilleDePerso = (props: {}) => {
+  const setAppMode = useStore((state) => state.setAppMode);
+
   return (
     <AppShell
       padding="md"
@@ -88,12 +71,13 @@ const FeuilleDePerso = (props: {}) => {
       header={
         <Header height={60} p="xs">
           <Group>
-            <Title>INS/MV Assistant</Title>
+            <Title>Assistant INS/MV </Title>
             <SegmentedControl
+              onChange={setAppMode}
               data={[
-                { label: "Création", value: "create" },
-                { label: "Mise à jour", value: "update" },
-                { label: "Aventure", value: "play" },
+                { label: "Création", value: APPMODE.CREATE },
+                { label: "Mise à jour", value: APPMODE.UPDATE },
+                { label: "Aventure", value: APPMODE.PLAY },
               ]}
             />
           </Group>

@@ -1,6 +1,5 @@
 import { useStore } from "../../store/Store";
 import {
-  TalentStandard,
   TALENTS_EXOTIQUES_STANDARD2,
   TALENTS_PRINCIPAUX_STANDARD2,
   TALENTS_SECONDAIRES_STANDARD2,
@@ -9,11 +8,6 @@ import "./TalentsGenerique";
 import { Talents2Component } from "./TalentsGenerique";
 import { Title } from "@mantine/core";
 import { Stack } from "@mantine/core";
-
-export interface TalentDisplayRow extends TalentStandard {
-  level: number | undefined;
-  pa_depense: number;
-}
 
 export const Talents = (props: {}) => {
   const currentTalentCollection_principal = useStore(

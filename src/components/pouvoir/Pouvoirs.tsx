@@ -3,10 +3,10 @@ import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Pouvoir } from "../../utils/const/Pouvoir";
 import { calcPouvoirLevelFromPaDepense } from "../../utils/helper/getPouvoirLevel";
+import { PouvoirLevelCell } from "./PouvoirLevelCell";
 import {
   Stack,
   Title,
-  Text,
   Group,
   NumberInput,
   TextInput,
@@ -18,14 +18,6 @@ import { useForm } from "@mantine/form";
 import { IconAlertCircle } from "@tabler/icons";
 import { DataTable } from "mantine-datatable";
 import slugify from "slugify";
-
-const LevelCell = (props: { pa_depense: number; coutEnPa: number }) => {
-  const computedLevel = calcPouvoirLevelFromPaDepense(
-    props.pa_depense,
-    props.coutEnPa
-  );
-  return <Text>{computedLevel}</Text>;
-};
 
 const PaDepensecell = (props: {
   pa_depense: number;
@@ -113,7 +105,7 @@ export const Pouvoirs = (props: {}) => {
     <tr key={row.id}>
       <td>{row.nom}</td>
       <td>
-        <LevelCell pa_depense={row.pa_depense} coutEnPa={row.coutEnPa} />
+        <PouvoirLevelCell pa_depense={row.pa_depense} coutEnPa={row.coutEnPa} />
       </td>
       <td>{row.coutEnPP}</td>
       <td>{row.coutEnPa}</td>

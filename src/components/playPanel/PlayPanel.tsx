@@ -1,6 +1,7 @@
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { CaracteristiquesSet } from "../../utils/const/Personnage";
+import { Pouvoir } from "../../utils/const/Pouvoir";
 import {
   Talent,
   TALENTS_EXOTIQUES_STANDARD,
@@ -9,6 +10,7 @@ import {
 } from "../../utils/const/TalentStandard";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
+import { PouvoirLevelCell } from "../pouvoir/PouvoirLevelCell";
 import { calcPPFromPaDepense } from "../status/Status";
 import { CaraCell } from "../talents/Tablecell/CaraCell";
 import { LevelCell } from "../talents/Tablecell/LevelCell";
@@ -102,8 +104,46 @@ export const PlayPanel = (props: {}) => {
             currentPersoSuperieur={perso.superieur}
           />
         </Group>
+        <Group>
+          <PlayPouvoir currentPouvoirs={Object.values(perso.pouvoirs)} />
+        </Group>
       </Stack>
     </>
+  );
+};
+
+const PlayPouvoir = (props: { currentPouvoirs: Pouvoir[] }) => {
+  const displayRows = Object.values(props.currentPouvoirs).map(
+    (row: Pouvoir) => {
+      return (
+        <tr key={row.id}>
+          <td>{row.nom}</td>
+          <td>
+            <PouvoirLevelCell
+              pa_depense={row.pa_depense}
+              coutEnPa={row.coutEnPa}
+            />
+          </td>
+          <td>{row.coutEnPP}</td>
+        </tr>
+      );
+    }
+  );
+
+  return (
+    <Stack>
+      <Title order={3}>Pouvoir</Title>
+      <Table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Niveau</th>
+            <th>Coût en PP</th>
+          </tr>
+        </thead>
+        <tbody>{displayRows}</tbody>
+      </Table>
+    </Stack>
   );
 };
 

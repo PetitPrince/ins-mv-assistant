@@ -1,14 +1,8 @@
-import { INSMVNumberInput } from "../../App";
 import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
-import { Caracteristique } from "../../utils/const/Personnage";
-import {
-  calcCaracteristiqueLevelFromPaDepense,
-  getCaracteristiqueLevel,
-} from "../../utils/helper/getCaracteristiqueLevel";
+import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { CaracteristiqueCard } from "./CaracteristiqueCard";
-import { INSMVCaraPaDepenseNumberInput } from "./INSMVCaraPaDepenseNumberInput";
-import { Stack, Group, Title, Space, Container } from "@mantine/core";
+import { Stack, Group, Title } from "@mantine/core";
 
 export const Caracteristiques = (props: {}) => {
   const { force, agilite, perception, volonte, presence, foi } = useStore(

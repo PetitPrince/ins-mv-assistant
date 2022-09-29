@@ -1,10 +1,6 @@
 import { CARACTERISTIQUE_NAMES } from "../const/Caracteristiques_names";
-import {
-  Caracteristique,
-  CaracteristiquesSet,
-  Personnage,
-} from "../const/Personnage";
-import { findStandardTalentById, Talent2 } from "../const/TalentStandard";
+import { CaracteristiquesSet } from "../const/Personnage";
+import { Talent2 } from "../const/TalentStandard";
 import { calcCaracteristiqueLevelFromPaDepense } from "./getCaracteristiqueLevel";
 
 // export const getTalentLevel = (perso: Personnage, talentId: string) => {

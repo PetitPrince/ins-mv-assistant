@@ -1,9 +1,6 @@
 import { useStore } from "../../store/Store";
-import { Pouvoir, PouvoirCollection } from "../../utils/const/Pouvoir";
-import {
-  calcPouvoirLevelFromPaDepense,
-  getPouvoirLevel,
-} from "../../utils/helper/getPouvoirLevel";
+import { Pouvoir } from "../../utils/const/Pouvoir";
+import { calcPouvoirLevelFromPaDepense } from "../../utils/helper/getPouvoirLevel";
 import {
   Stack,
   Title,

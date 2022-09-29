@@ -1,7 +1,10 @@
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
-import { Table, Radio } from "@mantine/core";
+import { Table, Radio, Container } from "@mantine/core";
 
-export const Blessures = (props: { force: number; faction: FACTIONS_NAMES }) => {
+export const Blessures = (props: {
+  force: number;
+  faction: FACTIONS_NAMES;
+}) => {
   const force = props.force;
 
   let modificateur_faction;
@@ -30,20 +33,21 @@ export const Blessures = (props: { force: number; faction: FACTIONS_NAMES }) => 
   ];
 
   return (
-    <Table>
-      <thead>
-        <tr>
-          <th>Gravité</th>
-          <th>Seuil</th>
-          <th>Nombre actuel</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((element) => (
-          <tr key={element.name}>
-            <td>{element.gravite}</td>
-            <td>{element.seuil}</td>
-            <td>
+    <Container sx={{ marginLeft: 0 }}>
+      <Table>
+        <thead>
+          <tr>
+            <th>Gravité</th>
+            <th>Seuil</th>
+            {/* <th>Nombre actuel</th> */}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((element) => (
+            <tr key={element.name}>
+              <td>{element.gravite}</td>
+              <td>{element.seuil}</td>
+              {/* <td>
               <Radio.Group name={element.name} defaultValue="0">
                 <Radio label="0" value="0" />
                 <Radio label="1" value="1" />
@@ -51,10 +55,11 @@ export const Blessures = (props: { force: number; faction: FACTIONS_NAMES }) => 
                 <Radio label="3" value="3" />
                 <Radio label="4" value="4" />
               </Radio.Group>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+            </td> */}
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </Container>
   );
 };

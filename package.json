@@ -1,6 +1,7 @@
 {
   "name": "ins-mv-assistant-mantine",
   "version": "0.1.0",
+  "homepage": "https://PetitPrince.github.io/ins-mv-assistant", 
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.4",
@@ -33,7 +34,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -57,6 +60,7 @@
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^3.3.0",
     "@types/file-saver": "^2.0.5",
+    "gh-pages": "^4.0.0",
     "prettier": "^2.7.1"
   }
 }

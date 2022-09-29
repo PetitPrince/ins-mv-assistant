@@ -17,6 +17,7 @@ export const Caracteristiques = (props: {}) => {
     foi: og_foi,
   } = useStore((state) => state.originalPerso.caracteristiques);
   const availablePa = useStore((state) => state.paAfterBilling);
+  const currentGrade = useStore((state) => state.currentPerso.grade);
 
   const storeCurrentCaracteristiquesPaDepense = useStore(
     (state) => state.setCurrentCaracteristiquesPaDepense
@@ -51,6 +52,7 @@ export const Caracteristiques = (props: {}) => {
           cara_pa_depense={force.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.FORCE}
+          currentGrade={currentGrade}
         />
         <CaracteristiqueCard
           caracName="Agilité"
@@ -60,6 +62,7 @@ export const Caracteristiques = (props: {}) => {
           cara_pa_depense={agilite.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.AGILITE}
+          currentGrade={currentGrade}
         />
         <CaracteristiqueCard
           caracName="Perception"
@@ -69,6 +72,7 @@ export const Caracteristiques = (props: {}) => {
           cara_pa_depense={perception.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.PERCEPTION}
+          currentGrade={currentGrade}
         />
         <CaracteristiqueCard
           caracName="Volonté"
@@ -78,6 +82,7 @@ export const Caracteristiques = (props: {}) => {
           cara_pa_depense={volonte.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.VOLONTE}
+          currentGrade={currentGrade}
         />
         <CaracteristiqueCard
           caracName="Présence"
@@ -87,6 +92,7 @@ export const Caracteristiques = (props: {}) => {
           cara_pa_depense={presence.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.PRESENCE}
+          currentGrade={currentGrade}
         />
         <CaracteristiqueCard
           caracName="Foi"
@@ -96,6 +102,7 @@ export const Caracteristiques = (props: {}) => {
           cara_pa_depense={foi.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.FOI}
+          currentGrade={currentGrade}
         />
       </Group>
     </Stack>

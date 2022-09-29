@@ -1,4 +1,5 @@
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
+import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { CaracteristiquesSet } from "../../utils/const/Personnage";
 import {
   Talent,
@@ -32,6 +33,7 @@ export const TalentsGenerique2 = (props: {
   ) => void;
   addCurrentTalent: (newTalent: Talent) => void;
   setCurrentTalentPaDepense: (talentId: string, val: number) => void;
+  faction: FACTIONS_NAMES;
 }) => {
   const {
     title,
@@ -42,6 +44,7 @@ export const TalentsGenerique2 = (props: {
     standardTalentCollection,
     currentPersoCara,
     currentPersoSuperieur,
+    faction,
   } = props;
 
   const updatePaOrCreateTalent = (talentId: string, updatedPa: number) => {
@@ -181,6 +184,9 @@ export const TalentsGenerique2 = (props: {
       <td>
         <PaDepenseCell
           pa_depense={row.pa_depense}
+          talent={row}
+          cara={currentPersoCara}
+          faction={faction}
           id={row.id}
           updatePaOrCreateTalent={updatePaOrCreateTalent}
         />
@@ -191,7 +197,6 @@ export const TalentsGenerique2 = (props: {
   return (
     <Stack>
       <Title order={3}>{title}</Title>
-
       <Table>
         <thead>
           <tr>
@@ -204,43 +209,7 @@ export const TalentsGenerique2 = (props: {
         </thead>
         <tbody>{displayRows}</tbody>
       </Table>
-
-      {/* <DataTable
-        minHeight={150}
-        columns={[
-          {
-            title: "Actions",
-            accessor: "actions",
-            width: 100,
-            render: renderActionColumn,
-          },
-          {
-            title: "Nom",
-            accessor: "name",
-            width: 150,
-            render: renderNameColumn,
-          },
-          {
-            title: "Niveau",
-            accessor: "level",
-            width: 80,
-            render: renderLevelColumn,
-          },
-          {
-            title: "PA Dépensé",
-            accessor: "pa_depense",
-            width: 100,
-            render: renderPaDepenseColumn,
-          },
-          {
-            title: "Caractéristique associée",
-            accessor: "associatedChara",
-            render: renderCaraAssocColumn,
-          },
-        ]}
-        records={rows}
-      />
-      {title.includes("exotique") ? exotiqueStuff : ""} */}
+      {title.includes("exotique") ? exotiqueStuff : ""}
     </Stack>
   );
 };

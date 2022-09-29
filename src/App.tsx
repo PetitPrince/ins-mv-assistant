@@ -87,7 +87,16 @@ const FeuilleDePerso = (props: {}) => {
       aside={<BillingPanel />}
       header={
         <Header height={60} p="xs">
-          <Title>INS/MV Assistant</Title>
+          <Group>
+            <Title>INS/MV Assistant</Title>
+            <SegmentedControl
+              data={[
+                { label: "Création", value: "create" },
+                { label: "Mise à jour", value: "update" },
+                { label: "Aventure", value: "play" },
+              ]}
+            />
+          </Group>
         </Header>
       }
       styles={(theme) => ({
@@ -117,12 +126,6 @@ const App = () => {
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <NotificationsProvider>
-        <SegmentedControl
-          data={[
-            { label: "Creation", value: "create" },
-            { label: "Update", value: "update" },
-          ]}
-        />
         <FeuilleDePerso />
       </NotificationsProvider>
     </MantineProvider>

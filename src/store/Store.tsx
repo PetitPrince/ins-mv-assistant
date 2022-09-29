@@ -35,8 +35,7 @@ const emptyPersoDict = {
   },
   pa: 0,
   paTotal: 0,
-  pp: 0,
-  ppMax: 0,
+  pp_pa_depense: 0,
   talents: {
     principaux: {
       // "combat-specifique": {
@@ -109,8 +108,7 @@ export const useStore = create<{
   ) => void;
   setCurrentPa: (val: number) => void;
   setCurrentPaTotal: (val: number) => void;
-  setCurrentPp: (val: number) => void;
-  setCurrentPpMax: (val: number) => void;
+  setCurrentPpPadepense: (val: number) => void;
   setCurrentFreeTalentPoints: (val: number) => void;
   setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
   setCurrentPouvoir: (pouvoirId: string, val: Pouvoir) => void;
@@ -293,17 +291,10 @@ export const useStore = create<{
       })
     );
   },
-  setCurrentPp: (val) => {
+  setCurrentPpPadepense: (val) => {
     set(
       produce((draftState) => {
-        draftState.currentPerso.pp = val;
-      })
-    );
-  },
-  setCurrentPpMax: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.ppMax = val;
+        draftState.currentPerso.pp_pa_depense = val;
       })
     );
   },

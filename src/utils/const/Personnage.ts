@@ -24,8 +24,7 @@ export interface Personnage {
   caracteristiques: CaracteristiquesSet;
   pa: number;
   paTotal: number;
-  pp: number;
-  ppMax: number;
+  pp_pa_depense: number;
   talents2: {
     principaux: Talent[];
     secondaires: Talent[];

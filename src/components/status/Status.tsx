@@ -1,20 +1,47 @@
 import { useStore } from "../../store/Store";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { Blessures } from "./Blessures";
-import { NumberInput, Stack, Group, Title } from "@mantine/core";
+import {
+  NumberInput,
+  Stack,
+  Group,
+  Title,
+  Card,
+  Center,
+  Text,
+} from "@mantine/core";
+
+export const calcPPFromPaDepense = (
+  volonte: number,
+  foi: number,
+  pa_depense: number
+) => {
+  return volonte + foi + pa_depense;
+};
 
 export const Status = (props: {}) => {
   const pa = useStore((state) => state.currentPerso.pa);
   const force_pa_depense = useStore(
     (state) => state.currentPerso.caracteristiques.force.pa_depense
   );
+  const volonte_pa_depense = useStore(
+    (state) => state.currentPerso.caracteristiques.volonte.pa_depense
+  );
+  const foi_pa_depense = useStore(
+    (state) => state.currentPerso.caracteristiques.foi.pa_depense
+  );
+  const pp_pa_depense = useStore((state) => state.currentPerso.pp_pa_depense);
   const faction = useStore((state) => state.currentPerso.faction);
-  const ppMax = useStore((state) => state.currentPerso.ppMax);
-  const force = calcCaracteristiqueLevelFromPaDepense(force_pa_depense);
-
+  const setCurrentPpPadepense = useStore(
+    (state) => state.setCurrentPpPadepense
+  );
   const setCurrentPa = useStore((state) => state.setCurrentPa);
-  const storePpMax = useStore((state) => state.setCurrentPpMax);
-  const setPpMax = (val: number) => storePpMax(val);
+
+  const force = calcCaracteristiqueLevelFromPaDepense(force_pa_depense);
+  const volonte = calcCaracteristiqueLevelFromPaDepense(volonte_pa_depense);
+  const foi = calcCaracteristiqueLevelFromPaDepense(foi_pa_depense);
+  const pp_base = volonte + foi;
+  const ppMax = calcPPFromPaDepense(volonte, foi, pp_pa_depense);
 
   return (
     <Stack>
@@ -30,13 +57,24 @@ export const Status = (props: {}) => {
         {/* <NumberInput label="PA accumulés" value={paTotal}/> */}
         {/* <NumberInput label="Point de Pouvoir (PP)" value={props.pp}
                     onChange={(val: number) => { setPp(val) }}/> */}
-        <NumberInput
-          label="PP Maximum"
-          value={ppMax}
-          onChange={(val: number) => {
-            setPpMax(val);
-          }}
-        />
+        <Card shadow="sm" p="lg" radius="md" withBorder>
+          <Card.Section>
+            <Center>
+              <Text size="xs">PP</Text>
+            </Center>
+            <Center>
+              <Title>{ppMax}</Title>
+            </Center>
+          </Card.Section>
+          <NumberInput
+            size="sm"
+            styles={{ input: { width: 75, textAlign: "center" } }}
+            label="PA dépensé"
+            value={pp_pa_depense}
+            onChange={(val: number) => setCurrentPpPadepense(val)}
+          />
+        </Card>
+
         <Blessures force={force} faction={faction} />
       </Group>
     </Stack>

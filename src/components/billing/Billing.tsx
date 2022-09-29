@@ -3,9 +3,13 @@ import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Personnage } from "../../utils/const/Personnage";
 import { Talent } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
-import { getCaracteristiqueLevel } from "../../utils/helper/getCaracteristiqueLevel";
+import {
+  calcCaracteristiqueLevelFromPaDepense,
+  getCaracteristiqueLevel,
+} from "../../utils/helper/getCaracteristiqueLevel";
 import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
+import { calcPPFromPaDepense } from "../status/Status";
 import { Aside, ScrollArea, Table } from "@mantine/core";
 import { ActionIcon } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
@@ -75,6 +79,24 @@ export const generateBillingItems = (
             msg: "Grade: " + originalValue + " → " + val,
             cost: null,
           });
+          break;
+        case "pp_pa_depense":
+          const volonte = calcCaracteristiqueLevelFromPaDepense(
+            currentPerso.caracteristiques.volonte.pa_depense
+          );
+          const foi = calcCaracteristiqueLevelFromPaDepense(
+            currentPerso.caracteristiques.foi.pa_depense
+          );
+          const originalPP = calcPPFromPaDepense(volonte, foi, originalValue);
+          const finalPP = calcPPFromPaDepense(volonte, foi, val);
+          const valDiff = val - originalValue;
+
+          billingItems.push({
+            key: diff.path,
+            msg: "PP: " + originalPP + " → " + finalPP,
+            cost: valDiff,
+          });
+
           break;
         case "caracteristiques":
           {
@@ -169,11 +191,15 @@ export const generateBillingItems = (
             )
               ? getPouvoirLevel(originalPerso, pouvoirId)
               : 0;
-            const newPouvoirLevel = getPouvoirLevel(currentPerso, pouvoirId);
+            const finalPouvoirLevel = getPouvoirLevel(currentPerso, pouvoirId);
             billingItems.push({
               key: diff.path,
               msg:
-                pouvoirName + ": " + oldPouvoirLevel + " → " + newPouvoirLevel,
+                pouvoirName +
+                ": " +
+                oldPouvoirLevel +
+                " → " +
+                finalPouvoirLevel,
               cost: valDiff,
             });
           }

@@ -9,13 +9,11 @@ import { useStore } from "./store/Store";
 import { FACTIONS_NAMES } from "./utils/const/Factions";
 import {
   AppShell,
-  Aside,
   Button,
   FileButton,
   Group,
   Header,
   MantineProvider,
-  Navbar,
   NumberInputProps,
   Title,
 } from "@mantine/core";

@@ -1,9 +1,5 @@
 import { useStore } from "../../store/Store";
-import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
-import {
-  calcCaracteristiqueLevelFromPaDepense,
-  getCaracteristiqueLevel,
-} from "../../utils/helper/getCaracteristiqueLevel";
+import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { Blessures } from "./Blessures";
 import { NumberInput, Stack, Group, Title } from "@mantine/core";
 

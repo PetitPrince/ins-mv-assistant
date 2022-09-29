@@ -4,6 +4,7 @@ import { Table, Radio, Container } from "@mantine/core";
 export const Blessures = (props: {
   force: number;
   faction: FACTIONS_NAMES;
+  showMarkers?: boolean;
 }) => {
   const force = props.force;
 
@@ -39,25 +40,29 @@ export const Blessures = (props: {
           <tr>
             <th>Gravité</th>
             <th>Seuil</th>
-            {/* <th>Nombre actuel</th> */}
+            {props.showMarkers ? <th>Nombre</th> : ""}
           </tr>
         </thead>
         <tbody>
-          {rows.map((element) => (
-            <tr key={element.name}>
-              <td>{element.gravite}</td>
-              <td>{element.seuil}</td>
-              {/* <td>
-              <Radio.Group name={element.name} defaultValue="0">
-                <Radio label="0" value="0" />
-                <Radio label="1" value="1" />
-                <Radio label="2" value="2" />
-                <Radio label="3" value="3" />
-                <Radio label="4" value="4" />
+          {rows.map((element) => {
+            const markerName = "marker-" + element.name;
+            const markers = (
+              <Radio.Group name={markerName}>
+                <Radio value="0" label="0" />
+                <Radio value="1" label="1" />
+                <Radio value="2" label="2" />
+                <Radio value="3" label="3" />
+                <Radio value="4" label="4" />
               </Radio.Group>
-            </td> */}
-            </tr>
-          ))}
+            );
+            return (
+              <tr key={element.name}>
+                <td>{element.gravite}</td>
+                <td>{element.seuil}</td>
+                <td>{markers}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
     </Container>

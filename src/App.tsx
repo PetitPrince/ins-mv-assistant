@@ -3,6 +3,8 @@ import "./App.css";
 import { BillingPanel } from "./components/billing/Billing";
 import { Caracteristiques } from "./components/caracteristiques/Caracteristiques";
 import { Generalites } from "./components/generalites/Generalites";
+import { PlayPanel } from "./components/playPanel/PlayPanel";
+import { TUM } from "./components/playPanel/TUM";
 import { Pouvoirs } from "./components/pouvoir/Pouvoirs";
 import { Status } from "./components/status/Status";
 import { Talents } from "./components/talents/Talents";
@@ -20,10 +22,13 @@ import {
 } from "@mantine/core";
 import { NumberInput, Stack } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
+import { useToggle } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
 import { saveAs } from "file-saver";
 import "immer";
 import { enablePatches } from "immer";
+import { stringify } from "querystring";
+import { useState } from "react";
 import { mountStoreDevtool } from "simple-zustand-devtools";
 import slugify from "slugify";
 
@@ -68,16 +73,35 @@ export const IOPanel = (props: {}) => {
 };
 
 const FeuilleDePerso = (props: {}) => {
+  const appMode = useStore((state) => state.appMode);
   const setAppMode = useStore((state) => state.setAppMode);
+  const [tumOpened, setTumOpened] = useState(false);
+
+  let mainPanel;
+  let aside;
+  if (appMode === APPMODE.PLAY) {
+    mainPanel = <PlayPanel />;
+  } else {
+    mainPanel = (
+      <>
+        <Generalites />
+        <Caracteristiques />
+        <Status />
+        <Talents />
+        <Pouvoirs />
+      </>
+    );
+    aside = <BillingPanel />;
+  }
 
   return (
     <AppShell
       padding="md"
-      aside={<BillingPanel />}
+      aside={aside}
       header={
         <Header height={60} p="xs">
           <Group>
-            <Title>Assistant INS/MV </Title>
+            <Title>Assistant INS/MV {tumOpened.valueOf()}</Title>
             <SegmentedControl
               onChange={setAppMode}
               data={[
@@ -87,6 +111,7 @@ const FeuilleDePerso = (props: {}) => {
               ]}
             />
             <IOPanel />
+            <Button onClick={() => setTumOpened((o) => !o)}>TUM</Button>
           </Group>
         </Header>
       }
@@ -99,14 +124,8 @@ const FeuilleDePerso = (props: {}) => {
         },
       })}
     >
-      <Stack>
-        <Generalites />
-
-        <Caracteristiques />
-        <Status />
-        <Talents />
-        <Pouvoirs />
-      </Stack>
+      <TUM opened={tumOpened} />
+      {mainPanel}
     </AppShell>
   );
 };

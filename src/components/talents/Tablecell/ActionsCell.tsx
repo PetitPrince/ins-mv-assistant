@@ -156,7 +156,10 @@ const AddNewMutiple = (props: {
         const newTalent: Talent = {
           ...talentInStandardRepo,
           customNameFragment: nameFragment,
-          id: "hobby_" + slugify(nameFragment, { lower: true }),
+          id:
+            talentInStandardRepo.id +
+            "_" +
+            slugify(nameFragment, { lower: true }),
         };
         addCurrentTalent(newTalent);
       }

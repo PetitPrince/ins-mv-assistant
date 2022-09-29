@@ -44,6 +44,16 @@ export const calcTalentLevelFromPaDepense = (
       associatedCaraPaDepense
     );
   }
-  const levelFromPa = (Math.floor((10 * (pa_depense / 2)) / 5) * 5) / 10;
-  return levelsFromCara + levelFromPa;
+  if (talent.isInnate) {
+    levelsFromCara = insMvRounding(levelsFromCara / 2);
+  } else {
+    levelsFromCara = 0;
+  }
+  const levelFromPa = insMvRounding(pa_depense / 2);
+
+  return insMvRounding(levelsFromCara / 2) + levelFromPa;
+};
+
+const insMvRounding = (x: number) => {
+  return (Math.floor((10 * x) / 5) * 5) / 10;
 };

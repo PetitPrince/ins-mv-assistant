@@ -412,7 +412,7 @@ export const BillingPanel = (props: {}) => {
   ) : null;
 
   return (
-    <Aside width={{ base: 300 }} height={500} p="xs">
+    <>
       <ScrollArea.Autosize maxHeight={600}>
         <Table>
           <thead>
@@ -469,6 +469,6 @@ export const BillingPanel = (props: {}) => {
           </tr>
         </tbody>
       </Table>
-    </Aside>
+    </>
   );
 };

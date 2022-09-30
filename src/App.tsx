@@ -1,8 +1,10 @@
 import { APPMODE } from "./APPMODE";
 import "./App.css";
+import { CreationLimitPanel } from "./components/CreationLimitPanel";
 import { BillingPanel } from "./components/billing/Billing";
 import { Caracteristiques } from "./components/caracteristiques/Caracteristiques";
 import { Generalites } from "./components/generalites/Generalites";
+import { LimitSliderThingy } from "./components/limitSliderThingy";
 import { PlayPanel } from "./components/playPanel/PlayPanel";
 import { TUM } from "./components/playPanel/TUM";
 import { Pouvoirs } from "./components/pouvoir/Pouvoirs";
@@ -12,15 +14,17 @@ import { useStore } from "./store/Store";
 import { FACTIONS_NAMES } from "./utils/const/Factions";
 import {
   AppShell,
+  Aside,
   Button,
   FileButton,
   Group,
   Header,
   MantineProvider,
   NumberInputProps,
+  Space,
   Title,
 } from "@mantine/core";
-import { NumberInput, Stack } from "@mantine/core";
+import { NumberInput, Stack, Text } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
@@ -85,13 +89,23 @@ const FeuilleDePerso = (props: {}) => {
     mainPanel = (
       <>
         <Generalites />
+        <Space h="md" />
         <Caracteristiques />
+        <Space h="md" />
         <Status />
+        <Space h="md" />
         <Talents />
+        <Space h="md" />
         <Pouvoirs />
       </>
     );
-    aside = <BillingPanel />;
+    aside = (
+      <Aside width={{ base: 300 }} height={500} p="xs">
+        <CreationLimitPanel />
+
+        <BillingPanel />
+      </Aside>
+    );
   }
 
   return (

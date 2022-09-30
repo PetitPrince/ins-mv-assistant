@@ -2,6 +2,7 @@ import { APPMODE } from "../../APPMODE";
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
+import { LimitSliderThingy } from "../limitSliderThingy";
 import { Blessures } from "./Blessures";
 import {
   NumberInput,
@@ -12,6 +13,8 @@ import {
   Center,
   Text,
   Alert,
+  Indicator,
+  Tooltip,
 } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons";
 
@@ -24,7 +27,7 @@ export const calcPPFromPaDepense = (
 };
 
 export const Status = (props: {}) => {
-  const appmode = useStore((state) => state.appMode);
+  const appMode = useStore((state) => state.appMode);
   const pa = useStore((state) => state.currentPerso.pa);
   const paTotal = useStore((state) => state.currentPerso.paTotal);
   const force_pa_depense = useStore(
@@ -48,38 +51,42 @@ export const Status = (props: {}) => {
   const foi = calcCaracteristiqueLevelFromPaDepense(foi_pa_depense);
   const ppMax = calcPPFromPaDepense(volonte, foi, pp_pa_depense);
 
-  let errMsg = "";
-  if (
-    appmode === APPMODE.CREATE &&
-    faction === FACTIONS_NAMES.ANGES &&
-    (pp_pa_depense < 2 || pp_pa_depense > 10)
-  ) {
-    errMsg =
-      "Les anges doivent dépenser entre 2 et 10 PA dans les PP (en moyenne 4).";
-  }
-  if (
-    appmode === APPMODE.CREATE &&
-    faction === FACTIONS_NAMES.DEMONS &&
-    (pp_pa_depense < 2 || pp_pa_depense > 8)
-  ) {
-    errMsg =
-      "Les démons doivent dépenser entre 2 et 8 PA dans les PP (en moyenne 4).";
+  let creationLimitMsg = "";
+  let lowerLimit = 2;
+  let upperLimit = 10;
+  let avgSpent = 4;
+  let isError = false;
+  if (appMode === APPMODE.CREATE) {
+    if (faction === FACTIONS_NAMES.ANGES) {
+      lowerLimit = 2;
+      upperLimit = 10;
+      avgSpent = 4;
+      if (pp_pa_depense < lowerLimit || pp_pa_depense > upperLimit) {
+        creationLimitMsg =
+          "Les anges doivent dépenser entre 2 et 10 PA dans les PP (en moyenne 4).";
+        isError = true;
+      }
+    } else if (faction === FACTIONS_NAMES.DEMONS) {
+      lowerLimit = 2;
+      upperLimit = 10;
+      avgSpent = 4;
+      if (pp_pa_depense < lowerLimit || pp_pa_depense > upperLimit) {
+        creationLimitMsg =
+          "Les démons doivent dépenser entre 2 et 8 PA dans les PP (en moyenne 4).";
+        isError = true;
+      }
+    }
   }
 
   return (
     <Stack>
-      <Title order={2}>Status</Title>
-      {errMsg ? (
-        <Alert
-          icon={<IconAlertCircle size={16} />}
-          title="Limite de dépense"
-          color="yellow"
-        >
-          {errMsg}
-        </Alert>
-      ) : (
-        ""
-      )}
+      <Group sx={{ "align-items": "flex-end" }}>
+        <Tooltip multiline label={creationLimitMsg} disabled={!isError}>
+          <Indicator position="top-start" color="red" disabled={!isError}>
+            <Title order={2}>Status</Title>
+          </Indicator>
+        </Tooltip>
+      </Group>
       <Group>
         <Stack>
           <NumberInput
@@ -113,7 +120,7 @@ export const Status = (props: {}) => {
             styles={{ input: { width: 75, textAlign: "center" } }}
             label="PA dépensé"
             value={pp_pa_depense}
-            error={errMsg ? "  " : ""}
+            error={creationLimitMsg ? "  " : ""}
             onChange={(val: number) => setCurrentPpPadepense(val)}
           />
         </Card>

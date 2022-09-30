@@ -13,6 +13,8 @@ import {
   Button,
   Table,
   Alert,
+  Tooltip,
+  Indicator,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconAlertCircle } from "@tabler/icons";
@@ -101,6 +103,8 @@ export const Pouvoirs = (props: {}) => {
       "Les démons doivent dépenser entre 20 et 28 PA dans les pouvoirs (en moyenne 24).";
   }
 
+  const isError = errMsg ? true : false;
+
   const displayRows = Object.values(currentPouvoirs).map((row: Pouvoir) => (
     <tr key={row.id}>
       <td>{row.nom}</td>
@@ -123,18 +127,13 @@ export const Pouvoirs = (props: {}) => {
 
   return (
     <Stack>
-      <Title order={3}>Pouvoirs</Title>
-      {errMsg ? (
-        <Alert
-          icon={<IconAlertCircle size={16} />}
-          title="Limite de dépense"
-          color="yellow"
-        >
-          {errMsg}
-        </Alert>
-      ) : (
-        ""
-      )}
+      <Group sx={{ "align-items": "flex-end" }}>
+        <Tooltip multiline label={errMsg} disabled={!isError}>
+          <Indicator position="top-start" color="red" disabled={!isError}>
+            <Title order={3}>Pouvoir</Title>
+          </Indicator>
+        </Tooltip>
+      </Group>
       <Table>
         <thead>
           <tr>

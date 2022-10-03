@@ -1,5 +1,4 @@
 import { useStore } from "../../store/Store";
-import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Personnage } from "../../utils/const/Personnage";
 import { Talent } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
@@ -11,7 +10,6 @@ import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
 import { calcPPFromPaDepense } from "../status/Status";
 import {
-  Aside,
   Button,
   Group,
   Modal,
@@ -405,7 +403,7 @@ export const BillingPanel = (props: {}) => {
 
   const commitAllBillingLine = () => {
     if (availablePa >= 0) {
-      const unused = createPatch(originalPerso, currentPerso);
+      // const unused = createPatch(originalPerso, currentPerso);
       const cost = currentPa - availablePa;
       setOriginalPerso(currentPerso);
       setCurrentPa(availablePa);

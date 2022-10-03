@@ -2,7 +2,6 @@ import { APPMODE } from "../../APPMODE";
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
-import { LimitSliderThingy } from "../limitSliderThingy";
 import { Blessures } from "./Blessures";
 import {
   NumberInput,
@@ -12,11 +11,9 @@ import {
   Card,
   Center,
   Text,
-  Alert,
   Indicator,
   Tooltip,
 } from "@mantine/core";
-import { IconAlertCircle } from "@tabler/icons";
 
 export const calcPPFromPaDepense = (
   volonte: number,

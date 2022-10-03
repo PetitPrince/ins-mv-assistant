@@ -12,13 +12,10 @@ import {
   TextInput,
   Button,
   Table,
-  Alert,
   Tooltip,
   Indicator,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconAlertCircle } from "@tabler/icons";
-import { DataTable } from "mantine-datatable";
 import slugify from "slugify";
 
 const PaDepensecell = (props: {

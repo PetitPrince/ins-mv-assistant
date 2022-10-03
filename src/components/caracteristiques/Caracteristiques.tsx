@@ -3,20 +3,8 @@ import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
-import { isTraitInRange } from "../CreationLimitPanel";
-import { LimitSliderThingy } from "../limitSliderThingy";
 import { CaracteristiqueCard } from "./CaracteristiqueCard";
-import {
-  Stack,
-  Group,
-  Title,
-  Alert,
-  Slider,
-  Container,
-  Indicator,
-  Tooltip,
-} from "@mantine/core";
-import { IconAlertCircle } from "@tabler/icons";
+import { Stack, Group, Title, Indicator, Tooltip } from "@mantine/core";
 
 export const Caracteristiques = (props: {}) => {
   const { force, agilite, perception, volonte, presence, foi } = useStore(

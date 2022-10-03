@@ -6,13 +6,10 @@ import {
   TALENTS_PRINCIPAUX_STANDARD,
   TALENTS_SECONDAIRES_STANDARD,
 } from "../../utils/const/TalentStandard";
-import { LimitSliderThingy } from "../limitSliderThingy";
 import "./TalentsGenerique";
-import { TalentsGenerique } from "./TalentsGenerique";
 import { TalentsGenerique2 } from "./TalentsGenerique2";
-import { Alert, Group, Indicator, Title, Tooltip } from "@mantine/core";
+import { Group, Indicator, Title, Tooltip } from "@mantine/core";
 import { Stack } from "@mantine/core";
-import { IconAlertCircle } from "@tabler/icons";
 
 const TalentsPrincipaux = (props: {}) => {
   const faction = useStore((state) => state.currentPerso.faction);

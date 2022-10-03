@@ -10,10 +10,20 @@ import {
 import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
 import { calcPPFromPaDepense } from "../status/Status";
-import { Aside, ScrollArea, Table } from "@mantine/core";
-import { ActionIcon } from "@mantine/core";
+import {
+  Aside,
+  Button,
+  Group,
+  Modal,
+  ScrollArea,
+  Stack,
+  Table,
+  Tooltip,
+} from "@mantine/core";
+import { ActionIcon, Text } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons";
+import { IconCheck, IconEyeCheck, IconX } from "@tabler/icons";
+import { useState } from "react";
 import { applyPatch, createPatch } from "rfc6902";
 
 export interface BillingItem {
@@ -332,14 +342,18 @@ export const BillingPanel = (props: {}) => {
     });
   };
 
-  const commitOneItem = (key: string, billingMsg: string) => {
+  const commitOneItem = (
+    key: string,
+    billingMsg: string,
+    gmOverride: boolean
+  ) => {
     const cost = billingItems.filter((x) => x.key === key)[0].cost;
 
     if (cost != null) {
       // key still looks like "/caracteristiques/volonte/pa_depense"
       // Create a patch with only one line selected, then apply it
       const paAfterTransaction = currentPerso.pa - cost;
-      if (paAfterTransaction >= 0) {
+      if (paAfterTransaction >= 0 || gmOverride) {
         // We have enough PA
         const difference = createPatch(originalPerso, currentPerso);
         const differenceWithOnlyTheOneSelected = difference.filter(
@@ -348,11 +362,15 @@ export const BillingPanel = (props: {}) => {
         let persoCopy: Personnage = JSON.parse(JSON.stringify(originalPerso)); // deep copy
         applyPatch(persoCopy, differenceWithOnlyTheOneSelected);
 
-        persoCopy.pa = paAfterTransaction; // Don't forget to update the PA
-        persoCopy.paTotal = currentPaTotal + cost;
+        if (!gmOverride) {
+          persoCopy.pa = paAfterTransaction; // Don't forget to update the PA
+          persoCopy.paTotal = currentPaTotal + cost;
+        }
         setOriginalPerso(persoCopy);
-        setCurrentPa(paAfterTransaction);
-        setCurrentPaTotal(currentPaTotal + cost);
+        if (!gmOverride) {
+          setCurrentPa(paAfterTransaction);
+          setCurrentPaTotal(currentPaTotal + cost);
+        }
 
         showNotification({
           title: "Ligne appliquée",
@@ -406,13 +424,50 @@ export const BillingPanel = (props: {}) => {
   };
 
   const commitAllButton = billingItems.length ? (
-    <ActionIcon onClick={commitAllBillingLine}>
-      <IconCheck size={16} />
-    </ActionIcon>
+    <Tooltip label="Tout appliquer">
+      <ActionIcon onClick={commitAllBillingLine}>
+        <IconCheck size={16} />
+      </ActionIcon>
+    </Tooltip>
   ) : null;
+
+  const [modalOpened, setModalOpened] = useState(true);
+  const [modalContent, setModalContent] = useState("");
+  const [modalKey, setModalKey] = useState("");
 
   return (
     <>
+      <Modal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+        title="Est-ce que le MJ accepte cette modification ?"
+        styles={(theme) => ({
+          title: {
+            fontWeight: 600,
+          },
+        })}
+        // 	.mantine-Modal-title
+      >
+        <Stack>
+          <Text>{modalContent}</Text>
+          <Group>
+            <Button
+              onClick={() => {
+                commitOneItem(modalKey, modalContent, true);
+              }}
+            >
+              Ok
+            </Button>
+            <Button
+              onClick={() => {
+                setModalOpened(false);
+              }}
+            >
+              Annuler
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
       <ScrollArea.Autosize maxHeight={600}>
         <Table>
           <thead>
@@ -436,20 +491,44 @@ export const BillingPanel = (props: {}) => {
                     <td>{costDisplay}</td>
                     <td>{billingItem.msg}</td>
                     <td>
-                      <ActionIcon
-                        onClick={(x: any) =>
-                          deleteOneBillingLine(billingItem.key, billingItem.msg)
-                        }
-                      >
-                        <IconX size={16} />
-                      </ActionIcon>
-                      <ActionIcon
-                        onClick={(x: any) =>
-                          commitOneItem(billingItem.key, billingItem.msg)
-                        }
-                      >
-                        <IconCheck size={16} />
-                      </ActionIcon>
+                      <Tooltip label="Annuler la ligne">
+                        <ActionIcon
+                          onClick={(x: any) =>
+                            deleteOneBillingLine(
+                              billingItem.key,
+                              billingItem.msg
+                            )
+                          }
+                        >
+                          <IconX size={16} />
+                        </ActionIcon>
+                      </Tooltip>
+
+                      <Tooltip label="Appliquer la ligne">
+                        <ActionIcon
+                          onClick={(x: any) =>
+                            commitOneItem(
+                              billingItem.key,
+                              billingItem.msg,
+                              false
+                            )
+                          }
+                        >
+                          <IconCheck size={16} />
+                        </ActionIcon>
+                      </Tooltip>
+
+                      <Tooltip label="Appliquer la ligne sans payer de PA">
+                        <ActionIcon
+                          onClick={(x: any) => {
+                            setModalOpened(true);
+                            setModalContent(billingItem.msg);
+                            setModalKey(billingItem.key);
+                          }}
+                        >
+                          <IconEyeCheck size={16} />
+                        </ActionIcon>
+                      </Tooltip>
                     </td>
                   </tr>
                 );

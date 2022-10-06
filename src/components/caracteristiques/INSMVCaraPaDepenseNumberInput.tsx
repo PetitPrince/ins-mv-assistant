@@ -19,6 +19,7 @@ export const INSMVCaraPaDepenseNumberInput = (
       {...restOfTheProps}
       variant={variant}
       // radius={radius}
+      step={2}
       error={errorMsg}
     />
   );

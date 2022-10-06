@@ -429,7 +429,7 @@ export const BillingPanel = (props: {}) => {
     </Tooltip>
   ) : null;
 
-  const [modalOpened, setModalOpened] = useState(true);
+  const [modalOpened, setModalOpened] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalKey, setModalKey] = useState("");
 
@@ -452,6 +452,7 @@ export const BillingPanel = (props: {}) => {
             <Button
               onClick={() => {
                 commitOneItem(modalKey, modalContent, true);
+                setModalOpened(false);
               }}
             >
               Ok

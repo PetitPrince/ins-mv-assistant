@@ -7,7 +7,7 @@ export const CreationLimitPanel = (props: {}) => {
   const faction = useStore((state) => state.currentPerso.faction);
   const cara = useStore((state) => state.currentPerso.caracteristiques);
   const talents = useStore((state) => state.currentPerso.talents);
-
+  const pouvoirs = useStore((state) => state.currentPerso.pouvoirs);
   // Cara
   const sumPaDpenseCara =
     cara.force.pa_depense +
@@ -95,8 +95,12 @@ export const CreationLimitPanel = (props: {}) => {
   );
 
   // Pouvoirs
-
-  const sumPaDpensePouvoirs = 0;
+  const sumPaDpensePouvoirs = Object.values(pouvoirs).reduce(
+    (totalValue, currentValue) => {
+      return totalValue + currentValue.pa_depense;
+    },
+    0
+  );
   let lowerLimitPouvoirs = 20,
     upperLimitPouvoirs = 35,
     avgSpentPouvoirs = 23;

@@ -94,6 +94,8 @@ export const CreationLimitPanel = (props: {}) => {
     upperLimitTalents
   );
 
+  // Pouvoirs
+
   const sumPaDpensePouvoirs = 0;
   let lowerLimitPouvoirs = 20,
     upperLimitPouvoirs = 35,
@@ -142,10 +144,10 @@ export const CreationLimitPanel = (props: {}) => {
         />
         <LimitSliderThingy
           title="Pouvoirs"
-          currentValue={sumPaDpenseTalents}
-          lowerLimit={lowerLimitTalents}
-          upperLimit={upperLimitTalents}
-          avgSpent={avgSpentTalents}
+          currentValue={sumPaDpensePouvoirs}
+          lowerLimit={lowerLimitPouvoirs}
+          upperLimit={upperLimitPouvoirs}
+          avgSpent={avgSpentPouvoirs}
           max={40}
         />
       </Group>

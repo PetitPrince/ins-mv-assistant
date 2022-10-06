@@ -20,7 +20,13 @@ import {
 } from "@mantine/core";
 import { ActionIcon, Text } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconEyeCheck, IconX } from "@tabler/icons";
+import {
+  IconCheck,
+  IconChecks,
+  IconEyeCheck,
+  IconTrashX,
+  IconX,
+} from "@tabler/icons";
 import { useState } from "react";
 import { applyPatch, createPatch } from "rfc6902";
 
@@ -317,7 +323,7 @@ export const BillingPanel = (props: {}) => {
 
   const availablePa = currentPa - sum;
 
-  const setPerso = useStore((state) => state.setCurrentPerso);
+  const setCurrentPerso = useStore((state) => state.setCurrentPerso);
   const setOriginalPerso = useStore((state) => state.setOriginalPerso);
   const setCurrentPa = useStore((state) => state.setCurrentPa);
   const setCurrentPaTotal = useStore((state) => state.setCurrentPaTotal);
@@ -332,7 +338,7 @@ export const BillingPanel = (props: {}) => {
     );
     let persoCopy = JSON.parse(JSON.stringify(originalPerso)); // deep copy
     applyPatch(persoCopy, differencesMinusTheOneIWantToDelete);
-    setPerso(persoCopy);
+    setCurrentPerso(persoCopy);
     showNotification({
       title: "Ligne supprimée",
       message: billingMsg,
@@ -420,11 +426,26 @@ export const BillingPanel = (props: {}) => {
       });
     }
   };
+  const cancelAllBillingLine = () => {
+    // const unused = createPatch(originalPerso, currentPerso);
+    setCurrentPerso(originalPerso);
+    showNotification({
+      message: "Tout est revenu comme avant",
+      color: "green",
+    });
+  };
 
   const commitAllButton = billingItems.length ? (
     <Tooltip label="Tout appliquer">
       <ActionIcon onClick={commitAllBillingLine}>
-        <IconCheck size={16} />
+        <IconChecks size={16} />
+      </ActionIcon>
+    </Tooltip>
+  ) : null;
+  const cancelAllButton = billingItems.length ? (
+    <Tooltip label="Tout annuler">
+      <ActionIcon onClick={cancelAllBillingLine}>
+        <IconTrashX size={16} />
       </ActionIcon>
     </Tooltip>
   ) : null;
@@ -467,7 +488,7 @@ export const BillingPanel = (props: {}) => {
           </Group>
         </Stack>
       </Modal>
-      <ScrollArea.Autosize maxHeight={600}>
+      <ScrollArea.Autosize maxHeight={300}>
         <Table>
           <thead>
             <tr>
@@ -543,7 +564,10 @@ export const BillingPanel = (props: {}) => {
           <tr>
             <td>{availablePa}</td>
             <td> total</td>
-            <td> {commitAllButton}</td>
+            <td>
+              {" "}
+              {commitAllButton} {cancelAllButton}
+            </td>
           </tr>
         </tbody>
       </Table>

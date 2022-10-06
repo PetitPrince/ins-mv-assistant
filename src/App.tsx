@@ -101,7 +101,7 @@ const FeuilleDePerso = (props: {}) => {
       </>
     );
     aside = (
-      <Aside width={{ base: 300 }} height={500} p="xs">
+      <Aside width={{ base: 300 }} p="xs">
         <CreationLimitPanel />
 
         <BillingPanel />

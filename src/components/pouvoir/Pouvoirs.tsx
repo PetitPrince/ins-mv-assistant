@@ -73,7 +73,7 @@ export const Pouvoirs = (props: {}) => {
   const setCurrentPouvoir = useStore((state) => state.setCurrentPouvoir);
 
   const form = useForm({
-    initialValues: { nom: "", coutEnPP: 0, coutEnPa: 0 },
+    initialValues: { nom: "", coutEnPP: "", coutEnPa: 0 },
   });
   const paDepensePouvoirs = Object.values(currentPouvoirs).reduce(
     (totalValue, currentValue) => {
@@ -183,10 +183,10 @@ export const Pouvoirs = (props: {}) => {
             placeholder="Nom"
             {...form.getInputProps("nom")}
           />
-          <NumberInput
+          <TextInput
             mt="sm"
             label="Coût en PP"
-            placeholder="Coût en PP"
+            placeholder='"1/min", "3/utilisation", ... '
             {...form.getInputProps("coutEnPP")}
           />
           <NumberInput

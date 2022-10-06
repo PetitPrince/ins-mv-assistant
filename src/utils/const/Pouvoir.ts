@@ -4,7 +4,7 @@ export interface PouvoirCollection {
 export interface Pouvoir{
     id: string,
     nom: string,
-    coutEnPP: number,
+    coutEnPP: string,
     coutEnPa: number,
     pa_depense: number,
 }

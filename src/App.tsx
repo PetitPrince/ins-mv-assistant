@@ -10,6 +10,7 @@ import { TUM } from "./components/playPanel/TUM";
 import { Pouvoirs } from "./components/pouvoir/Pouvoirs";
 import { Status } from "./components/status/Status";
 import { Talents } from "./components/talents/Talents";
+import logo from "./logo.png";
 import { useStore } from "./store/Store";
 import { FACTIONS_NAMES } from "./utils/const/Factions";
 import {
@@ -24,7 +25,7 @@ import {
   Space,
   Title,
 } from "@mantine/core";
-import { NumberInput, Stack, Text } from "@mantine/core";
+import { NumberInput, Stack, Text, Image } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
@@ -115,6 +116,7 @@ const FeuilleDePerso = (props: {}) => {
       header={
         <Header height={60} p="xs">
           <Group>
+            <Image src={logo} width={32} height={32} />
             <Title>Assistant INS/MV {tumOpened.valueOf()}</Title>
             <SegmentedControl
               onChange={setAppMode}

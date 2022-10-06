@@ -16,7 +16,7 @@ const emptyPersoDict = {
   grade: 0,
   caracteristiques: {
     force: {
-      pa_depense: 6,
+      pa_depense: 0,
     },
     agilite: {
       pa_depense: 0,

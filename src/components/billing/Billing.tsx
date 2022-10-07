@@ -265,9 +265,7 @@ export const BillingPanel = (props: {}) => {
   const setOriginalPerso = useStore((state) => state.setOriginalPerso);
   const setCurrentPa = useStore((state) => state.setCurrentPa);
   const setCurrentPaTotal = useStore((state) => state.setCurrentPaTotal);
-  const setCurrentExtraPaTalent = useStore(
-    (state) => state.setCurrentExtraPaTalent
-  );
+
   const currentPaTotal = useStore((state) => state.currentPerso.paTotal);
   const currentPa = currentPerso.pa;
 

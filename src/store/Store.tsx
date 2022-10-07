@@ -91,7 +91,6 @@ export const useStore = create<{
     caracteristique: CARACTERISTIQUE_NAMES
   ) => void;
   setCurrentPa: (val: number) => void;
-  setCurrentExtraPaTalent: (val: number) => void;
   setCurrentPaTotal: (val: number) => void;
   setCurrentPpPadepense: (val: number) => void;
   setCurrentFreeTalentPoints: (val: number) => void;
@@ -255,13 +254,6 @@ export const useStore = create<{
     );
   },
 
-  setCurrentExtraPaTalent: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.extraPaTalent = val;
-      })
-    );
-  },
   setCurrentPaTotal: (val) => {
     set(
       produce((draftState) => {

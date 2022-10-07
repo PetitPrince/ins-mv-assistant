@@ -10,6 +10,7 @@ import { NumberInput, Stack, Group } from "@mantine/core";
 const Superieur = (props: {}) => {
   const value = useStore((state) => state.currentPerso.superieur);
   const faction = useStore((state) => state.currentPerso.faction);
+
   const setCurrentSuperieur = useStore((state) => state.setCurrentSuperieur);
 
   let superieurs;
@@ -39,6 +40,8 @@ export const Generalites = (props: {}) => {
   const identite = useStore((state) => state.currentPerso.identite);
   const faction = useStore((state) => state.currentPerso.faction);
   const grade = useStore((state) => state.currentPerso.grade);
+  const pa = useStore((state) => state.currentPerso.pa);
+  const paTotal = useStore((state) => state.currentPerso.paTotal);
 
   const setCurrentIdentite = useStore((state) => state.setCurrentIdentite);
   const setCurrentFaction = useStore((state) => state.setCurrentFaction);
@@ -90,6 +93,21 @@ export const Generalites = (props: {}) => {
           max={4}
           defaultValue={grade}
           onChange={(val: number) => setCurrentGrade(val)}
+        />
+
+        <NumberInput
+          label="Point d'Administration (PA) restant"
+          value={pa}
+          onChange={(val: number) => {
+            setCurrentPa(val);
+          }}
+        />
+        <NumberInput
+          label="PA dépense"
+          value={paTotal}
+          hideControls
+          readOnly
+          variant="filled"
         />
       </Group>
     </Stack>

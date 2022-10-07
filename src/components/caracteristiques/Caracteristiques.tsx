@@ -3,8 +3,19 @@ import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
+import { Blessures } from "../status/Blessures";
 import { CaracteristiqueCard } from "./CaracteristiqueCard";
-import { Stack, Group, Title, Indicator, Tooltip } from "@mantine/core";
+import {
+  Stack,
+  Group,
+  Title,
+  Indicator,
+  Tooltip,
+  Card,
+  Center,
+  NumberInput,
+  Text,
+} from "@mantine/core";
 
 export const Caracteristiques = (props: {}) => {
   const { force, agilite, perception, volonte, presence, foi } = useStore(
@@ -28,6 +39,11 @@ export const Caracteristiques = (props: {}) => {
   const setPaDepense = (val: number, cara: CARACTERISTIQUE_NAMES) => {
     storeCurrentCaracteristiquesPaDepense(val, cara);
   };
+  const pp_pa_depense = useStore((state) => state.currentPerso.pp_pa_depense);
+  const setCurrentPpPadepense = useStore(
+    (state) => state.setCurrentPpPadepense
+  );
+
   const force_niveau = calcCaracteristiqueLevelFromPaDepense(force.pa_depense);
   const agilite_niveau = calcCaracteristiqueLevelFromPaDepense(
     agilite.pa_depense
@@ -42,6 +58,7 @@ export const Caracteristiques = (props: {}) => {
     presence.pa_depense
   );
   const foi_niveau = calcCaracteristiqueLevelFromPaDepense(foi.pa_depense);
+  const ppMax = calcPPFromPaDepense(volonte_niveau, foi_niveau, pp_pa_depense);
 
   const sum =
     force.pa_depense +
@@ -76,6 +93,8 @@ export const Caracteristiques = (props: {}) => {
       }
     }
   }
+
+  const pfMax = force_niveau + volonte_niveau;
 
   return (
     <Stack>
@@ -149,6 +168,43 @@ export const Caracteristiques = (props: {}) => {
           currentGrade={currentGrade}
         />
       </Group>
+
+      <Group sx={{ "align-items": "flex-start" }}>
+        <Stack>
+          <Title order={5}> PP</Title>
+          <Card shadow="sm" p="lg" radius="md" withBorder>
+            <Card.Section>
+              <Center>
+                <Text size="xs">PP</Text>
+              </Center>
+              <Center>
+                <Title>{ppMax}</Title>
+              </Center>
+            </Card.Section>
+            <NumberInput
+              size="sm"
+              styles={{ input: { width: 75, textAlign: "center" } }}
+              label="PA dépensé"
+              value={pp_pa_depense}
+              error={creationLimitMsg ? "  " : ""}
+              onChange={(val: number) => setCurrentPpPadepense(val)}
+            />
+          </Card>
+        </Stack>
+
+        <Stack>
+          <Title order={5}> Seuils de blessures | PF Maxium {pfMax} </Title>
+
+          <Blessures force={force_niveau} faction={faction} />
+        </Stack>
+      </Group>
     </Stack>
   );
+};
+export const calcPPFromPaDepense = (
+  volonte: number,
+  foi: number,
+  pa_depense: number
+) => {
+  return volonte + foi + pa_depense;
 };

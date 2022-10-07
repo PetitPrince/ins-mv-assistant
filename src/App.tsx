@@ -11,7 +11,7 @@ import { Pouvoirs } from "./components/pouvoir/Pouvoirs";
 import { Status } from "./components/status/Status";
 import { Talents } from "./components/talents/Talents";
 import logo from "./logo.png";
-import { useStore } from "./store/Store";
+import { emptyPerso, useStore } from "./store/Store";
 import { FACTIONS_NAMES } from "./utils/const/Factions";
 import {
   AppShell,
@@ -25,6 +25,7 @@ import {
   NumberInputProps,
   Space,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { NumberInput, Stack, Text, Image } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
@@ -54,6 +55,10 @@ export const IOPanel = (props: {}) => {
   const setCurrentPerso = useStore((state) => state.setCurrentPerso);
   const setOriginalPerso = useStore((state) => state.setOriginalPerso);
 
+  const resetAll = () => {
+    setCurrentPerso(emptyPerso);
+    setOriginalPerso(emptyPerso);
+  };
   const clickToSave = () => {
     let blob = new Blob([JSON.stringify(originalPerso)], {
       type: "text/json;charset=utf-8",
@@ -69,11 +74,23 @@ export const IOPanel = (props: {}) => {
   };
   return (
     <Group>
-      <Button onClick={clickToSave}>
-        Exporter personnage (sans modification en cours)
+      <Button size="xs" onClick={resetAll}>
+        Nouveau personnage
       </Button>
+      <Tooltip
+        label="Les modifications non appliquées ne seront pas exportée"
+        zIndex={10}
+      >
+        <Button size="xs" onClick={clickToSave}>
+          Exporter personnage
+        </Button>
+      </Tooltip>
       <FileButton onChange={loadThePerso}>
-        {(props) => <Button {...props}>Importer personnage</Button>}
+        {(props) => (
+          <Button size="xs" {...props}>
+            Importer personnage
+          </Button>
+        )}
       </FileButton>
     </Group>
   );
@@ -128,8 +145,6 @@ const FeuilleDePerso = (props: {}) => {
         <Generalites />
         <Space h="md" />
         <Caracteristiques />
-        <Space h="md" />
-        <Status />
         <Space h="md" />
         <Talents />
         <Space h="md" />

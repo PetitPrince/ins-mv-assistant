@@ -7,6 +7,7 @@ import { Pouvoir } from "../utils/const/Pouvoir";
 import { Talent } from "../utils/const/TalentStandard";
 import produce from "immer";
 import create from "zustand";
+import { persist } from "zustand/middleware";
 
 // any operation in the app is done on the Personnage, and the billing sort out the rest
 const emptyPersoDict = {
@@ -96,197 +97,218 @@ export const useStore = create<{
   setCurrentFreeTalentPoints: (val: number) => void;
   setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
   setCurrentPouvoir: (pouvoirId: string, val: Pouvoir) => void;
-}>((set, get) => ({
-  currentPerso: emptyPerso,
-  originalPerso: emptyPerso,
-  billingItems: [],
-  paAfterBilling: 0,
-  appMode: APPMODE.CREATE,
+}>()(
+  persist(
+    (set, get) => {
+      return {
+        currentPerso: emptyPerso,
+        originalPerso: emptyPerso,
+        billingItems: [],
+        paAfterBilling: 0,
+        appMode: APPMODE.CREATE,
 
-  setAppMode: (appMode) => {
-    set(
-      produce((draftState) => {
-        draftState.appMode = appMode;
-      })
-    );
-  },
+        setAppMode: (appMode) => {
+          set(
+            produce((draftState) => {
+              draftState.appMode = appMode;
+            })
+          );
+        },
 
-  setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => {
-    const updatedTalentPrincipalArray = produce((draftState) => {
-      draftState.currentPerso.talents.principaux[talentId].pa_depense = val;
-    });
-    set(updatedTalentPrincipalArray);
-  },
+        setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => {
+          const updatedTalentPrincipalArray = produce((draftState) => {
+            draftState.currentPerso.talents.principaux[talentId].pa_depense =
+              val;
+          });
+          set(updatedTalentPrincipalArray);
+        },
 
-  setCurrentTalentPrincipalNameFragment: (
-    talentId: string,
-    nameFragment: string
-  ) => {
-    const updatedTalentPrincipalArray = produce((draftState) => {
-      draftState.currentPerso.talents.principaux[talentId].customNameFragment =
-        nameFragment;
-    });
-    set(updatedTalentPrincipalArray);
-  },
+        setCurrentTalentPrincipalNameFragment: (
+          talentId: string,
+          nameFragment: string
+        ) => {
+          const updatedTalentPrincipalArray = produce((draftState) => {
+            draftState.currentPerso.talents.principaux[
+              talentId
+            ].customNameFragment = nameFragment;
+          });
+          set(updatedTalentPrincipalArray);
+        },
 
-  addCurrentTalentPrincipal: (newTalent: Talent) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.talents.principaux[newTalent.id] = newTalent;
-      })
-    );
-  },
-  setCurrentTalentSecondairePaDepense: (talentId: string, val: number) => {
-    const updatedTalentSecondaireArray = produce((draftState) => {
-      draftState.currentPerso.talents.secondaires[talentId].pa_depense = val;
-    });
-    set(updatedTalentSecondaireArray);
-  },
+        addCurrentTalentPrincipal: (newTalent: Talent) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.talents.principaux[newTalent.id] =
+                newTalent;
+            })
+          );
+        },
+        setCurrentTalentSecondairePaDepense: (
+          talentId: string,
+          val: number
+        ) => {
+          const updatedTalentSecondaireArray = produce((draftState) => {
+            draftState.currentPerso.talents.secondaires[talentId].pa_depense =
+              val;
+          });
+          set(updatedTalentSecondaireArray);
+        },
 
-  setCurrentTalentSecondaireNameFragment: (
-    talentId: string,
-    nameFragment: string
-  ) => {
-    const updatedTalentSecondaireArray = produce((draftState) => {
-      draftState.currentPerso.talents.secondaires[talentId].customNameFragment =
-        nameFragment;
-    });
-    set(updatedTalentSecondaireArray);
-  },
+        setCurrentTalentSecondaireNameFragment: (
+          talentId: string,
+          nameFragment: string
+        ) => {
+          const updatedTalentSecondaireArray = produce((draftState) => {
+            draftState.currentPerso.talents.secondaires[
+              talentId
+            ].customNameFragment = nameFragment;
+          });
+          set(updatedTalentSecondaireArray);
+        },
 
-  addCurrentTalentSecondaire: (newTalent: Talent) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.talents.secondaires[newTalent.id] = newTalent;
-      })
-    );
-  },
+        addCurrentTalentSecondaire: (newTalent: Talent) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.talents.secondaires[newTalent.id] =
+                newTalent;
+            })
+          );
+        },
 
-  setCurrentTalentExotiquePaDepense: (talentId: string, val: number) => {
-    const updatedTalentExotiqueArray = produce((draftState) => {
-      draftState.currentPerso.talents.exotiques[talentId].pa_depense = val;
-    });
-    set(updatedTalentExotiqueArray);
-  },
+        setCurrentTalentExotiquePaDepense: (talentId: string, val: number) => {
+          const updatedTalentExotiqueArray = produce((draftState) => {
+            draftState.currentPerso.talents.exotiques[talentId].pa_depense =
+              val;
+          });
+          set(updatedTalentExotiqueArray);
+        },
 
-  setCurrentTalentExotiqueNameFragment: (
-    talentId: string,
-    nameFragment: string
-  ) => {
-    const updatedTalentExotiqueArray = produce((draftState) => {
-      draftState.currentPerso.talents.exotiques[talentId].customNameFragment =
-        nameFragment;
-    });
-    set(updatedTalentExotiqueArray);
-  },
+        setCurrentTalentExotiqueNameFragment: (
+          talentId: string,
+          nameFragment: string
+        ) => {
+          const updatedTalentExotiqueArray = produce((draftState) => {
+            draftState.currentPerso.talents.exotiques[
+              talentId
+            ].customNameFragment = nameFragment;
+          });
+          set(updatedTalentExotiqueArray);
+        },
 
-  addCurrentTalentExotique: (newTalent: Talent) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.talents.exotiques[newTalent.id] = newTalent;
-      })
-    );
-  },
+        addCurrentTalentExotique: (newTalent: Talent) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.talents.exotiques[newTalent.id] =
+                newTalent;
+            })
+          );
+        },
 
-  setCurrentPerso: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso = val;
-      })
-    );
-  },
-  setOriginalPerso: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.originalPerso = val;
-      })
-    );
-  },
-  setCurrentIdentite: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.identite = val;
-      })
-    );
-  },
-  setCurrentFaction: (val) => {
-    console.log(val);
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.faction = val;
-      })
-    );
-  },
-  setCurrentGrade: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.grade = val;
-      })
-    );
-  },
-  setCurrentSuperieur: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.superieur = val;
-      })
-    );
-  },
-  setCurrentCaracteristiques: (val, cara) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.caracteristiques[cara] = val;
-      })
-    );
-  },
-  setCurrentCaracteristiquesPaDepense: (val, cara) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.caracteristiques[cara].pa_depense = val;
-      })
-    );
-  },
+        setCurrentPerso: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso = val;
+            })
+          );
+        },
+        setOriginalPerso: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.originalPerso = val;
+            })
+          );
+        },
+        setCurrentIdentite: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.identite = val;
+            })
+          );
+        },
+        setCurrentFaction: (val) => {
+          console.log(val);
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.faction = val;
+            })
+          );
+        },
+        setCurrentGrade: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.grade = val;
+            })
+          );
+        },
+        setCurrentSuperieur: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.superieur = val;
+            })
+          );
+        },
+        setCurrentCaracteristiques: (val, cara) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.caracteristiques[cara] = val;
+            })
+          );
+        },
+        setCurrentCaracteristiquesPaDepense: (val, cara) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.caracteristiques[cara].pa_depense = val;
+            })
+          );
+        },
 
-  setCurrentPa: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.pa = val;
-      })
-    );
-  },
+        setCurrentPa: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.pa = val;
+            })
+          );
+        },
 
-  setCurrentPaTotal: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.paTotal = val;
-      })
-    );
-  },
-  setCurrentPpPadepense: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.pp_pa_depense = val;
-      })
-    );
-  },
-  setCurrentFreeTalentPoints: (val) => {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.freeTalentPoints = val;
-      })
-    );
-  },
-  setCurrentPouvoirPaDepense(pouvoirId, val) {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.pouvoirs[pouvoirId].pa_depense = val;
-      })
-    );
-  },
-  setCurrentPouvoir(pouvoirId, val) {
-    set(
-      produce((draftState) => {
-        draftState.currentPerso.pouvoirs[pouvoirId] = val;
-      })
-    );
-  },
-}));
+        setCurrentPaTotal: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.paTotal = val;
+            })
+          );
+        },
+        setCurrentPpPadepense: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.pp_pa_depense = val;
+            })
+          );
+        },
+        setCurrentFreeTalentPoints: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.freeTalentPoints = val;
+            })
+          );
+        },
+        setCurrentPouvoirPaDepense(pouvoirId, val) {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.pouvoirs[pouvoirId].pa_depense = val;
+            })
+          );
+        },
+        setCurrentPouvoir(pouvoirId, val) {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.pouvoirs[pouvoirId] = val;
+            })
+          );
+        },
+      };
+    },
+    {
+      name: "insmvassistantstorage",
+    }
+  )
+);

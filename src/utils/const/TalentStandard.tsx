@@ -150,5 +150,5 @@ export const TALENTS_EXOTIQUES_STANDARD_MAP = new Map(
 );
 
 export const TALENTS_EXOTIQUES_STANDARD_OBJ = Object.fromEntries(
-  TALENTS_PRINCIPAUX_STANDARD_MAP.entries()
+  TALENTS_EXOTIQUES_STANDARD_MAP.entries()
 );

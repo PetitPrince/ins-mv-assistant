@@ -72,9 +72,13 @@ export const CreationLimitPanel = (props: {}) => {
     0
   );
 
+  const talentSecondaireContribution = Math.floor(
+    (paDepenseTalentsSecondaire - paDepenseTalentsPrincipaux) / 2
+  );
+
   const sumPaDpenseTalents =
     paDepenseTalentsPrincipaux +
-    paDepenseTalentsSecondaire +
+    talentSecondaireContribution +
     paDepenseTalentsExotique;
   let lowerLimitTalents = 20,
     upperLimitTalents = 50,

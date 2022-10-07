@@ -1,12 +1,12 @@
-import { Talent } from "../const/TalentStandard";
+import { Talent, TalentCollection } from "../const/TalentStandard";
 
 export const talentExistsInCollection = (
-    currentTalentCollection: Talent[],
+    currentTalentCollection: TalentCollection,
     talentId: string
   ) => {
-    return currentTalentCollection.some((t) => t.id === talentId);
+    return Object.values(currentTalentCollection).some((t) => t.id === talentId);
   };
-export const findTalentInCollection = (talentId: string, talentCollection: Talent[]) => {
-    return talentCollection.find((t) => t.id === talentId);
+export const findTalentInCollection = (talentId: string, talentCollection: TalentCollection) => {
+    return Object.values(talentCollection).find((t) => t.id === talentId);
   }
   

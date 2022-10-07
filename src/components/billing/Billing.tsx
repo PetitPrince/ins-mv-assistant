@@ -34,6 +34,7 @@ export interface BillingItem {
   key: string;
   msg: string;
   cost: number | null;
+  specialType?: string;
 }
 
 export const generateBillingItems = (
@@ -151,7 +152,7 @@ export const generateBillingItems = (
               finalLvl;
             const valDiff = newTalent.pa_depense;
             billingItems.push({
-              key: diff.path + newTalent.id,
+              key: diff.path,
               msg: msgString,
               cost: valDiff,
             });
@@ -187,7 +188,7 @@ export const generateBillingItems = (
               finalLvl;
 
             billingItems.push({
-              key: diff.path + currentTalent.id,
+              key: diff.path,
               msg: msgString,
               cost: valDiff,
             });
@@ -292,6 +293,7 @@ export const BillingPanel = (props: {}) => {
         key: "freeSecondaryTalentPointsFromPrimarySpending",
         msg: msgP,
         cost: -deducPrimary,
+        specialType: "noAction",
       });
     }
     const costAfterDeduction = secondaryTalentCost - deducPrimary;
@@ -303,7 +305,7 @@ export const BillingPanel = (props: {}) => {
       let remainingFreePoints = costAfterDeduction % 2;
       const msgS =
         deducSecondary +
-        " rangs offert par les dépenses dans les talents secondaires (reste +" +
+        " rangs offert par les dépenses dans les talents secondaires (reste " +
         remainingFreePoints +
         ")";
       if (deducSecondary) {
@@ -336,6 +338,7 @@ export const BillingPanel = (props: {}) => {
     const differencesMinusTheOneIWantToDelete = differences.filter(
       (x) => x.path !== key
     );
+
     let persoCopy = JSON.parse(JSON.stringify(originalPerso)); // deep copy
     applyPatch(persoCopy, differencesMinusTheOneIWantToDelete);
     setCurrentPerso(persoCopy);
@@ -506,11 +509,9 @@ export const BillingPanel = (props: {}) => {
               if (Object.keys(billingItem).length) {
                 const cost = billingItem.cost;
                 const costDisplay = prepareCostDisplay(cost);
-                return (
-                  <tr key={billingItem.key}>
-                    <td>{costDisplay}</td>
-                    <td>{billingItem.msg}</td>
-                    <td>
+                const ActionIcons =
+                  billingItem.specialType === "noAction" ? null : (
+                    <>
                       <Tooltip label="Annuler la ligne">
                         <ActionIcon
                           onClick={(x: any) =>
@@ -549,7 +550,14 @@ export const BillingPanel = (props: {}) => {
                           <IconEyeCheck size={16} />
                         </ActionIcon>
                       </Tooltip>
-                    </td>
+                    </>
+                  );
+
+                return (
+                  <tr key={billingItem.key}>
+                    <td>{costDisplay}</td>
+                    <td>{billingItem.msg}</td>
+                    <td>{ActionIcons}</td>
                   </tr>
                 );
               } else {

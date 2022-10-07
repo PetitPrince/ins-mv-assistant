@@ -3,8 +3,11 @@ import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import {
   TALENTS_EXOTIQUES_STANDARD,
+  TALENTS_EXOTIQUES_STANDARD_OBJ,
   TALENTS_PRINCIPAUX_STANDARD,
+  TALENTS_PRINCIPAUX_STANDARD_OBJ,
   TALENTS_SECONDAIRES_STANDARD,
+  TALENTS_SECONDAIRES_STANDARD_OBJ,
 } from "../../utils/const/TalentStandard";
 import "./TalentsGenerique";
 import { TalentsGenerique2 } from "./TalentsGenerique2";
@@ -39,7 +42,7 @@ const TalentsPrincipaux = (props: {}) => {
       setCurrentTalentNameFragment={setCurrentTalentNameFragment_principal}
       addCurrentTalent={addCurrentTalent_principal}
       setCurrentTalentPaDepense={setCurrentTalentPaDepense_principal}
-      standardTalentCollection={TALENTS_PRINCIPAUX_STANDARD}
+      standardTalentCollection={TALENTS_PRINCIPAUX_STANDARD_OBJ}
       currentPersoCara={currentPersoCara}
       currentPersoSuperieur={currentPersoSuperieur}
       faction={faction}
@@ -74,7 +77,7 @@ const TalentsSecondaires = (props: {}) => {
       setCurrentTalentNameFragment={setCurrentTalentNameFragment_secondaire}
       addCurrentTalent={addCurrentTalent_secondaire}
       setCurrentTalentPaDepense={setCurrentTalentPaDepense_secondaire}
-      standardTalentCollection={TALENTS_SECONDAIRES_STANDARD}
+      standardTalentCollection={TALENTS_SECONDAIRES_STANDARD_OBJ}
       currentPersoCara={currentPersoCara}
       currentPersoSuperieur={currentPersoSuperieur}
       faction={faction}
@@ -110,7 +113,7 @@ const TalentsExotiques = (props: {}) => {
       setCurrentTalentNameFragment={setCurrentTalentNameFragment_exotique}
       addCurrentTalent={addCurrentTalent_exotique}
       setCurrentTalentPaDepense={setCurrentTalentPaDepense_exotique}
-      standardTalentCollection={TALENTS_EXOTIQUES_STANDARD}
+      standardTalentCollection={TALENTS_EXOTIQUES_STANDARD_OBJ}
       currentPersoCara={currentPersoCara}
       currentPersoSuperieur={currentPersoSuperieur}
       faction={faction}
@@ -122,25 +125,24 @@ export const Talents = (props: {}) => {
   const appMode = useStore((state) => state.appMode);
   const talents = useStore((state) => state.currentPerso.talents);
   const faction = useStore((state) => state.currentPerso.faction);
-  const paDepenseTalentsPrincipaux = talents.principaux.reduce(
+  const paDepenseTalentsPrincipaux = Object.values(talents.principaux).reduce(
     (totalValue, currentValue) => {
       return totalValue + currentValue.pa_depense;
     },
     0
   );
-  const paDepenseTalentsSecondaire = talents.secondaires.reduce(
+  const paDepenseTalentsSecondaire = Object.values(talents.secondaires).reduce(
     (totalValue, currentValue) => {
       return totalValue + currentValue.pa_depense;
     },
     0
   );
-  const paDepenseTalentsExotique = talents.exotiques.reduce(
+  const paDepenseTalentsExotique = Object.values(talents.exotiques).reduce(
     (totalValue, currentValue) => {
       return totalValue + currentValue.pa_depense;
     },
     0
   );
-
   const sum =
     paDepenseTalentsPrincipaux +
     paDepenseTalentsSecondaire +

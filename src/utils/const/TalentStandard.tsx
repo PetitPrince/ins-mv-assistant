@@ -12,7 +12,9 @@ interface LoadedTalentJson {
 }
 //@ts-ignore
 const talentsJsonCasted: LoadedTalentJson[] = talentsJson;
-
+export interface TalentCollection {
+  [key: string]: Talent;
+}
 export interface Talent {
   name: string;
   id: string;
@@ -119,11 +121,34 @@ export const TALENTS_PRINCIPAUX_STANDARD = TOUS_LES_TALENTS2.filter(
     return talent.talentType === TALENT_TYPE_NAME.PRINCIPALE;
   }
 );
+export const TALENTS_PRINCIPAUX_STANDARD_MAP = new Map(
+  TALENTS_PRINCIPAUX_STANDARD.map((t) => [t.id, t])
+);
+
+export const TALENTS_PRINCIPAUX_STANDARD_OBJ = Object.fromEntries(
+  TALENTS_PRINCIPAUX_STANDARD_MAP.entries()
+);
+
 export const TALENTS_SECONDAIRES_STANDARD = TOUS_LES_TALENTS2.filter(
   (talent) => {
     return talent.talentType === TALENT_TYPE_NAME.SECONDAIRE;
   }
 );
+export const TALENTS_SECONDAIRES_STANDARD_MAP = new Map(
+  TALENTS_SECONDAIRES_STANDARD.map((t) => [t.id, t])
+);
+
+export const TALENTS_SECONDAIRES_STANDARD_OBJ = Object.fromEntries(
+  TALENTS_PRINCIPAUX_STANDARD_MAP.entries()
+);
+
 export const TALENTS_EXOTIQUES_STANDARD = TOUS_LES_TALENTS2.filter((talent) => {
   return talent.talentType === TALENT_TYPE_NAME.EXOTIQUE;
 });
+export const TALENTS_EXOTIQUES_STANDARD_MAP = new Map(
+  TALENTS_EXOTIQUES_STANDARD.map((t) => [t.id, t])
+);
+
+export const TALENTS_EXOTIQUES_STANDARD_OBJ = Object.fromEntries(
+  TALENTS_PRINCIPAUX_STANDARD_MAP.entries()
+);

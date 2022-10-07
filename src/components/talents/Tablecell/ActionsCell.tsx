@@ -1,5 +1,6 @@
 import {
   Talent,
+  TalentCollection,
   TALENT_SPECIALISATION_TYPE_NAME,
 } from "../../../utils/const/TalentStandard";
 import {
@@ -20,8 +21,8 @@ import slugify from "slugify";
 export const ActionsCell = (props: {
   specialisationType: TALENT_SPECIALISATION_TYPE_NAME;
   id: string;
-  currentTalentCollection: Talent[];
-  standardTalentCollection: Talent[];
+  currentTalentCollection: TalentCollection;
+  standardTalentCollection: TalentCollection;
   setCurrentTalentPaDepense: (talentId: string, val: number) => void;
   setCurrentTalentNameFragment: (
     talentId: string,
@@ -68,8 +69,8 @@ export const ActionsCell = (props: {
 
 const EditNameFragment = (props: {
   recordId: string;
-  currentTalentCollection: Talent[];
-  standardTalentCollection: Talent[];
+  currentTalentCollection: TalentCollection;
+  standardTalentCollection: TalentCollection;
   setCurrentTalentNameFragment: (
     talentId: string,
     nameFragment: string
@@ -83,13 +84,10 @@ const EditNameFragment = (props: {
     talentId: string,
     nameFragment: string
   ) => {
-    if (talentExistsInCollection(props.currentTalentCollection, talentId)) {
+    if (Object.hasOwn(props.currentTalentCollection, talentId)) {
       setCurrentTalentNameFragment(talentId, nameFragment);
     } else {
-      const talentInStandardRepo = findTalentInCollection(
-        talentId,
-        props.standardTalentCollection
-      );
+      const talentInStandardRepo = props.standardTalentCollection[talentId];
       if (talentInStandardRepo) {
         const newTalent: Talent = {
           ...talentInStandardRepo,
@@ -132,8 +130,8 @@ const EditNameFragment = (props: {
 
 const AddNewMutiple = (props: {
   recordId: string;
-  currentTalentCollection: Talent[];
-  standardTalentCollection: Talent[];
+  currentTalentCollection: TalentCollection;
+  standardTalentCollection: TalentCollection;
   setCurrentTalentNameFragment: (
     talentId: string,
     nameFragment: string
@@ -146,12 +144,9 @@ const AddNewMutiple = (props: {
     talentId: string,
     nameFragment: string
   ) => {
-    if (talentExistsInCollection(props.currentTalentCollection, talentId)) {
+    if (Object.hasOwn(props.currentTalentCollection, talentId)) {
     } else {
-      const talentInStandardRepo = findTalentInCollection(
-        talentId,
-        props.standardTalentCollection
-      );
+      const talentInStandardRepo = props.standardTalentCollection[talentId];
       if (talentInStandardRepo) {
         const newTalent: Talent = {
           ...talentInStandardRepo,

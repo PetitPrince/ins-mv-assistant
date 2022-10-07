@@ -1,6 +1,6 @@
 import { FACTIONS_NAMES } from "./Factions";
 import { PouvoirCollection } from "./Pouvoir";
-import {Talent} from "../const/TalentStandard"
+import {Talent, TalentCollection} from "../const/TalentStandard"
 
 export interface Caracteristique {
   // niveau: number,
@@ -26,9 +26,9 @@ export interface Personnage {
   paTotal: number;
   pp_pa_depense: number;
   talents: {
-    principaux: Talent[];
-    secondaires: Talent[];
-    exotiques: Talent[];
+    principaux: TalentCollection; // TODO: talents have to be stored as a dict to keep the direct access for json patch
+    secondaires: TalentCollection;
+    exotiques: TalentCollection;
   };
 
   pouvoirs: PouvoirCollection;

@@ -3,6 +3,7 @@ import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { CaracteristiquesSet } from "../../utils/const/Personnage";
 import {
   Talent,
+  TalentCollection,
   TALENT_SPECIALISATION_TYPE_NAME,
   TALENT_TYPE_NAME,
 } from "../../utils/const/TalentStandard";
@@ -24,8 +25,8 @@ import slugify from "slugify";
 
 export const TalentsGenerique2 = (props: {
   title: string;
-  currentTalentCollection: Talent[];
-  standardTalentCollection: Talent[];
+  currentTalentCollection: TalentCollection;
+  standardTalentCollection: TalentCollection;
   currentPersoCara: CaracteristiquesSet;
   currentPersoSuperieur: string;
   setCurrentTalentNameFragment: (
@@ -48,31 +49,11 @@ export const TalentsGenerique2 = (props: {
     faction,
   } = props;
 
-  const updatePaOrCreateTalent = (talentId: string, updatedPa: number) => {
-    if (talentExistsInCollection(currentTalentCollection, talentId)) {
-      setCurrentTalentPaDepense(talentId, updatedPa);
-    } else {
-      const talentInStandardRepo = findTalentInCollection(
-        talentId,
-        standardTalentCollection
-      );
-      if (talentInStandardRepo) {
-        const newTalent: Talent = {
-          ...talentInStandardRepo,
-          pa_depense: updatedPa,
-        };
-        addCurrentTalent(newTalent);
-      }
-    }
+  const mergedTalents = {
+    ...standardTalentCollection,
+    ...currentTalentCollection,
   };
-
-  let talentsStandards: Talent[] = standardTalentCollection;
-  let updatedStandardTalent: Talent[] = findMatchingStandardTalentInCollection(
-    currentTalentCollection,
-    standardTalentCollection
-  );
-
-  let rows = talentsStandards.concat(updatedStandardTalent);
+  let rows = Array.from(Object.values(mergedTalents));
 
   if (title.includes("exotique")) {
     if (currentPersoSuperieur) {
@@ -84,6 +65,22 @@ export const TalentsGenerique2 = (props: {
     }
   }
   rows.sort(alphaSort);
+  //
+  const updatePaOrCreateTalent = (talentId: string, updatedPa: number) => {
+    if (Object.hasOwn(currentTalentCollection, talentId)) {
+      // if (talentExistsInCollection(currentTalentCollection, talentId)) {
+      setCurrentTalentPaDepense(talentId, updatedPa);
+    } else {
+      const talentInStandardRepo = standardTalentCollection[talentId];
+      if (talentInStandardRepo) {
+        const newTalent: Talent = {
+          ...talentInStandardRepo,
+          pa_depense: updatedPa,
+        };
+        addCurrentTalent(newTalent);
+      }
+    }
+  };
 
   const submitNewExoticTalent = (event: any) => {
     const newTalentName = event.target.talentName.value;

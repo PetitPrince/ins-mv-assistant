@@ -53,19 +53,19 @@ export const CreationLimitPanel = (props: {}) => {
 
   // Talents
 
-  const paDepenseTalentsPrincipaux = talents.principaux.reduce(
+  const paDepenseTalentsPrincipaux = Object.values(talents.principaux).reduce(
     (totalValue, currentValue) => {
       return totalValue + currentValue.pa_depense;
     },
     0
   );
-  const paDepenseTalentsSecondaire = talents.secondaires.reduce(
+  const paDepenseTalentsSecondaire = Object.values(talents.secondaires).reduce(
     (totalValue, currentValue) => {
       return totalValue + currentValue.pa_depense;
     },
     0
   );
-  const paDepenseTalentsExotique = talents.exotiques.reduce(
+  const paDepenseTalentsExotique = Object.values(talents.exotiques).reduce(
     (totalValue, currentValue) => {
       return totalValue + currentValue.pa_depense;
     },

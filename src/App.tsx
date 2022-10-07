@@ -85,7 +85,7 @@ const FeuilleDePerso = (props: {}) => {
   let mainPanel;
   let aside;
   if (appMode === APPMODE.PLAY) {
-    mainPanel = <PlayPanel />;
+    // mainPanel = <PlayPanel />;
   } else {
     mainPanel = (
       <>

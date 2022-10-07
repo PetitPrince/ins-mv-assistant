@@ -4,9 +4,13 @@ import { CaracteristiquesSet } from "../../utils/const/Personnage";
 import { Pouvoir } from "../../utils/const/Pouvoir";
 import {
   Talent,
+  TalentCollection,
   TALENTS_EXOTIQUES_STANDARD,
+  TALENTS_EXOTIQUES_STANDARD_OBJ,
   TALENTS_PRINCIPAUX_STANDARD,
+  TALENTS_PRINCIPAUX_STANDARD_OBJ,
   TALENTS_SECONDAIRES_STANDARD,
+  TALENTS_SECONDAIRES_STANDARD_OBJ,
 } from "../../utils/const/TalentStandard";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
@@ -84,21 +88,21 @@ export const PlayPanel = (props: {}) => {
         <Group sx={{ "align-items": "flex-start" }}>
           <PlayTalentGenerique
             title={"Talents principaux"}
-            standardTalentCollection={TALENTS_PRINCIPAUX_STANDARD}
+            standardTalentCollection={TALENTS_PRINCIPAUX_STANDARD_OBJ}
             currentTalentCollection={perso.talents.principaux}
             currentPersoCara={perso.caracteristiques}
             currentPersoSuperieur={perso.superieur}
           />
           <PlayTalentGenerique
             title={"Talents secondaires"}
-            standardTalentCollection={TALENTS_SECONDAIRES_STANDARD}
+            standardTalentCollection={TALENTS_SECONDAIRES_STANDARD_OBJ}
             currentTalentCollection={perso.talents.secondaires}
             currentPersoCara={perso.caracteristiques}
             currentPersoSuperieur={perso.superieur}
           />
           <PlayTalentGenerique
             title={"Talents exotique"}
-            standardTalentCollection={TALENTS_EXOTIQUES_STANDARD}
+            standardTalentCollection={TALENTS_EXOTIQUES_STANDARD_OBJ}
             currentTalentCollection={perso.talents.exotiques}
             currentPersoCara={perso.caracteristiques}
             currentPersoSuperieur={perso.superieur}
@@ -149,8 +153,8 @@ const PlayPouvoir = (props: { currentPouvoirs: Pouvoir[] }) => {
 
 const PlayTalentGenerique = (props: {
   title: string;
-  standardTalentCollection: Talent[];
-  currentTalentCollection: Talent[];
+  standardTalentCollection: TalentCollection;
+  currentTalentCollection: TalentCollection;
   currentPersoCara: CaracteristiquesSet;
   currentPersoSuperieur: string;
 }) => {
@@ -161,13 +165,12 @@ const PlayTalentGenerique = (props: {
     currentPersoCara,
     currentPersoSuperieur,
   } = props;
-  let talentsStandards: Talent[] = standardTalentCollection;
-  let updatedStandardTalent: Talent[] = findMatchingStandardTalentInCollection(
-    currentTalentCollection,
-    standardTalentCollection
-  );
 
-  let rows = talentsStandards.concat(updatedStandardTalent);
+  const mergedTalents = {
+    ...standardTalentCollection,
+    ...currentTalentCollection,
+  };
+  let rows = Array.from(Object.values(mergedTalents));
 
   if (title.includes("exotique")) {
     if (currentPersoSuperieur) {

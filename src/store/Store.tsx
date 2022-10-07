@@ -38,9 +38,9 @@ const emptyPersoDict = {
   paTotal: 0,
   pp_pa_depense: 0,
   talents: {
-    principaux: [],
-    secondaires: [],
-    exotiques: [],
+    principaux: {},
+    secondaires: {},
+    exotiques: {},
   },
   pouvoirs: {},
 };
@@ -112,11 +112,7 @@ export const useStore = create<{
 
   setCurrentTalentPrincipalPaDepense: (talentId: string, val: number) => {
     const updatedTalentPrincipalArray = produce((draftState) => {
-      const index = draftState.currentPerso.talents.principaux.findIndex(
-        (talent: Talent) => talent.id === talentId
-      );
-      if (index !== -1)
-        draftState.currentPerso.talents.principaux[index].pa_depense = val;
+      draftState.currentPerso.talents.principaux[talentId].pa_depense = val;
     });
     set(updatedTalentPrincipalArray);
   },
@@ -126,12 +122,8 @@ export const useStore = create<{
     nameFragment: string
   ) => {
     const updatedTalentPrincipalArray = produce((draftState) => {
-      const index = draftState.currentPerso.talents.principaux.findIndex(
-        (talent: Talent) => talent.id === talentId
-      );
-      if (index !== -1)
-        draftState.currentPerso.talents.principaux[index].customNameFragment =
-          nameFragment;
+      draftState.currentPerso.talents.principaux[talentId].customNameFragment =
+        nameFragment;
     });
     set(updatedTalentPrincipalArray);
   },
@@ -139,17 +131,13 @@ export const useStore = create<{
   addCurrentTalentPrincipal: (newTalent: Talent) => {
     set(
       produce((draftState) => {
-        draftState.currentPerso.talents.principaux.push(newTalent);
+        draftState.currentPerso.talents.principaux[newTalent.id] = newTalent;
       })
     );
   },
   setCurrentTalentSecondairePaDepense: (talentId: string, val: number) => {
     const updatedTalentSecondaireArray = produce((draftState) => {
-      const index = draftState.currentPerso.talents.secondaires.findIndex(
-        (talent: Talent) => talent.id === talentId
-      );
-      if (index !== -1)
-        draftState.currentPerso.talents.secondaires[index].pa_depense = val;
+      draftState.currentPerso.talents.secondaires[talentId].pa_depense = val;
     });
     set(updatedTalentSecondaireArray);
   },
@@ -159,12 +147,8 @@ export const useStore = create<{
     nameFragment: string
   ) => {
     const updatedTalentSecondaireArray = produce((draftState) => {
-      const index = draftState.currentPerso.talents.secondaires.findIndex(
-        (talent: Talent) => talent.id === talentId
-      );
-      if (index !== -1)
-        draftState.currentPerso.talents.secondaires[index].customNameFragment =
-          nameFragment;
+      draftState.currentPerso.talents.secondaires[talentId].customNameFragment =
+        nameFragment;
     });
     set(updatedTalentSecondaireArray);
   },
@@ -172,18 +156,14 @@ export const useStore = create<{
   addCurrentTalentSecondaire: (newTalent: Talent) => {
     set(
       produce((draftState) => {
-        draftState.currentPerso.talents.secondaires.push(newTalent);
+        draftState.currentPerso.talents.secondaires[newTalent.id] = newTalent;
       })
     );
   },
 
   setCurrentTalentExotiquePaDepense: (talentId: string, val: number) => {
     const updatedTalentExotiqueArray = produce((draftState) => {
-      const index = draftState.currentPerso.talents.exotiques.findIndex(
-        (talent: Talent) => talent.id === talentId
-      );
-      if (index !== -1)
-        draftState.currentPerso.talents.exotiques[index].pa_depense = val;
+      draftState.currentPerso.talents.exotiques[talentId].pa_depense = val;
     });
     set(updatedTalentExotiqueArray);
   },
@@ -193,12 +173,8 @@ export const useStore = create<{
     nameFragment: string
   ) => {
     const updatedTalentExotiqueArray = produce((draftState) => {
-      const index = draftState.currentPerso.talents.exotiques.findIndex(
-        (talent: Talent) => talent.id === talentId
-      );
-      if (index !== -1)
-        draftState.currentPerso.talents.exotiques[index].customNameFragment =
-          nameFragment;
+      draftState.currentPerso.talents.exotiques[talentId].customNameFragment =
+        nameFragment;
     });
     set(updatedTalentExotiqueArray);
   },
@@ -206,7 +182,7 @@ export const useStore = create<{
   addCurrentTalentExotique: (newTalent: Talent) => {
     set(
       produce((draftState) => {
-        draftState.currentPerso.talents.exotiques.push(newTalent);
+        draftState.currentPerso.talents.exotiques[newTalent.id] = newTalent;
       })
     );
   },

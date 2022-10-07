@@ -51,7 +51,7 @@ export const calcTalentLevelFromPaDepense = (
   }
   const levelFromPa = insMvRounding(pa_depense / 2);
 
-  return insMvRounding(levelsFromCara / 2) + levelFromPa;
+  return levelsFromCara + levelFromPa;
 };
 
 const insMvRounding = (x: number) => {

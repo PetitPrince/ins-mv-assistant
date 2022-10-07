@@ -19,8 +19,18 @@ import { NameCell } from "./Tablecell/NameCell";
 import { PaDepenseCell } from "./Tablecell/PaDepenseCell";
 import { alphaSort } from "./alphaSort";
 import { findMatchingStandardTalentInCollection } from "./findMatchingStandardTalentInCollection";
-import { Title, Group, TextInput, Button, Select, Table } from "@mantine/core";
+import {
+  Title,
+  Group,
+  TextInput,
+  Button,
+  Select,
+  Table,
+  Collapse,
+} from "@mantine/core";
 import { Stack } from "@mantine/core";
+import { IconChevronDown, IconChevronRight } from "@tabler/icons";
+import { useState } from "react";
 import slugify from "slugify";
 
 export const TalentsGenerique2 = (props: {
@@ -106,9 +116,9 @@ export const TalentsGenerique2 = (props: {
   };
   const exotiqueStuff = (
     <form onSubmit={submitNewExoticTalent}>
-      <Title order={4}>Nouveau talent</Title>
+      <Title order={4}>Nouveau talent exotique</Title>
       <Group>
-        <TextInput name="talentName" label="nom" />
+        <TextInput name="talentName" label="Nom" />
         <Select
           label="Spécialisation"
           name="specialisation"
@@ -220,23 +230,39 @@ export const TalentsGenerique2 = (props: {
       </tr>
     );
   });
-
+  const [tableOpened, setTableOpened] = useState(true);
+  const iconTableOpened = tableOpened ? (
+    <IconChevronDown size={16} />
+  ) : (
+    <IconChevronRight size={16} />
+  );
   return (
     <Stack>
-      <Title order={3}>{title}</Title>
-      <Table>
-        <thead>
-          <tr>
-            <th>Actions</th>
-            <th>Nom</th>
-            <th>Niveau</th>
-            <th>Caractéristique associée</th>
-            <th>PA depensé</th>
-          </tr>
-        </thead>
-        <tbody>{displayRows}</tbody>
-      </Table>
-      {title.includes("exotique") ? exotiqueStuff : ""}
+      <Title order={3} onClick={() => setTableOpened((o) => !o)}>
+        {" "}
+        {iconTableOpened}
+        {title}
+      </Title>
+      <Collapse in={tableOpened}>
+        <Table
+          sx={{
+            "& thead tr th": { width: 100 },
+            "& thead tr th:first-child": { width: 50 },
+          }}
+        >
+          <thead>
+            <tr>
+              <th>Actions</th>
+              <th>Nom</th>
+              <th>Niveau</th>
+              <th>Caractéristique associée</th>
+              <th>PA depensé</th>
+            </tr>
+          </thead>
+          <tbody>{displayRows}</tbody>
+        </Table>
+        {title.includes("exotique") ? exotiqueStuff : ""}
+      </Collapse>
     </Stack>
   );
 };

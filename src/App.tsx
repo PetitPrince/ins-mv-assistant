@@ -17,6 +17,7 @@ import {
   AppShell,
   Aside,
   Button,
+  Collapse,
   FileButton,
   Group,
   Header,
@@ -29,6 +30,7 @@ import { NumberInput, Stack, Text, Image } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
+import { IconChevronDown, IconChevronRight } from "@tabler/icons";
 import { saveAs } from "file-saver";
 import "immer";
 import { enablePatches } from "immer";
@@ -77,6 +79,40 @@ export const IOPanel = (props: {}) => {
   );
 };
 
+const MyAside = (props: {}) => {
+  const [creationLimitPanelOpened, setCreationLimitPanelOpened] =
+    useState(false);
+  const [billingPanelOpened, setBillingPanelOpened] = useState(true);
+  const iconCreationLimitPanel = creationLimitPanelOpened ? (
+    <IconChevronDown size={12} />
+  ) : (
+    <IconChevronRight size={12} />
+  );
+  const iconBillingPanel = billingPanelOpened ? (
+    <IconChevronDown size={12} />
+  ) : (
+    <IconChevronRight size={12} />
+  );
+  return (
+    <Aside width={{ base: 400 }} p="xs">
+      <Title order={5} onClick={() => setCreationLimitPanelOpened((o) => !o)}>
+        {" "}
+        {iconCreationLimitPanel} Limites de crétions
+      </Title>
+      <Collapse in={creationLimitPanelOpened}>
+        <CreationLimitPanel />
+      </Collapse>
+      <Title order={5} onClick={() => setBillingPanelOpened((o) => !o)}>
+        {" "}
+        {iconBillingPanel} Modifications
+      </Title>
+      <Collapse in={billingPanelOpened}>
+        <BillingPanel />
+      </Collapse>
+    </Aside>
+  );
+};
+
 const FeuilleDePerso = (props: {}) => {
   const appMode = useStore((state) => state.appMode);
   const setAppMode = useStore((state) => state.setAppMode);
@@ -85,7 +121,7 @@ const FeuilleDePerso = (props: {}) => {
   let mainPanel;
   let aside;
   if (appMode === APPMODE.PLAY) {
-    // mainPanel = <PlayPanel />;
+    mainPanel = <PlayPanel />;
   } else {
     mainPanel = (
       <>
@@ -100,13 +136,7 @@ const FeuilleDePerso = (props: {}) => {
         <Pouvoirs />
       </>
     );
-    aside = (
-      <Aside width={{ base: 300 }} p="xs">
-        <CreationLimitPanel />
-
-        <BillingPanel />
-      </Aside>
-    );
+    aside = <MyAside />;
   }
 
   return (

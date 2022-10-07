@@ -458,8 +458,13 @@ export const BillingPanel = (props: {}) => {
           </Group>
         </Stack>
       </Modal>
-      <ScrollArea.Autosize maxHeight={300} type="always">
-        <Table>
+      <ScrollArea.Autosize maxHeight={400} type="always">
+        <Table
+          verticalSpacing="xs"
+          sx={{
+            "& thead tr th:last-child": { width: 150 },
+          }}
+        >
           <thead>
             <tr>
               <th>PA</th>
@@ -477,11 +482,15 @@ export const BillingPanel = (props: {}) => {
                 const cost = billingItem.cost;
                 const costDisplay = prepareCostDisplay(cost);
                 let ActionIcons;
-                if (billingItem.specialType === "noAction") {
+                if (
+                  ["noAction", "remainingTalentPa"].includes(
+                    billingItem.specialType ? billingItem.specialType : ""
+                  )
+                ) {
                   ActionIcons = null;
                 } else if (billingItem.specialType === "noIndividualCommit") {
                   ActionIcons = (
-                    <>
+                    <Group spacing={4}>
                       <Tooltip label="Annuler la ligne">
                         <ActionIcon
                           onClick={(x: any) =>
@@ -506,11 +515,11 @@ export const BillingPanel = (props: {}) => {
                           <IconEyeCheck size={16} />
                         </ActionIcon>
                       </Tooltip>
-                    </>
+                    </Group>
                   );
                 } else {
                   ActionIcons = (
-                    <>
+                    <Group spacing={4}>
                       <Tooltip label="Annuler la ligne">
                         <ActionIcon
                           onClick={(x: any) =>
@@ -549,7 +558,7 @@ export const BillingPanel = (props: {}) => {
                           <IconEyeCheck size={16} />
                         </ActionIcon>
                       </Tooltip>
-                    </>
+                    </Group>
                   );
                 }
 

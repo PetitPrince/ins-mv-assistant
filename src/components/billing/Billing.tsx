@@ -1,6 +1,6 @@
 import { useStore } from "../../store/Store";
 import { Personnage } from "../../utils/const/Personnage";
-import { Talent } from "../../utils/const/TalentStandard";
+import { Talent, TALENT_TYPE_NAME } from "../../utils/const/TalentStandard";
 import { findDeepValueOfObjFromPathAndLeadingSep } from "../../utils/helper/findDeepValueOfObjFromPathAndLeadingSep";
 import {
   calcCaracteristiqueLevelFromPaDepense,
@@ -146,7 +146,7 @@ export const generateBillingItems = (
               "Talent " +
               newTalent.name +
               nameFragment +
-              ":" +
+              ": " +
               0 +
               " → " +
               finalLvl;
@@ -155,6 +155,7 @@ export const generateBillingItems = (
               key: diff.path,
               msg: msgString,
               cost: valDiff,
+              specialType: "noIndividualCommit",
             });
           } else if (diff.op === "replace") {
             const currentTalent = findDeepValueOfObjFromPathAndLeadingSep(
@@ -260,76 +261,26 @@ const prepareCostDisplay = (cost: number | null | undefined) => {
 export const BillingPanel = (props: {}) => {
   const originalPerso = useStore((state) => state.originalPerso);
   const currentPerso = useStore((state) => state.currentPerso);
+  const setCurrentPerso = useStore((state) => state.setCurrentPerso);
+  const setOriginalPerso = useStore((state) => state.setOriginalPerso);
+  const setCurrentPa = useStore((state) => state.setCurrentPa);
+  const setCurrentPaTotal = useStore((state) => state.setCurrentPaTotal);
+  const setCurrentExtraPaTalent = useStore(
+    (state) => state.setCurrentExtraPaTalent
+  );
+  const currentPaTotal = useStore((state) => state.currentPerso.paTotal);
   const currentPa = currentPerso.pa;
 
-  let billingItems = generateBillingItems(originalPerso, currentPerso);
-
-  const secondaryTalentUpdates = billingItems.filter((x) =>
-    x.key.includes("secondaires")
-  );
-  const primaryTalentUpdates = billingItems.filter((x) =>
-    x.key.includes("principaux")
-  );
-
-  if (secondaryTalentUpdates.length > 0) {
-    let deducPrimary = 0;
-    // In any case I have a deduction based on the PA spent on primary talents
-    primaryTalentUpdates.forEach((x) => {
-      deducPrimary += x.cost ? x.cost : 0;
-    });
-
-    // Let's apply the deduction
-    const secondaryTalentCost = secondaryTalentUpdates
-      .map((x) => (x.cost ? x.cost : 0))
-      .reduce((sum, val) => {
-        return sum + val;
-      }, 0);
-    const msgP =
-      deducPrimary +
-      " rangs offert par les dépenses dans les talents principaux";
-    if (deducPrimary) {
-      // don't show if there's no deduction
-      billingItems.push({
-        key: "freeSecondaryTalentPointsFromPrimarySpending",
-        msg: msgP,
-        cost: -deducPrimary,
-        specialType: "noAction",
-      });
-    }
-    const costAfterDeduction = secondaryTalentCost - deducPrimary;
-
-    if (costAfterDeduction > 0) {
-      // half of the secondary talents point can be considered paid by the other half
-
-      let deducSecondary = Math.floor(costAfterDeduction / 2);
-      let remainingFreePoints = costAfterDeduction % 2;
-      const msgS =
-        deducSecondary +
-        " rangs offert par les dépenses dans les talents secondaires (reste " +
-        remainingFreePoints +
-        ")";
-      if (deducSecondary) {
-        // don't show if there's no deduction
-        billingItems.push({
-          key: "freeSecondaryTalentPointsFromSecondaySpending",
-          msg: msgS,
-          cost: -deducSecondary,
-        });
-      }
-    }
-  }
+  let billingItems = calcBillingItemsWithTalentDeductionLines(
+    originalPerso,
+    currentPerso
+  ); // end deduction
 
   // For each points spent
 
   const sum = calcBillingItemSum(billingItems);
 
   const availablePa = currentPa - sum;
-
-  const setCurrentPerso = useStore((state) => state.setCurrentPerso);
-  const setOriginalPerso = useStore((state) => state.setOriginalPerso);
-  const setCurrentPa = useStore((state) => state.setCurrentPa);
-  const setCurrentPaTotal = useStore((state) => state.setCurrentPaTotal);
-  const currentPaTotal = useStore((state) => state.currentPerso.paTotal);
 
   const deleteOneBillingLine = (key: string, billingMsg: string) => {
     // key looks lioke "/caracteristiques/volonte/pa_depense"
@@ -411,21 +362,37 @@ export const BillingPanel = (props: {}) => {
   };
 
   const commitAllBillingLine = () => {
-    if (availablePa >= 0) {
+    // just get the talent extra points:
+    const billingItems = calcBillingItemsWithTalentDeductionLines(
+      originalPerso,
+      currentPerso
+    );
+    const remainingTalentPaBillingItem = billingItems.find(
+      (x) => x.specialType === "remainingTalentPa"
+    );
+
+    if (remainingTalentPaBillingItem) {
+      showNotification({
+        title: "Il reste des PAs obligatoire à dépenser",
+        message: remainingTalentPaBillingItem.msg,
+        color: "red",
+      });
+    } else if (availablePa < 0) {
+      showNotification({
+        title: "Pas assez de PA",
+        message: "Il manque " + -availablePa + " PA.",
+        color: "red",
+      });
+    } else {
       // const unused = createPatch(originalPerso, currentPerso);
       const cost = currentPa - availablePa;
+
       setOriginalPerso(currentPerso);
       setCurrentPa(availablePa);
       setCurrentPaTotal(currentPaTotal + cost);
       showNotification({
         message: "Toutes les modifications ont été appliquées",
         color: "green",
-      });
-    } else {
-      showNotification({
-        title: "Pas assez de PA",
-        message: "Il manque " + -availablePa + " PA.",
-        color: "red",
       });
     }
   };
@@ -491,7 +458,7 @@ export const BillingPanel = (props: {}) => {
           </Group>
         </Stack>
       </Modal>
-      <ScrollArea.Autosize maxHeight={300}>
+      <ScrollArea.Autosize maxHeight={300} type="always">
         <Table>
           <thead>
             <tr>
@@ -509,8 +476,40 @@ export const BillingPanel = (props: {}) => {
               if (Object.keys(billingItem).length) {
                 const cost = billingItem.cost;
                 const costDisplay = prepareCostDisplay(cost);
-                const ActionIcons =
-                  billingItem.specialType === "noAction" ? null : (
+                let ActionIcons;
+                if (billingItem.specialType === "noAction") {
+                  ActionIcons = null;
+                } else if (billingItem.specialType === "noIndividualCommit") {
+                  ActionIcons = (
+                    <>
+                      <Tooltip label="Annuler la ligne">
+                        <ActionIcon
+                          onClick={(x: any) =>
+                            deleteOneBillingLine(
+                              billingItem.key,
+                              billingItem.msg
+                            )
+                          }
+                        >
+                          <IconX size={16} />
+                        </ActionIcon>
+                      </Tooltip>
+
+                      <Tooltip label="Appliquer la ligne sans payer de PA">
+                        <ActionIcon
+                          onClick={(x: any) => {
+                            setModalOpened(true);
+                            setModalContent(billingItem.msg);
+                            setModalKey(billingItem.key);
+                          }}
+                        >
+                          <IconEyeCheck size={16} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </>
+                  );
+                } else {
+                  ActionIcons = (
                     <>
                       <Tooltip label="Annuler la ligne">
                         <ActionIcon
@@ -552,6 +551,7 @@ export const BillingPanel = (props: {}) => {
                       </Tooltip>
                     </>
                   );
+                }
 
                 return (
                   <tr key={billingItem.key}>
@@ -582,3 +582,107 @@ export const BillingPanel = (props: {}) => {
     </>
   );
 };
+function calcBillingItemsWithTalentDeductionLines(
+  originalPerso: Personnage,
+  currentPerso: Personnage
+) {
+  let billingItems = generateBillingItems(originalPerso, currentPerso);
+
+  const secondaryTalentUpdates = billingItems.filter((x) =>
+    x.key.includes("secondaires")
+  );
+  const primaryTalentUpdates = billingItems.filter((x) =>
+    x.key.includes("principaux")
+  );
+
+  // Calc deduction
+  var {
+    deducPrimary,
+    costAfterPrimaryDeduction,
+    deducSecondary,
+    remainingFreePoints,
+  } = calcDeduction(primaryTalentUpdates, secondaryTalentUpdates);
+
+  if (secondaryTalentUpdates.length > 0) {
+    if (deducPrimary) {
+      // don't show if there's no deduction
+      const msgP =
+        deducPrimary +
+        " rangs de talent secondaires offert par les dépenses dans les talents principaux";
+      billingItems.push({
+        key: "freeSecondaryTalentPointsFromPrimarySpending",
+        msg: msgP,
+        cost: -deducPrimary,
+        specialType: "noAction",
+      });
+    }
+
+    if (costAfterPrimaryDeduction > 0 && deducSecondary) {
+      // don't show if there's no deduction
+      const msgS =
+        deducSecondary +
+        " rangs de talent secondaires offert par les dépenses dans les talents secondaires";
+      billingItems.push({
+        key: "freeSecondaryTalentPointsFromSecondaySpending",
+        msg: msgS,
+        cost: -deducSecondary,
+        specialType: "noAction",
+      });
+    }
+  }
+  if (remainingFreePoints > 0) {
+    billingItems.push({
+      key: "remainingFreePointsWhat",
+      msg:
+        "Attention, il reste " +
+        remainingFreePoints +
+        " rangs de talent secondaire à utiliser",
+      cost: null,
+      specialType: "remainingTalentPa",
+    });
+  }
+  return billingItems;
+}
+
+function calcDeduction(
+  primaryTalentUpdates: BillingItem[],
+  secondaryTalentUpdates: BillingItem[]
+) {
+  let deducPrimary = calcPrimaryDeduction(primaryTalentUpdates);
+  const secondaryTalentCost = calcSecondaryCost(secondaryTalentUpdates);
+  const costAfterPrimaryDeduction = secondaryTalentCost - deducPrimary;
+  const remainingPrimaryFreePoints =
+    deducPrimary - secondaryTalentCost > 0
+      ? deducPrimary - secondaryTalentCost
+      : 0;
+
+  // half of the secondary talents point can be considered paid by the other half
+  let deducSecondary = Math.floor(costAfterPrimaryDeduction / 2);
+  let remainingFreePoints =
+    remainingPrimaryFreePoints > 0
+      ? remainingPrimaryFreePoints
+      : costAfterPrimaryDeduction % 2;
+  return {
+    deducPrimary,
+    costAfterPrimaryDeduction,
+    deducSecondary,
+    remainingFreePoints,
+  };
+}
+
+function calcSecondaryCost(secondaryTalentUpdates: BillingItem[]) {
+  return secondaryTalentUpdates
+    .map((x) => (x.cost ? x.cost : 0))
+    .reduce((sum, val) => {
+      return sum + val;
+    }, 0);
+}
+
+function calcPrimaryDeduction(primaryTalentUpdates: BillingItem[]) {
+  let deducPrimary = 0;
+  // In any case I have a deduction based on the PA spent on primary talents
+  primaryTalentUpdates.forEach((x) => {
+    deducPrimary += x.cost ? x.cost : 0;
+  });
+  return deducPrimary;
+}

@@ -35,6 +35,7 @@ const emptyPersoDict = {
     },
   },
   pa: 0,
+  extraPaTalent: 0,
   paTotal: 0,
   pp_pa_depense: 0,
   talents: {
@@ -90,6 +91,7 @@ export const useStore = create<{
     caracteristique: CARACTERISTIQUE_NAMES
   ) => void;
   setCurrentPa: (val: number) => void;
+  setCurrentExtraPaTalent: (val: number) => void;
   setCurrentPaTotal: (val: number) => void;
   setCurrentPpPadepense: (val: number) => void;
   setCurrentFreeTalentPoints: (val: number) => void;
@@ -249,6 +251,14 @@ export const useStore = create<{
     set(
       produce((draftState) => {
         draftState.currentPerso.pa = val;
+      })
+    );
+  },
+
+  setCurrentExtraPaTalent: (val) => {
+    set(
+      produce((draftState) => {
+        draftState.currentPerso.extraPaTalent = val;
       })
     );
   },

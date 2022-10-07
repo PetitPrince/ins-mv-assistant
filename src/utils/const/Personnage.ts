@@ -23,6 +23,7 @@ export interface Personnage {
   grade: number;
   caracteristiques: CaracteristiquesSet;
   pa: number;
+  extraPaTalent: number;
   paTotal: number;
   pp_pa_depense: number;
   talents: {

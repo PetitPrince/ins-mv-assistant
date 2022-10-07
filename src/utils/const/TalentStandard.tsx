@@ -139,7 +139,7 @@ export const TALENTS_SECONDAIRES_STANDARD_MAP = new Map(
 );
 
 export const TALENTS_SECONDAIRES_STANDARD_OBJ = Object.fromEntries(
-  TALENTS_PRINCIPAUX_STANDARD_MAP.entries()
+  TALENTS_SECONDAIRES_STANDARD_MAP.entries()
 );
 
 export const TALENTS_EXOTIQUES_STANDARD = TOUS_LES_TALENTS2.filter((talent) => {

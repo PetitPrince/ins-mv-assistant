@@ -9,6 +9,7 @@ export const SUPERIEURS_ANGES_AUTOCOMPLETE : AutocompleteItem[] = [
   {value: "Dominique", label: "Dominique, archange de la justice"},
   {value: "Francis", label: "Francis, archange de la diplomatie"},
   {value: "Guy", label: "Guy, archange des guérisseurs"},
+  {value: "Janus", label: "Jean, archange des vents"},
   {value: "Jean", label: "Jean, archange de la foudre"},
   {value: "Jean-Luc", label: "Jean-Luc, archange des protecteurs"},
   {value: "Jordi", label: "Jordi, archange des animaux"},

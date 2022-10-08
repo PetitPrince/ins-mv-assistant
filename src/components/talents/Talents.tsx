@@ -143,9 +143,17 @@ export const Talents = (props: {}) => {
     },
     0
   );
+
+  const talentSecondaireContribution =
+    paDepenseTalentsSecondaire - paDepenseTalentsPrincipaux > 0
+      ? Math.floor(
+          (paDepenseTalentsSecondaire - paDepenseTalentsPrincipaux) / 2
+        )
+      : 0;
+
   const sum =
     paDepenseTalentsPrincipaux +
-    paDepenseTalentsSecondaire +
+    talentSecondaireContribution +
     paDepenseTalentsExotique;
 
   let creationLimitMsg = "";

@@ -72,9 +72,12 @@ export const CreationLimitPanel = (props: {}) => {
     0
   );
 
-  const talentSecondaireContribution = Math.floor(
-    (paDepenseTalentsSecondaire - paDepenseTalentsPrincipaux) / 2
-  );
+  const talentSecondaireContribution =
+    paDepenseTalentsSecondaire - paDepenseTalentsPrincipaux > 0
+      ? Math.floor(
+          (paDepenseTalentsSecondaire - paDepenseTalentsPrincipaux) / 2
+        )
+      : 0;
 
   const sumPaDpenseTalents =
     paDepenseTalentsPrincipaux +

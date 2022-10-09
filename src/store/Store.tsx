@@ -5,7 +5,7 @@ import { FACTIONS_NAMES } from "../utils/const/Factions";
 import { Personnage } from "../utils/const/Personnage";
 import { Pouvoir } from "../utils/const/Pouvoir";
 import { Talent } from "../utils/const/TalentStandard";
-import produce from "immer";
+import produce, { Patch, produceWithPatches } from "immer";
 import create from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -55,6 +55,8 @@ export const useStore = create<{
   billingItems: BillingItem[];
   paAfterBilling: number;
   appMode: APPMODE;
+  historyUndo: Patch[];
+  historyRedo: (Patch | Patch[])[];
 
   setAppMode: (appMode: string) => void;
 
@@ -97,6 +99,7 @@ export const useStore = create<{
   setCurrentFreeTalentPoints: (val: number) => void;
   setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
   setCurrentPouvoir: (pouvoirId: string, val: Pouvoir) => void;
+  deleteCurrentPouvoir: (pouvoirId: string) => void;
 }>()(
   persist(
     (set, get) => {
@@ -106,6 +109,8 @@ export const useStore = create<{
         billingItems: [],
         paAfterBilling: 0,
         appMode: APPMODE.CREATE,
+        historyUndo: [],
+        historyRedo: [],
 
         setAppMode: (appMode) => {
           set(
@@ -219,14 +224,18 @@ export const useStore = create<{
           );
         },
         setCurrentIdentite: (val) => {
-          set(
-            produce((draftState) => {
+          const [nextState, patches, inversePatches] = produceWithPatches(
+            get(),
+            (draftState) => {
               draftState.currentPerso.identite = val;
-            })
+            }
           );
+          get().historyRedo.push(...patches);
+          get().historyRedo.push(...inversePatches);
+
+          set(nextState);
         },
         setCurrentFaction: (val) => {
-          console.log(val);
           set(
             produce((draftState) => {
               draftState.currentPerso.faction = val;
@@ -234,16 +243,28 @@ export const useStore = create<{
           );
         },
         setCurrentGrade: (val) => {
-          set(
-            produce((draftState) => {
-              draftState.currentPerso.grade = val;
-            })
-          );
+          const newLocal = produce(get(), (draftState) => {
+            draftState.currentPerso.grade = val;
+          });
+          console.log(newLocal);
+          set(newLocal);
         },
         setCurrentSuperieur: (val) => {
+          const [nextState, patches, inversePatches] = produceWithPatches(
+            get(),
+            (draftState) => {
+              draftState.currentPerso.superieur = val;
+            }
+          );
+          console.log(inversePatches);
+          // get().historyUndo.push.apply(get().historyUndo, inversePatches));
+          // console.log(get().historyUndo);
+
+          set(nextState);
           set(
             produce((draftState) => {
-              draftState.currentPerso.superieur = val;
+              draftState.historyRedo.push(patches);
+              draftState.historyUndo.push(inversePatches);
             })
           );
         },
@@ -302,6 +323,13 @@ export const useStore = create<{
           set(
             produce((draftState) => {
               draftState.currentPerso.pouvoirs[pouvoirId] = val;
+            })
+          );
+        },
+        deleteCurrentPouvoir(pouvoirId) {
+          set(
+            produce((draftState) => {
+              delete draftState.currentPerso.pouvoirs[pouvoirId];
             })
           );
         },

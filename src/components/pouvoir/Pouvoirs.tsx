@@ -14,8 +14,10 @@ import {
   Table,
   Tooltip,
   Indicator,
+  ActionIcon,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { IconTrashX } from "@tabler/icons";
 import slugify from "slugify";
 
 const PaDepensecell = (props: {
@@ -71,6 +73,7 @@ export const Pouvoirs = (props: {}) => {
     (state) => state.setCurrentPouvoirPaDepense
   );
   const setCurrentPouvoir = useStore((state) => state.setCurrentPouvoir);
+  const deleteCurrentPouvoir = useStore((state) => state.deleteCurrentPouvoir);
 
   const form = useForm({
     initialValues: { nom: "", coutEnPP: "", coutEnPa: 0 },
@@ -104,6 +107,11 @@ export const Pouvoirs = (props: {}) => {
 
   const displayRows = Object.values(currentPouvoirs).map((row: Pouvoir) => (
     <tr key={row.id}>
+      <td>
+        <ActionIcon onClick={() => deleteCurrentPouvoir(row.id)}>
+          <IconTrashX size={16} />
+        </ActionIcon>
+      </td>
       <td>{row.nom}</td>
       <td>
         <PouvoirLevelCell pa_depense={row.pa_depense} coutEnPa={row.coutEnPa} />
@@ -134,6 +142,7 @@ export const Pouvoirs = (props: {}) => {
       <Table>
         <thead>
           <tr>
+            <th>Action</th>
             <th>Nom</th>
             <th>Niveau</th>
             <th>Coût en PP</th>
@@ -143,25 +152,7 @@ export const Pouvoirs = (props: {}) => {
         </thead>
         <tbody>{displayRows}</tbody>
       </Table>
-      {/* <DataTable
-        columns={[
-          { title: "Nom", accessor: "nom" },
-          {
-            title: "Niveau",
-            accessor: "noaccessor",
-            render: levelRenderer,
-          },
-          { title: "Coût en PP", accessor: "id" },
-          { title: "Coût en PP", accessor: "coutEnPP" },
-          { title: "Coût en PA", accessor: "coutEnPa" },
-          {
-            title: "PA dépensé",
-            accessor: "pa_depense",
-            render: paRenderer,
-          },
-        ]}
-        records={Object.values(currentPouvoirs)}
-      /> */}
+
       <Title order={4}>Nouveau pouvoir</Title>
       <form
         onSubmit={form.onSubmit((values) => {

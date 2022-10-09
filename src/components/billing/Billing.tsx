@@ -220,6 +220,17 @@ export const generateBillingItems = (
             });
           }
           break;
+        case "equipements":
+          if (diff.op === "add") {
+            const equipementId = diffPathElements[2];
+            const equipementName = currentPerso.equipements[equipementId].nom;
+            billingItems.push({
+              key: diff.path,
+              msg: equipementName,
+              cost: diff.value.coutEnPP,
+            });
+          }
+          break;
         case "pa":
           break;
         case "paTotal":

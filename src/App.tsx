@@ -3,6 +3,7 @@ import "./App.css";
 import { CreationLimitPanel } from "./components/CreationLimitPanel";
 import { BillingPanel } from "./components/billing/Billing";
 import { Caracteristiques } from "./components/caracteristiques/Caracteristiques";
+import { EquipementEtRessources } from "./components/equipementEtRessources/EquipementEtRessources";
 import { Generalites } from "./components/generalites/Generalites";
 import { LimitSliderThingy } from "./components/limitSliderThingy";
 import { PlayPanel } from "./components/playPanel/PlayPanel";
@@ -149,6 +150,8 @@ const FeuilleDePerso = (props: {}) => {
         <Talents />
         <Space h="md" />
         <Pouvoirs />
+        <Space h="md" />
+        <EquipementEtRessources />
       </>
     );
     aside = <MyAside />;

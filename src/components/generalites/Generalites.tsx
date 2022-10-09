@@ -4,7 +4,13 @@ import {
   SUPERIEURS_ANGES_AUTOCOMPLETE,
   SUPERIEURS_DEMONS_AUTOCOMPLETE,
 } from "../../utils/const/Superieurs";
-import { Autocomplete, Select, TextInput, Title } from "@mantine/core";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Select,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { NumberInput, Stack, Group } from "@mantine/core";
 
 const Superieur = (props: {}) => {
@@ -31,8 +37,9 @@ const Superieur = (props: {}) => {
       data={superieurs}
       label="Supérieur"
       limit={1000}
-      value={value}
-      onChange={(val: string) => setCurrentSuperieur(val)}
+      defaultValue={value}
+      // onChange={(val: string) => setCurrentSuperieur(val)}
+      onItemSubmit={(val: AutocompleteItem) => setCurrentSuperieur(val.value)}
     />
   );
 };

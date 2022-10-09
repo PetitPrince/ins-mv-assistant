@@ -1,6 +1,6 @@
 import { FACTIONS_NAMES } from "./Factions";
 import { PouvoirCollection } from "./Pouvoir";
-import {Talent, TalentCollection} from "../const/TalentStandard"
+import {TalentCollection} from "../const/TalentStandard"
 
 export interface Caracteristique {
   // niveau: number,
@@ -31,6 +31,15 @@ export interface Personnage {
     secondaires: TalentCollection;
     exotiques: TalentCollection;
   };
-
   pouvoirs: PouvoirCollection;
+  equipements: EquipementCollection;
+}
+
+export interface Equipement{
+  id: string;
+  nom: string;
+  coutEnPP: number;
+}
+export interface EquipementCollection {
+  [key: string]: Equipement;
 }

@@ -2,7 +2,7 @@ import { APPMODE } from "../APPMODE";
 import { BillingItem } from "../components/billing/Billing";
 import { CARACTERISTIQUE_NAMES } from "../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../utils/const/Factions";
-import { Personnage } from "../utils/const/Personnage";
+import { Equipement, Personnage } from "../utils/const/Personnage";
 import { Pouvoir } from "../utils/const/Pouvoir";
 import { Talent } from "../utils/const/TalentStandard";
 import produce, { Patch, produceWithPatches } from "immer";
@@ -44,6 +44,7 @@ const emptyPersoDict = {
     secondaires: {},
     exotiques: {},
   },
+  equipements: {},
   pouvoirs: {},
 };
 // export const emptyPerso = new Personnage(emptyPersoDict);
@@ -100,6 +101,8 @@ export const useStore = create<{
   setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
   setCurrentPouvoir: (pouvoirId: string, val: Pouvoir) => void;
   deleteCurrentPouvoir: (pouvoirId: string) => void;
+  setCurrentEquipement: (equipementId: string, val: Equipement) => void;
+  deleteCurrentEquipement: (equipementId: string) => void;
 }>()(
   persist(
     (set, get) => {
@@ -330,6 +333,20 @@ export const useStore = create<{
           set(
             produce((draftState) => {
               delete draftState.currentPerso.pouvoirs[pouvoirId];
+            })
+          );
+        },
+        setCurrentEquipement(equipementId, val) {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.equipements[equipementId] = val;
+            })
+          );
+        },
+        deleteCurrentEquipement(equipementId) {
+          set(
+            produce((draftState) => {
+              delete draftState.currentPerso.equipements[equipementId];
             })
           );
         },

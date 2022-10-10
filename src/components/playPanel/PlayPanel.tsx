@@ -113,8 +113,8 @@ export const PlayPanel = (props: {}) => {
             />
           </Stack>
           <PlayPouvoir currentPouvoirs={Object.values(perso.pouvoirs)} />
+          <PlayEquipment />
         </Group>
-        <PlayEquipment />
         <Notes />
       </Stack>
     </>

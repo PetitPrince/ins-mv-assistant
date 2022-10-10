@@ -1,5 +1,6 @@
 import { useStore } from "../../store/Store";
 import { Equipement } from "../../utils/const/Personnage";
+import { CollapsableWithTitle } from "../utils/CollapsableWithTitle";
 import {
   Stack,
   Title,
@@ -8,11 +9,9 @@ import {
   Button,
   Table,
   ActionIcon,
-  Collapse,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconChevronDown, IconChevronRight, IconTrashX } from "@tabler/icons";
-import { useState } from "react";
+import { IconTrashX } from "@tabler/icons";
 import slugify from "slugify";
 
 export const EquipementEtRessources = (props: {}) => {
@@ -23,12 +22,7 @@ export const EquipementEtRessources = (props: {}) => {
   const deleteCurrentEquipement = useStore(
     (state) => state.deleteCurrentEquipement
   );
-  const [newEquipmentPanelOpened, setNewEquipementPanelOpened] = useState(true);
-  const iconNewEquipementPanel = newEquipmentPanelOpened ? (
-    <IconChevronDown size={12} />
-  ) : (
-    <IconChevronRight size={12} />
-  );
+
   const form = useForm({
     initialValues: { nom: "", coutEnPa: 0 },
   });
@@ -63,10 +57,7 @@ export const EquipementEtRessources = (props: {}) => {
         <tbody>{displayRows}</tbody>
       </Table>
 
-      <Title order={4} onClick={() => setNewEquipementPanelOpened((o) => !o)}>
-        {iconNewEquipementPanel} Nouvel équipement / ressource
-      </Title>
-      <Collapse in={newEquipmentPanelOpened}>
+      <CollapsableWithTitle title="Nouvel équipement / ressource">
         <form
           onSubmit={form.onSubmit((values) => {
             const equipmentId = slugify(values.nom, { lower: true });
@@ -79,7 +70,7 @@ export const EquipementEtRessources = (props: {}) => {
           })}
         >
           {" "}
-          <Group>
+          <Group align="end">
             <TextInput
               label="Nom"
               placeholder="Nom"
@@ -90,14 +81,12 @@ export const EquipementEtRessources = (props: {}) => {
               label="Coût en PA"
               {...form.getInputProps("coutEnPa")}
             />
-
             <Button type="submit" mt="sm">
-              Nouvel équipement / ressource
+              Ajouter
             </Button>
           </Group>
-        </form>{" "}
-      </Collapse>
-      <Title order={4}></Title>
+        </form>
+      </CollapsableWithTitle>
     </Stack>
   );
 };

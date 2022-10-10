@@ -3,6 +3,7 @@ import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Pouvoir } from "../../utils/const/Pouvoir";
 import { calcPouvoirLevelFromPaDepense } from "../../utils/helper/getPouvoirLevel";
+import { CollapsableWithTitle } from "../utils/CollapsableWithTitle";
 import { PouvoirLevelCell } from "./PouvoirLevelCell";
 import {
   Stack,
@@ -153,44 +154,45 @@ export const Pouvoirs = (props: {}) => {
         <tbody>{displayRows}</tbody>
       </Table>
 
-      <Title order={4}>Nouveau pouvoir</Title>
-      <form
-        onSubmit={form.onSubmit((values) => {
-          const pouvoirId = slugify(values.nom, { lower: true });
-          const newPouvoir = {
-            id: pouvoirId,
-            nom: values.nom,
-            coutEnPP: values.coutEnPP,
-            coutEnPa: values.coutEnPa,
-            pa_depense: 0,
-          };
-          setCurrentPouvoir(pouvoirId, newPouvoir);
-        })}
-      >
-        {" "}
-        <Group>
-          <TextInput
-            label="Nom"
-            placeholder="Nom"
-            {...form.getInputProps("nom")}
-          />
-          <TextInput
-            mt="sm"
-            label="Coût en PP"
-            placeholder='"1/min", "3/utilisation", ... '
-            {...form.getInputProps("coutEnPP")}
-          />
-          <NumberInput
-            mt="sm"
-            label="Coût en PA"
-            placeholder="Coût en PA"
-            {...form.getInputProps("coutEnPa")}
-          />
-          <Button type="submit" mt="sm">
-            Nouveau pouvoir
-          </Button>
-        </Group>
-      </form>
+      <CollapsableWithTitle title="Nouveau pouvoir">
+        <form
+          onSubmit={form.onSubmit((values) => {
+            const pouvoirId = slugify(values.nom, { lower: true });
+            const newPouvoir = {
+              id: pouvoirId,
+              nom: values.nom,
+              coutEnPP: values.coutEnPP,
+              coutEnPa: values.coutEnPa,
+              pa_depense: 0,
+            };
+            setCurrentPouvoir(pouvoirId, newPouvoir);
+          })}
+        >
+          {" "}
+          <Group align="end">
+            <TextInput
+              label="Nom"
+              placeholder="Nom"
+              {...form.getInputProps("nom")}
+            />
+            <TextInput
+              mt="sm"
+              label="Coût en PP"
+              placeholder='"1/min", "3/utilisation", ... '
+              {...form.getInputProps("coutEnPP")}
+            />
+            <NumberInput
+              mt="sm"
+              label="Coût en PA"
+              placeholder="Coût en PA"
+              {...form.getInputProps("coutEnPa")}
+            />
+            <Button type="submit" mt="sm">
+              Ajouter
+            </Button>
+          </Group>
+        </form>
+      </CollapsableWithTitle>
     </Stack>
   );
 };

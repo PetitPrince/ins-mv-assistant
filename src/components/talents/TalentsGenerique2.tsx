@@ -12,6 +12,7 @@ import {
   findTalentInCollection,
   talentExistsInCollection,
 } from "../../utils/helper/talentHelpers";
+import { CollapsableWithTitle } from "../utils/CollapsableWithTitle";
 import { ActionsCell } from "./Tablecell/ActionsCell";
 import { CaraCell } from "./Tablecell/CaraCell";
 import { LevelCell } from "./Tablecell/LevelCell";
@@ -115,48 +116,47 @@ export const TalentsGenerique2 = (props: {
     event.preventDefault();
   };
   const exotiqueStuff = (
-    <form onSubmit={submitNewExoticTalent}>
-      <Title order={4}>Nouveau talent exotique</Title>
-      <Group>
-        <TextInput name="talentName" label="Nom" />
-        <Select
-          label="Spécialisation"
-          name="specialisation"
-          defaultValue={TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE}
-          data={[
-            {
-              value: TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE,
-              label: "Générique",
-            },
-            {
-              value: TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE,
-              label: "Spécifique",
-            },
-            {
-              value: TALENT_SPECIALISATION_TYPE_NAME.MULTIPLE,
-              label: "Multiple",
-            },
-          ]}
-        />
-        <Select
-          label="Caractéristique associée"
-          name="cara_associe"
-          defaultValue={CARACTERISTIQUE_NAMES.AUCUNE}
-          data={[
-            { value: CARACTERISTIQUE_NAMES.AUCUNE, label: "Aucune" },
-            { value: CARACTERISTIQUE_NAMES.FORCE, label: "Force" },
-            { value: CARACTERISTIQUE_NAMES.AGILITE, label: "Agilité" },
-            { value: CARACTERISTIQUE_NAMES.PERCEPTION, label: "Perception" },
-            { value: CARACTERISTIQUE_NAMES.VOLONTE, label: "Volonté" },
-            { value: CARACTERISTIQUE_NAMES.PRESENCE, label: "Présence" },
-            { value: CARACTERISTIQUE_NAMES.FOI, label: "Foi" },
-          ]}
-        />
-        <Button size="xs" type="submit">
-          Ajouter
-        </Button>
-      </Group>
-    </form>
+    <CollapsableWithTitle title="Nouveau talent exotique">
+      <form onSubmit={submitNewExoticTalent}>
+        <Group align="end">
+          <TextInput name="talentName" label="Nom" />
+          <Select
+            label="Spécialisation"
+            name="specialisation"
+            defaultValue={TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE}
+            data={[
+              {
+                value: TALENT_SPECIALISATION_TYPE_NAME.GENERIQUE,
+                label: "Générique",
+              },
+              {
+                value: TALENT_SPECIALISATION_TYPE_NAME.SPECIFIQUE,
+                label: "Spécifique",
+              },
+              {
+                value: TALENT_SPECIALISATION_TYPE_NAME.MULTIPLE,
+                label: "Multiple",
+              },
+            ]}
+          />
+          <Select
+            label="Caractéristique associée"
+            name="cara_associe"
+            defaultValue={CARACTERISTIQUE_NAMES.AUCUNE}
+            data={[
+              { value: CARACTERISTIQUE_NAMES.AUCUNE, label: "Aucune" },
+              { value: CARACTERISTIQUE_NAMES.FORCE, label: "Force" },
+              { value: CARACTERISTIQUE_NAMES.AGILITE, label: "Agilité" },
+              { value: CARACTERISTIQUE_NAMES.PERCEPTION, label: "Perception" },
+              { value: CARACTERISTIQUE_NAMES.VOLONTE, label: "Volonté" },
+              { value: CARACTERISTIQUE_NAMES.PRESENCE, label: "Présence" },
+              { value: CARACTERISTIQUE_NAMES.FOI, label: "Foi" },
+            ]}
+          />
+          <Button type="submit">Ajouter</Button>
+        </Group>
+      </form>
+    </CollapsableWithTitle>
   );
 
   const displayRows = rows.map((row: Talent) => {

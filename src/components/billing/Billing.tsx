@@ -1,21 +1,22 @@
 import { useStore } from "../../store/Store";
-import { Personnage } from "../../utils/const/Personnage";
+import { BillingActionIcons } from "./BillingActionIcons";
 import {
-  calcBillingItemSum,
-  prepareCostDisplay,
-  calcBillingItemsWithTalentDeductionLines,
-  BillingActionIcons,
   cancelAllBillingitems,
   commitAllBillingItems,
   deleteOneBillingItem,
   assessCostAndCommitOneBillingItem2,
 } from "./helper";
+import { calcBillingItemsWithTalentDeductionLines } from "./helper_deductionRelated";
+import {
+  calcBillingItemSum,
+  prepareCostDisplay,
+} from "./helper_generateBillingItems";
 import { ScrollArea, Table, Tooltip } from "@mantine/core";
 import { ActionIcon, Text } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import { IconChecks, IconTrashX } from "@tabler/icons";
-import { applyPatch, createPatch } from "rfc6902";
+import { createPatch } from "rfc6902";
 
 export interface BillingItem {
   key: string;
@@ -46,7 +47,7 @@ export const BillingPanel = (props: {}) => {
 
   const sum = calcBillingItemSum(billingItems);
 
-  const availablePa = currentPa - sum;
+  const currentRemainingPa = currentPa - sum;
 
   const deleteOneBillingLine = (key: string, billingMsg: string) => {
     // key looks lioke "/caracteristiques/volonte/pa_depense"
@@ -81,9 +82,9 @@ export const BillingPanel = (props: {}) => {
   const commitAllBillingLine = () => {
     // just get the talent extra points:
     commitAllBillingItems(
-      originalPerso,
+      billingItems,
       currentPerso,
-      availablePa,
+      currentRemainingPa,
       currentPa,
       setOriginalPerso,
       setCurrentPa,
@@ -189,7 +190,7 @@ export const BillingPanel = (props: {}) => {
       <Table>
         <tbody>
           <tr>
-            <td>{availablePa}</td>
+            <td>{currentRemainingPa}</td>
             <td> total</td>
             <td>
               {" "}

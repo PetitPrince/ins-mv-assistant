@@ -14,9 +14,9 @@ import {
 } from "../../utils/const/TalentStandard";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
+import { calcPPFromPaDepense } from "../caracteristiques/helper_calcPPFromPaDepense";
 import { EquipementEtRessources } from "../equipementEtRessources/EquipementEtRessources";
 import { PouvoirLevelCell } from "../pouvoir/PouvoirLevelCell";
-import { calcPPFromPaDepense } from "../status/Status";
 import { CaraCell } from "../talents/Tablecell/CaraCell";
 import { LevelCell } from "../talents/Tablecell/LevelCell";
 import { NameCell } from "../talents/Tablecell/NameCell";

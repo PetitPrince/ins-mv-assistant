@@ -3,7 +3,7 @@ import { useStore } from "../../store/Store";
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
-import { Blessures } from "../status/Blessures";
+import { Blessures } from "./Blessures";
 import { CaracteristiqueCard } from "./CaracteristiqueCard";
 import { calcPPFromPaDepense } from "./helper_calcPPFromPaDepense";
 import {
@@ -16,9 +16,12 @@ import {
   Center,
   NumberInput,
   Text,
+  TextInput,
+  useMantineTheme,
 } from "@mantine/core";
 
 export const Caracteristiques = (props: {}) => {
+  const theme = useMantineTheme();
   const { force, agilite, perception, volonte, presence, foi } = useStore(
     (state) => state.currentPerso.caracteristiques
   );
@@ -96,13 +99,13 @@ export const Caracteristiques = (props: {}) => {
   }
 
   const pfMax = force_niveau + volonte_niveau;
-
+  const pfComputationDisplay = force_niveau + " + " + volonte_niveau;
   return (
     <Stack>
       <Group sx={{ "align-items": "flex-end" }}>
         <Tooltip multiline label={creationLimitMsg} disabled={!isError}>
           <Indicator position="top-start" color="red" disabled={!isError}>
-            <Title order={2}>Caractéristiques</Title>
+            <Title order={2}>Caractéristiques et valeurs annexes</Title>
           </Indicator>
         </Tooltip>
       </Group>
@@ -166,8 +169,13 @@ export const Caracteristiques = (props: {}) => {
 
       <Group sx={{ "align-items": "flex-start" }}>
         <Stack>
-          <Title order={5}> PP</Title>
-          <Card shadow="sm" p="lg" radius="md" withBorder>
+          <Card
+            shadow="sm"
+            p="lg"
+            radius="md"
+            withBorder
+            sx={{ backgroundColor: theme.colors.blue[1] }}
+          >
             <Card.Section>
               <Center>
                 <Text size="xs">PP</Text>
@@ -186,10 +194,35 @@ export const Caracteristiques = (props: {}) => {
             />
           </Card>
         </Stack>
+        <Stack>
+          <Card
+            shadow="sm"
+            p="lg"
+            radius="md"
+            withBorder
+            sx={{ backgroundColor: theme.colors.red[1] }}
+          >
+            <Card.Section>
+              <Center>
+                <Text size="xs">PF</Text>
+              </Center>
+              <Center>
+                <Title>{pfMax}</Title>
+              </Center>
+            </Card.Section>
+            <TextInput
+              size="sm"
+              disabled
+              styles={{ input: { width: 75, textAlign: "center" } }}
+              label="PA dépensé"
+              value={pfComputationDisplay}
+              error={creationLimitMsg ? "  " : ""}
+            />
+          </Card>
+        </Stack>
 
         <Stack>
-          <Title order={5}> Seuils de blessures | PF Maxium {pfMax} </Title>
-
+          <Title order={5}> Seuils de blessures </Title>
           <Blessures force={force_niveau} faction={faction} />
         </Stack>
       </Group>

@@ -7,9 +7,9 @@ import {
 } from "../../utils/helper/getCaracteristiqueLevel";
 import { getPouvoirLevel } from "../../utils/helper/getPouvoirLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
-import { calcPPFromPaDepense } from "../status/Status";
 import { BillingItem } from "./Billing";
 import { Operation } from "rfc6902";
+import { calcPPFromPaDepense } from "../caracteristiques/helper_calcPPFromPaDepense";
 
 export const generateBillingItems = (
   differences: Operation[],

@@ -1,5 +1,5 @@
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
-import { Blessures } from "../status/Blessures";
+import { Blessures } from "../caracteristiques/Blessures";
 import { Stack, Title, Group, Slider, Container } from "@mantine/core";
 import { useState } from "react";
 

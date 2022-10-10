@@ -9,7 +9,6 @@ import { LimitSliderThingy } from "./components/limitSliderThingy";
 import { PlayPanel } from "./components/playPanel/PlayPanel";
 import { TUM } from "./components/playPanel/TUM";
 import { Pouvoirs } from "./components/pouvoir/Pouvoirs";
-import { Status } from "./components/status/Status";
 import { Talents } from "./components/talents/Talents";
 import logo from "./logo.png";
 import { emptyPerso, useStore } from "./store/Store";

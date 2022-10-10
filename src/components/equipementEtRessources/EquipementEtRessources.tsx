@@ -4,16 +4,15 @@ import {
   Stack,
   Title,
   Group,
-  NumberInput,
   TextInput,
   Button,
   Table,
-  Tooltip,
-  Indicator,
   ActionIcon,
+  Collapse,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconTrashX } from "@tabler/icons";
+import { IconChevronDown, IconChevronRight, IconTrashX } from "@tabler/icons";
+import { useState } from "react";
 import slugify from "slugify";
 
 export const EquipementEtRessources = (props: {}) => {
@@ -24,7 +23,12 @@ export const EquipementEtRessources = (props: {}) => {
   const deleteCurrentEquipement = useStore(
     (state) => state.deleteCurrentEquipement
   );
-
+  const [newEquipmentPanelOpened, setNewEquipementPanelOpened] = useState(true);
+  const iconNewEquipementPanel = newEquipmentPanelOpened ? (
+    <IconChevronDown size={12} />
+  ) : (
+    <IconChevronRight size={12} />
+  );
   const form = useForm({
     initialValues: { nom: "", coutEnPa: 0 },
   });
@@ -59,36 +63,41 @@ export const EquipementEtRessources = (props: {}) => {
         <tbody>{displayRows}</tbody>
       </Table>
 
-      <Title order={4}>Nouvel equipement / ressource</Title>
-      <form
-        onSubmit={form.onSubmit((values) => {
-          const equipmentId = slugify(values.nom, { lower: true });
-          const newEquipement = {
-            id: equipmentId,
-            nom: values.nom,
-            coutEnPa: values.coutEnPa,
-          };
-          setCurrentEquipement(equipmentId, newEquipement);
-        })}
-      >
-        {" "}
-        <Group>
-          <TextInput
-            label="Nom"
-            placeholder="Nom"
-            {...form.getInputProps("nom")}
-          />
-          <TextInput
-            mt="sm"
-            label="Coût en PA"
-            {...form.getInputProps("coutEnPa")}
-          />
+      <Title order={4} onClick={() => setNewEquipementPanelOpened((o) => !o)}>
+        {iconNewEquipementPanel} Nouvel équipement / ressource
+      </Title>
+      <Collapse in={newEquipmentPanelOpened}>
+        <form
+          onSubmit={form.onSubmit((values) => {
+            const equipmentId = slugify(values.nom, { lower: true });
+            const newEquipement = {
+              id: equipmentId,
+              nom: values.nom,
+              coutEnPa: values.coutEnPa,
+            };
+            setCurrentEquipement(equipmentId, newEquipement);
+          })}
+        >
+          {" "}
+          <Group>
+            <TextInput
+              label="Nom"
+              placeholder="Nom"
+              {...form.getInputProps("nom")}
+            />
+            <TextInput
+              mt="sm"
+              label="Coût en PA"
+              {...form.getInputProps("coutEnPa")}
+            />
 
-          <Button type="submit" mt="sm">
-            Nouvel equipement / ressource
-          </Button>
-        </Group>
-      </form>
+            <Button type="submit" mt="sm">
+              Nouvel équipement / ressource
+            </Button>
+          </Group>
+        </form>{" "}
+      </Collapse>
+      <Title order={4}></Title>
     </Stack>
   );
 };

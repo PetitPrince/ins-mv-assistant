@@ -1,5 +1,4 @@
 import { CARACTERISTIQUE_NAMES } from "../../utils/const/Caracteristiques_names";
-import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { INSMVCaraPaDepenseNumberInput } from "./INSMVCaraPaDepenseNumberInput";
 import { Title, Text, Card, Center } from "@mantine/core";
 
@@ -8,7 +7,6 @@ export const CaracteristiqueCard = (props: {
   caracNiveau: number;
   og_pa_depense: number;
   cara_pa_depense: number;
-  availablePa: number;
   setPaDepense: (val: number, cara: CARACTERISTIQUE_NAMES) => void;
   caraNameEnum: CARACTERISTIQUE_NAMES;
   currentGrade: number;
@@ -18,7 +16,6 @@ export const CaracteristiqueCard = (props: {
     caracNiveau,
     og_pa_depense,
     cara_pa_depense,
-    availablePa,
     setPaDepense,
     caraNameEnum,
     currentGrade,

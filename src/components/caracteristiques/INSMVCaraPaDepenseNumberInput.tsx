@@ -1,8 +1,6 @@
 import { NumberInput, NumberInputProps } from "@mantine/core";
 
 interface INSMVCaraNumberInputProps extends NumberInputProps {
-  // initialValue: number;
-  // availablePa: number;
   isModified: boolean;
   errorMsg: string;
 }

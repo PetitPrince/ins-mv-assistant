@@ -5,6 +5,7 @@ import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { Blessures } from "../status/Blessures";
 import { CaracteristiqueCard } from "./CaracteristiqueCard";
+import { calcPPFromPaDepense } from "./helper_calcPPFromPaDepense";
 import {
   Stack,
   Group,
@@ -29,7 +30,6 @@ export const Caracteristiques = (props: {}) => {
     presence: og_presence,
     foi: og_foi,
   } = useStore((state) => state.originalPerso.caracteristiques);
-  const availablePa = useStore((state) => state.paAfterBilling);
   const currentGrade = useStore((state) => state.currentPerso.grade);
   const faction = useStore((state) => state.currentPerso.faction);
   const appMode = useStore((state) => state.appMode);
@@ -43,21 +43,22 @@ export const Caracteristiques = (props: {}) => {
   const setCurrentPpPadepense = useStore(
     (state) => state.setCurrentPpPadepense
   );
+  const [
+    force_niveau,
+    agilite_niveau,
+    perception_niveau,
+    volonte_niveau,
+    presence_niveau,
+    foi_niveau,
+  ] = [
+    force.pa_depense,
+    agilite.pa_depense,
+    perception.pa_depense,
+    volonte.pa_depense,
+    presence.pa_depense,
+    foi.pa_depense,
+  ].map(calcCaracteristiqueLevelFromPaDepense);
 
-  const force_niveau = calcCaracteristiqueLevelFromPaDepense(force.pa_depense);
-  const agilite_niveau = calcCaracteristiqueLevelFromPaDepense(
-    agilite.pa_depense
-  );
-  const perception_niveau = calcCaracteristiqueLevelFromPaDepense(
-    perception.pa_depense
-  );
-  const volonte_niveau = calcCaracteristiqueLevelFromPaDepense(
-    volonte.pa_depense
-  );
-  const presence_niveau = calcCaracteristiqueLevelFromPaDepense(
-    presence.pa_depense
-  );
-  const foi_niveau = calcCaracteristiqueLevelFromPaDepense(foi.pa_depense);
   const ppMax = calcPPFromPaDepense(volonte_niveau, foi_niveau, pp_pa_depense);
 
   const sum =
@@ -70,13 +71,13 @@ export const Caracteristiques = (props: {}) => {
   let creationLimitMsg = "";
   let lowerLimit = 16;
   let upperLimit = 50;
-  let avgSpent = 33;
+  // let avgSpent = 33;
   let isError = false;
   if (appMode === APPMODE.CREATE) {
     if (faction === FACTIONS_NAMES.ANGES) {
       lowerLimit = 20;
       upperLimit = 50;
-      avgSpent = 40;
+      // avgSpent = 40;
       if (sum < lowerLimit || sum > upperLimit) {
         creationLimitMsg =
           "Les anges doivent dépenser entre 20 et 50 PA dans les caractéristiques (en moyenne 40).";
@@ -85,7 +86,7 @@ export const Caracteristiques = (props: {}) => {
     } else if (faction === FACTIONS_NAMES.DEMONS) {
       lowerLimit = 16;
       upperLimit = 40;
-      avgSpent = 24;
+      // avgSpent = 24;
       if (sum < lowerLimit || sum > upperLimit) {
         creationLimitMsg =
           "Les démons doivent dépenser entre 16 et 40 PA dans les caractéristiques (en moyenne 24).";
@@ -111,7 +112,6 @@ export const Caracteristiques = (props: {}) => {
           caracName="Force"
           caracNiveau={force_niveau}
           og_pa_depense={og_force.pa_depense}
-          availablePa={availablePa}
           cara_pa_depense={force.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.FORCE}
@@ -121,7 +121,6 @@ export const Caracteristiques = (props: {}) => {
           caracName="Agilité"
           caracNiveau={agilite_niveau}
           og_pa_depense={og_agilite.pa_depense}
-          availablePa={availablePa}
           cara_pa_depense={agilite.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.AGILITE}
@@ -131,7 +130,6 @@ export const Caracteristiques = (props: {}) => {
           caracName="Perception"
           caracNiveau={perception_niveau}
           og_pa_depense={og_perception.pa_depense}
-          availablePa={availablePa}
           cara_pa_depense={perception.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.PERCEPTION}
@@ -141,7 +139,6 @@ export const Caracteristiques = (props: {}) => {
           caracName="Volonté"
           caracNiveau={volonte_niveau}
           og_pa_depense={og_volonte.pa_depense}
-          availablePa={availablePa}
           cara_pa_depense={volonte.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.VOLONTE}
@@ -151,7 +148,6 @@ export const Caracteristiques = (props: {}) => {
           caracName="Présence"
           caracNiveau={presence_niveau}
           og_pa_depense={og_presence.pa_depense}
-          availablePa={availablePa}
           cara_pa_depense={presence.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.PRESENCE}
@@ -161,7 +157,6 @@ export const Caracteristiques = (props: {}) => {
           caracName="Foi"
           caracNiveau={foi_niveau}
           og_pa_depense={og_foi.pa_depense}
-          availablePa={availablePa}
           cara_pa_depense={foi.pa_depense}
           setPaDepense={setPaDepense}
           caraNameEnum={CARACTERISTIQUE_NAMES.FOI}
@@ -200,11 +195,4 @@ export const Caracteristiques = (props: {}) => {
       </Group>
     </Stack>
   );
-};
-export const calcPPFromPaDepense = (
-  volonte: number,
-  foi: number,
-  pa_depense: number
-) => {
-  return volonte + foi + pa_depense;
 };

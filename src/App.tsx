@@ -31,6 +31,7 @@ import {
 import { NumberInput, Stack, Text, Image } from "@mantine/core";
 import { SegmentedControl } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
+import { ModalsProvider } from "@mantine/modals";
 import { NotificationsProvider } from "@mantine/notifications";
 import { IconChevronDown, IconChevronRight } from "@tabler/icons";
 import { saveAs } from "file-saver";
@@ -198,7 +199,9 @@ const App = () => {
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <NotificationsProvider>
-        <FeuilleDePerso />
+        <ModalsProvider>
+          <FeuilleDePerso />
+        </ModalsProvider>
       </NotificationsProvider>
     </MantineProvider>
   );

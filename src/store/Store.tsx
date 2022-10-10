@@ -46,6 +46,7 @@ const emptyPersoDict = {
   },
   equipements: {},
   pouvoirs: {},
+  notes: "",
 };
 // export const emptyPerso = new Personnage(emptyPersoDict);
 export const emptyPerso = emptyPersoDict;
@@ -103,6 +104,7 @@ export const useStore = create<{
   deleteCurrentPouvoir: (pouvoirId: string) => void;
   setCurrentEquipement: (equipementId: string, val: Equipement) => void;
   deleteCurrentEquipement: (equipementId: string) => void;
+  setCurrentNotes: (data: string) => void;
 }>()(
   persist(
     (set, get) => {
@@ -347,6 +349,13 @@ export const useStore = create<{
           set(
             produce((draftState) => {
               delete draftState.currentPerso.equipements[equipementId];
+            })
+          );
+        },
+        setCurrentNotes: (val) => {
+          set(
+            produce((draftState) => {
+              draftState.currentPerso.notes = val;
             })
           );
         },

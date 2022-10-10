@@ -26,7 +26,7 @@ export const EquipementEtRessources = (props: {}) => {
   );
 
   const form = useForm({
-    initialValues: { nom: "", coutEnPP: 0 },
+    initialValues: { nom: "", coutEnPa: 0 },
   });
 
   const displayRows = Object.values(currentEquipements).map(
@@ -38,7 +38,7 @@ export const EquipementEtRessources = (props: {}) => {
           </ActionIcon>
         </td>
         <td>{row.nom}</td>
-        <td>{row.coutEnPP}</td>
+        <td>{row.coutEnPa}</td>
       </tr>
     )
   );
@@ -66,7 +66,7 @@ export const EquipementEtRessources = (props: {}) => {
           const newEquipement = {
             id: equipmentId,
             nom: values.nom,
-            coutEnPP: values.coutEnPP,
+            coutEnPa: values.coutEnPa,
           };
           setCurrentEquipement(equipmentId, newEquipement);
         })}
@@ -80,9 +80,8 @@ export const EquipementEtRessources = (props: {}) => {
           />
           <TextInput
             mt="sm"
-            label="Coût en PP"
-            placeholder='"1/min", "3/utilisation", ... '
-            {...form.getInputProps("coutEnPP")}
+            label="Coût en PA"
+            {...form.getInputProps("coutEnPa")}
           />
 
           <Button type="submit" mt="sm">

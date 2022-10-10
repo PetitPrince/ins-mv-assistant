@@ -1,6 +1,14 @@
 import { CaracteristiquesSet } from "../../utils/const/Personnage";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
-import { Title, Group, Text, Card, Center, Divider } from "@mantine/core";
+import {
+  Title,
+  Group,
+  Text,
+  Card,
+  Center,
+  Divider,
+  Stack,
+} from "@mantine/core";
 
 export const PlayCaracteristique = (props: { carac: CaracteristiquesSet }) => {
   const forceLvl = calcCaracteristiqueLevelFromPaDepense(
@@ -22,9 +30,9 @@ export const PlayCaracteristique = (props: { carac: CaracteristiquesSet }) => {
     props.carac.foi.pa_depense
   );
   return (
-    <>
+    <Stack>
       <Title order={2}>Caractéristiques</Title>
-      <Group>
+      <Group spacing="xs">
         <PlayCaracteristiqueCard caracName="Force" caracNiveau={forceLvl} />
         <PlayCaracteristiqueCard caracName="Agilité" caracNiveau={agiliteLvl} />
         <PlayCaracteristiqueCard
@@ -38,7 +46,7 @@ export const PlayCaracteristique = (props: { carac: CaracteristiquesSet }) => {
         />
         <PlayCaracteristiqueCard caracName="Foi" caracNiveau={foiLvl} />
       </Group>
-    </>
+    </Stack>
   );
 };
 const PlayCaracteristiqueCard = (props: {

@@ -33,12 +33,13 @@ export interface Personnage {
   };
   pouvoirs: PouvoirCollection;
   equipements: EquipementCollection;
+  notes: string;
 }
 
 export interface Equipement{
   id: string;
   nom: string;
-  coutEnPP: number;
+  coutEnPa: number;
 }
 export interface EquipementCollection {
   [key: string]: Equipement;

@@ -13,7 +13,7 @@ export const PlayStatus = (props: {
   const [pfSliderValue, setPfSliderValue] = useState(props.pfMax);
 
   return (
-    <>
+    <Stack>
       <Title order={2}>Status</Title>
       <Group>
         <Stack>
@@ -26,6 +26,7 @@ export const PlayStatus = (props: {
               thumbSize={20}
               size="xl"
               onChange={setPPSliderValue}
+              labelAlwaysOn
             />
           </Container>
           <Title order={4}>PF</Title>
@@ -38,11 +39,12 @@ export const PlayStatus = (props: {
               size="xl"
               marks={[{ value: 0, label: 0 }]}
               onChange={setPfSliderValue}
+              labelAlwaysOn
             />
           </Container>
         </Stack>
         <Blessures force={props.force} faction={props.faction} showMarkers />
       </Group>
-    </>
+    </Stack>
   );
 };

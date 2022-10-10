@@ -14,6 +14,7 @@ import {
 } from "../../utils/const/TalentStandard";
 import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCaracteristiqueLevel";
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
+import { EquipementEtRessources } from "../equipementEtRessources/EquipementEtRessources";
 import { PouvoirLevelCell } from "../pouvoir/PouvoirLevelCell";
 import { calcPPFromPaDepense } from "../status/Status";
 import { CaraCell } from "../talents/Tablecell/CaraCell";
@@ -32,7 +33,10 @@ import {
   NumberInput,
   Dialog,
   Table,
+  Textarea,
 } from "@mantine/core";
+import { RichTextEditor } from "@mantine/rte";
+import { useState } from "react";
 
 export const PlayPanel = (props: {}) => {
   const perso = useStore((state) => state.currentPerso);
@@ -67,24 +71,23 @@ export const PlayPanel = (props: {}) => {
   return (
     <>
       <Stack>
-        {/* <Button onClick={printFeed}>Print feedback</Button> */}
         <Group sx={{ "align-items": "flex-end" }}>
-          {/* <Group > */}
-          <Title order={1}>{perso.identite}</Title>
+          <Title order={1}>
+            {perso.identite ? perso.identite : "Personnage sans nom"}
+          </Title>
           <Text>
             {displayFaction} de {perso.superieur} de grade {perso.grade}
           </Text>
         </Group>
-        <PlayStatus
-          ppMax={ppMax}
-          pfMax={pfMax}
-          force={force}
-          faction={perso.faction}
-        />
-
-        <PlayCaracteristique carac={perso.caracteristiques} />
-
-        <PlayEquipment />
+        <Group sx={{ alignItems: "flex-start" }}>
+          <PlayStatus
+            ppMax={ppMax}
+            pfMax={pfMax}
+            force={force}
+            faction={perso.faction}
+          />
+          <PlayCaracteristique carac={perso.caracteristiques} />
+        </Group>
         <Group sx={{ "align-items": "flex-start" }}>
           <PlayTalentGenerique
             title={"Talents principaux"}
@@ -93,29 +96,55 @@ export const PlayPanel = (props: {}) => {
             currentPersoCara={perso.caracteristiques}
             currentPersoSuperieur={perso.superieur}
           />
-          <PlayTalentGenerique
-            title={"Talents secondaires"}
-            standardTalentCollection={TALENTS_SECONDAIRES_STANDARD_OBJ}
-            currentTalentCollection={perso.talents.secondaires}
-            currentPersoCara={perso.caracteristiques}
-            currentPersoSuperieur={perso.superieur}
-          />
-          <PlayTalentGenerique
-            title={"Talents exotique"}
-            standardTalentCollection={TALENTS_EXOTIQUES_STANDARD_OBJ}
-            currentTalentCollection={perso.talents.exotiques}
-            currentPersoCara={perso.caracteristiques}
-            currentPersoSuperieur={perso.superieur}
-          />
-        </Group>
-        <Group>
+          <Stack>
+            <PlayTalentGenerique
+              title={"Talents secondaires"}
+              standardTalentCollection={TALENTS_SECONDAIRES_STANDARD_OBJ}
+              currentTalentCollection={perso.talents.secondaires}
+              currentPersoCara={perso.caracteristiques}
+              currentPersoSuperieur={perso.superieur}
+            />
+            <PlayTalentGenerique
+              title={"Talents exotique"}
+              standardTalentCollection={TALENTS_EXOTIQUES_STANDARD_OBJ}
+              currentTalentCollection={perso.talents.exotiques}
+              currentPersoCara={perso.caracteristiques}
+              currentPersoSuperieur={perso.superieur}
+            />
+          </Stack>
           <PlayPouvoir currentPouvoirs={Object.values(perso.pouvoirs)} />
         </Group>
+        <PlayEquipment />
+        <Notes />
       </Stack>
     </>
   );
 };
-
+const Notes = (props: {}) => {
+  const notes = useStore((state) => state.currentPerso.notes);
+  const [value, onChange] = useState(notes);
+  const setCurrentNotes = useStore((state) => state.setCurrentNotes);
+  const onBlur = (something: any) => {
+    setCurrentNotes(value);
+  };
+  return (
+    <Stack>
+      <Title order={3}>Notes</Title>
+      <RichTextEditor
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        id="rte"
+        controls={[
+          ["bold", "italic", "underline", "link", "image"],
+          ["unorderedList", "orderedList", "h1", "h2", "h3"],
+          ["sup", "sub"],
+          ["alignLeft", "alignCenter", "alignRight"],
+        ]}
+      />
+    </Stack>
+  );
+};
 const PlayPouvoir = (props: { currentPouvoirs: Pouvoir[] }) => {
   const displayRows = Object.values(props.currentPouvoirs).map(
     (row: Pouvoir) => {
@@ -229,12 +258,7 @@ const PlayTalentGenerique = (props: {
 const PlayEquipment = (props: {}) => {
   return (
     <>
-      <Title order={2}>Équipement</Title>
-      <Group>
-        <NumberInput label="Précision" />
-        <NumberInput label="Puissance" />
-        <NumberInput label="Protection" />
-      </Group>
+      <EquipementEtRessources />
     </>
   );
 };

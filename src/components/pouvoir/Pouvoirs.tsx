@@ -2,9 +2,8 @@ import { APPMODE } from "../../APPMODE";
 import { useStore } from "../../store/Store";
 import { FACTIONS_NAMES } from "../../utils/const/Factions";
 import { Pouvoir } from "../../utils/const/Pouvoir";
-import { calcPouvoirLevelFromPaDepense } from "../../utils/helper/getPouvoirLevel";
 import { CollapsableWithTitle } from "../utils/CollapsableWithTitle";
-import { PouvoirLevelCell } from "./PouvoirLevelCell";
+import { PouvoirRow } from "./pouvoirRow/PouvoirRow";
 import {
   Stack,
   Title,
@@ -15,56 +14,9 @@ import {
   Table,
   Tooltip,
   Indicator,
-  ActionIcon,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconTrashX } from "@tabler/icons";
 import slugify from "slugify";
-
-const PaDepensecell = (props: {
-  pa_depense: number;
-  id: string;
-  faction: FACTIONS_NAMES;
-  coutEnPa: number;
-  setCurrentPouvoirPaDepense: (pouvoirId: string, val: number) => void;
-}) => {
-  const appmode = useStore((state) => state.appMode);
-  const computedLevel = calcPouvoirLevelFromPaDepense(
-    props.pa_depense,
-    props.coutEnPa
-  );
-  let errorMsgs = [];
-  if (computedLevel < 1) {
-    errorMsgs.push("Niveau minimum 1");
-  }
-  if (
-    appmode === APPMODE.CREATE &&
-    props.faction === FACTIONS_NAMES.ANGES &&
-    computedLevel > 2.5
-  ) {
-    errorMsgs.push("Niveau maximum à la création pour les anges 2.5");
-  }
-  if (
-    appmode === APPMODE.CREATE &&
-    props.faction === FACTIONS_NAMES.DEMONS &&
-    computedLevel > 2
-  ) {
-    errorMsgs.push("Niveau maximum à la création pour les démons 2");
-  }
-  const errorMsg = errorMsgs.join(" + ");
-
-  return (
-    <Group>
-      <NumberInput
-        value={props.pa_depense}
-        onChange={(val: number) => {
-          props.setCurrentPouvoirPaDepense(props.id, val);
-        }}
-        error={errorMsg}
-      />
-    </Group>
-  );
-};
 
 export const Pouvoirs = (props: {}) => {
   const appmode = useStore((state) => state.appMode);
@@ -79,7 +31,7 @@ export const Pouvoirs = (props: {}) => {
   const form = useForm({
     initialValues: { nom: "", coutEnPP: "", coutEnPa: 0 },
   });
-  const paDepensePouvoirs = Object.values(currentPouvoirs).reduce(
+  const sumPaDepensePouvoirs = Object.values(currentPouvoirs).reduce(
     (totalValue, currentValue) => {
       return totalValue + currentValue.pa_depense;
     },
@@ -90,7 +42,7 @@ export const Pouvoirs = (props: {}) => {
   if (
     appmode === APPMODE.CREATE &&
     faction === FACTIONS_NAMES.ANGES &&
-    (paDepensePouvoirs < 20 || paDepensePouvoirs > 35)
+    (sumPaDepensePouvoirs < 20 || sumPaDepensePouvoirs > 35)
   ) {
     errMsg =
       "Les anges doivent dépenser entre 20 et 35 PA dans les pouvoirs (en moyenne 24).";
@@ -98,38 +50,13 @@ export const Pouvoirs = (props: {}) => {
   if (
     appmode === APPMODE.CREATE &&
     faction === FACTIONS_NAMES.DEMONS &&
-    (paDepensePouvoirs < 20 || paDepensePouvoirs > 28)
+    (sumPaDepensePouvoirs < 20 || sumPaDepensePouvoirs > 28)
   ) {
     errMsg =
       "Les démons doivent dépenser entre 20 et 28 PA dans les pouvoirs (en moyenne 24).";
   }
 
   const isError = errMsg ? true : false;
-
-  const displayRows = Object.values(currentPouvoirs).map((row: Pouvoir) => (
-    <tr key={row.id}>
-      <td>
-        <ActionIcon onClick={() => deleteCurrentPouvoir(row.id)}>
-          <IconTrashX size={16} />
-        </ActionIcon>
-      </td>
-      <td>{row.nom}</td>
-      <td>
-        <PouvoirLevelCell pa_depense={row.pa_depense} coutEnPa={row.coutEnPa} />
-      </td>
-      <td>{row.coutEnPP}</td>
-      <td>{row.coutEnPa}</td>
-      <td>
-        <PaDepensecell
-          pa_depense={row.pa_depense}
-          id={row.id}
-          setCurrentPouvoirPaDepense={setCurrentPouvoirPaDepense}
-          faction={faction}
-          coutEnPa={row.coutEnPa}
-        />
-      </td>
-    </tr>
-  ));
 
   return (
     <Stack>
@@ -151,7 +78,16 @@ export const Pouvoirs = (props: {}) => {
             <th>PA depensé</th>
           </tr>
         </thead>
-        <tbody>{displayRows}</tbody>
+        <tbody>
+          {Object.values(currentPouvoirs).map((row: Pouvoir) => (
+            <PouvoirRow
+              row={row}
+              faction={faction}
+              deleteCurrentPouvoir={deleteCurrentPouvoir}
+              setCurrentPouvoirPaDepense={setCurrentPouvoirPaDepense}
+            />
+          ))}
+        </tbody>
       </Table>
 
       <CollapsableWithTitle title="Nouveau pouvoir">

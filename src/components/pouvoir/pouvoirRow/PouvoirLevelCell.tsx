@@ -1,4 +1,4 @@
-import { calcPouvoirLevelFromPaDepense } from "../../utils/helper/getPouvoirLevel";
+import { calcPouvoirLevelFromPaDepense } from "../../../utils/helper/getPouvoirLevel";
 import { Text } from "@mantine/core";
 
 export const PouvoirLevelCell = (props: {

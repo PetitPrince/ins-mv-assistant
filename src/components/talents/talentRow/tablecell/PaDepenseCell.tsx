@@ -1,9 +1,9 @@
-import { APPMODE } from "../../../APPMODE";
-import { useStore } from "../../../store/Store";
-import { FACTIONS_NAMES } from "../../../utils/const/Factions";
-import { CaracteristiquesSet } from "../../../utils/const/Personnage";
-import { Talent } from "../../../utils/const/TalentStandard";
-import { calcTalentLevelFromPaDepense } from "../../../utils/helper/getTalentLevel";
+import { APPMODE } from "../../../../APPMODE";
+import { useStore } from "../../../../store/Store";
+import { FACTIONS_NAMES } from "../../../../utils/const/Factions";
+import { CaracteristiquesSet } from "../../../../utils/const/Personnage";
+import { Talent } from "../../../../utils/const/TalentStandard";
+import { calcTalentLevelFromPaDepense } from "../../../../utils/helper/getTalentLevel";
 import { NumberInput } from "@mantine/core";
 
 export const PaDepenseCell = (props: {

@@ -1,6 +1,6 @@
-import { CaracteristiquesSet } from "../../../utils/const/Personnage";
-import { Talent } from "../../../utils/const/TalentStandard";
-import { calcTalentLevelFromPaDepense } from "../../../utils/helper/getTalentLevel";
+import { CaracteristiquesSet } from "../../../../utils/const/Personnage";
+import { Talent } from "../../../../utils/const/TalentStandard";
+import { calcTalentLevelFromPaDepense } from "../../../../utils/helper/getTalentLevel";
 import { Text } from "@mantine/core";
 
 export const NameCell = (props: {

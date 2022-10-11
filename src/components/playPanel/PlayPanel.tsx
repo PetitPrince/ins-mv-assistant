@@ -16,12 +16,11 @@ import { calcCaracteristiqueLevelFromPaDepense } from "../../utils/helper/getCar
 import { calcTalentLevelFromPaDepense } from "../../utils/helper/getTalentLevel";
 import { calcPPFromPaDepense } from "../caracteristiques/helper_calcPPFromPaDepense";
 import { EquipementEtRessources } from "../equipementEtRessources/EquipementEtRessources";
-import { PouvoirLevelCell } from "../pouvoir/PouvoirLevelCell";
-import { CaraCell } from "../talents/Tablecell/CaraCell";
-import { LevelCell } from "../talents/Tablecell/LevelCell";
-import { NameCell } from "../talents/Tablecell/NameCell";
+import { PouvoirLevelCell } from "../pouvoir/pouvoirRow/PouvoirLevelCell";
 import { alphaSort } from "../talents/alphaSort";
-import { findMatchingStandardTalentInCollection } from "../talents/findMatchingStandardTalentInCollection";
+import { CaraCell } from "../talents/talentRow/tablecell/CaraCell";
+import { LevelCell } from "../talents/talentRow/tablecell/LevelCell";
+import { NameCell } from "../talents/talentRow/tablecell/NameCell";
 import { PlayCaracteristique } from "./PlayCaracteristique";
 import { PlayStatus } from "./PlayStatus";
 import {

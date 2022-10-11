@@ -1,4 +1,4 @@
-import { CARACTERISTIQUE_NAMES } from "../../../utils/const/Caracteristiques_names";
+import { CARACTERISTIQUE_NAMES } from "../../../../utils/const/Caracteristiques_names";
 import { Text } from "@mantine/core";
 
 export const CaraCell = (props: { cara: CARACTERISTIQUE_NAMES }) => {

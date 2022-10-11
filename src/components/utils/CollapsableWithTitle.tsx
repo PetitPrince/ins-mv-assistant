@@ -1,4 +1,4 @@
-import { Title, Collapse, useMantineTheme } from "@mantine/core";
+import { Title, Collapse } from "@mantine/core";
 import { IconChevronDown, IconChevronRight } from "@tabler/icons";
 import { useState } from "react";
 

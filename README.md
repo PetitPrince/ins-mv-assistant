@@ -1,46 +1,38 @@
-# Getting Started with Create React App
+<p align="center">
+  <img src="public/logo-192.png" />
+</p>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# INS/MV Assistant
 
-## Available Scripts
+[Live version here](https://petitprince.github.io/ins-mv-assistant/).
 
-In the project directory, you can run:
+Offline-first assistant for the French pen-and-paper role playing game "In Nomine Satanis / Magna Veritas", 4th edition. The rest of the readme is French, because this is, after all, a French RPG
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+[Version en ligne ici](https://petitprince.github.io/ins-mv-assistant/).
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Assistant pour le jeu de rôle "In Nomine Satanis / Magna Veritas" (INS/MV), 4ème édition. Sauve les données seulement sur votre navigateur et/ou sur votre machine locale, au grand dam de Monseigneur Didier et Monseigneur Baalberith.
 
-### `npm test`
+## On peut faire quoi ? [features]
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Mode création: générer une fiche de personnage suivant les règles de la 4ème édition, avec un contrôle des restrictions de création (pas besoin de chercher sur trois chapitres différents les limites de PA)
+- Mode update: gérer l'évolution d'un personnage-joueur au fil d'une campagne
+- Mode aventure: avoir un accès rapide aux talents, caractéristiques, etc... accessibles par le personnage. Gestion des PF, PP pour éviter d'avoir une région dévastée par la gomme sur sa fiche de perso.
 
-### `npm run build`
+## J'aimerais bien faire ça dans le future [roadmap]
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Assistant de combat: calcul automatique des bonus de base; il ne resterait plus que jeter le d666 et communiuquer le résultat au MJ.
+- Création rapide personnage pour le MJ, en suivant des archetypes
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Pourquoi pas l'édition 3 et/ou l'édition Apéro ?
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Parce que notre groupe de joueurs avons commencé avec la 4ème édition, et migrer vers une autre version bousculerait trop nos habitudes. De plus, les règles tarabiscotées de la 4ème édition se prêtent bien à un exercice de programmation.
 
-### `npm run eject`
+## Tech stack
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [React](reactjs.org/) et Typescript parce que le but de l'exercice était d'apprendre React
+- [Create React App](https://create-react-app.dev/) parce qu'il faut bien commencer quelque part
+- [Mantine](https://mantine.dev/) pour des composants pas trop mal
+- [Zustand](https://github.com/pmndrs/zustand) comme Store
+- [Immer](https://github.com/immerjs/immer) pour simplifier l'écriture dans le Store

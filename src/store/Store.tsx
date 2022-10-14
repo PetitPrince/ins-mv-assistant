@@ -363,6 +363,7 @@ export const useStore = create<{
     },
     {
       name: "insmvassistantstorage",
+      version: 1,
     }
   )
 );

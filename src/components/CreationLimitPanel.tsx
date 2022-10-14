@@ -121,6 +121,7 @@ export const CreationLimitPanel = (props: {}) => {
     avgSpentPouvoirs = 24;
   }
   const isErrorPouvoirs = isTraitInRange(
+    // todo: use that to add color in the sliders
     sumPaDpensePouvoirs,
     lowerLimitPouvoirs,
     upperLimitPouvoirs

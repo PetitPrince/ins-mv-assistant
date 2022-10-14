@@ -1,7 +1,7 @@
 import {
   Talent,
   TalentCollection,
-} from "../../../../../utils/const/TalentStandard";
+} from "../../../../../../utils/const/TalentStandard";
 import { ActionIcon, Button, Popover, TextInput } from "@mantine/core";
 import { IconEdit } from "@tabler/icons";
 
